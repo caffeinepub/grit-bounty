@@ -1,0 +1,95 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-build-community-voting-interface-for-dispute-resolution-display-disputed-quest-details-both-parties-arguments-and-allow-logged-in-users-to-cast-votes-calculate-vote-weights-in-real-time-and-display-current-vote-distribution-publisher-30-admin-15-community-votes-55-show-voting-deadline-and-prevent-duplicate-votes-close-voting-when-total-votes-exceed-50-threshold-for-either-side",
+      "featureTitle": "Build community voting interface for dispute resolution. Display disputed quest details, both parties' arguments, and allow logged-in users to cast votes. Calculate vote weights in real-time and display current vote distribution (publisher 30%, admin 15%, community votes 55%). Show voting deadline and prevent duplicate votes. Close voting when total votes exceed 50% threshold for either side.",
+      "files": [
+        "frontend/src/components/DisputeVoting.tsx",
+        "frontend/src/components/MainApp.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-14"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-appeal-submission-interface-allowing-publishers-and-warriors-to-submit-written-dispute-reasoning-display-a-form-with-text-area-for-detailed-arguments-character-count-minimum-100-characters-and-evidence-attachment-capability-show-submission-status-and-timestamp-for-transparency",
+      "featureTitle": "Create appeal submission interface allowing publishers and warriors to submit written dispute reasoning. Display a form with text area for detailed arguments, character count (minimum 100 characters), and evidence attachment capability. Show submission status and timestamp for transparency.",
+      "files": [
+        "frontend/src/components/AppealSubmission.tsx",
+        "frontend/src/components/DisputeVoting.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-15"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-display-warrior-credit-score-and-current-deposit-rate-prominently-in-the-personal-center-tab-show-a-progress-indicator-visualizing-the-journey-from-50-to-2-deposit-rate-highlighting-successful-completions-and-remaining-tasks-to-reach-minimum-deposit-include-a-credit-history-section-showing-past-quest-outcomes-and-penalty-events",
+      "featureTitle": "Display warrior credit score and current deposit rate prominently in the Personal Center tab. Show a progress indicator visualizing the journey from 50% to 2% deposit rate, highlighting successful completions and remaining tasks to reach minimum deposit. Include a credit history section showing past quest outcomes and penalty events.",
+      "files": [
+        "frontend/src/components/CreditScoreDisplay.tsx",
+        "frontend/src/components/PersonalCenter.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/i18n/translations.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-17"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-quest-card-component-in-bounty-board-to-display-required-deposit-amount-in-icp-based-on-the-logged-in-warrior-s-current-credit-score-show-both-the-bounty-pool-amount-and-the-calculated-deposit-requirement-update-the-accept-challenge-button-to-trigger-deposit-collection-using-icp-ledger-integration-before-locking-the-contract",
+      "featureTitle": "Update Quest Card component in Bounty Board to display required deposit amount in ICP based on the logged-in warrior's current credit score. Show both the bounty pool amount and the calculated deposit requirement. Update the Accept Challenge button to trigger deposit collection using ICP Ledger integration before locking the contract.",
+      "files": [
+        "frontend/src/components/DepositConfirmationDialog.tsx",
+        "frontend/src/components/QuestCard.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/i18n/translations.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-18"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

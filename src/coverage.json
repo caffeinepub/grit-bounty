@@ -1,0 +1,155 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-22T10:35:22.399Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 10,
+    "implemented": 4,
+    "items": [
+      {
+        "id": "REQ-10",
+        "summary": "Implement dynamic deposit calculation system starting at 50% of the bounty pool. Track each warrior's successful quest completion count and reduce their deposit rate by 3% per successful completion until reaching a minimum of 2% (achievable after 16 successful completions). Store warrior credit scores in user profiles.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-11",
+        "summary": "Implement deposit penalty reset mechanism: when a warrior abandons a quest mid-way or loses a dispute vote, reset their deposit rate back to 50% and restart the credit accumulation cycle from zero. Update the user profile to reflect the penalty.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-12",
+        "summary": "Create automated reward distribution system with 6% platform fee deduction. When a quest completes successfully without disputes, automatically transfer 6% to the platform treasury, return the warrior's deposit to their account, and transfer 94% of the bounty pool to the warrior. Execute all transfers atomically within 24 hours if no objections are raised.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-13",
+        "summary": "Implement three-tier dispute resolution system. First tier (auto-release): if no party raises an objection within 24 hours of quest completion, automatically distribute funds. Second tier (first appeal): if either party disputes, enable weighted voting with publisher holding 30% weight, platform admin holding 15% weight, and community votes totaling 55% weight. Third tier (second appeal): require both parties to submit written reasoning, then wait 24 hours; if no further objections, release funds. Fourth tier (third appeal): grant platform admin 100% final decision authority.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-14",
+        "summary": "Build community voting interface for dispute resolution. Display disputed quest details, both parties' arguments, and allow logged-in users to cast votes. Calculate vote weights in real-time and display current vote distribution (publisher 30%, admin 15%, community votes 55%). Show voting deadline and prevent duplicate votes. Close voting when total votes exceed 50% threshold for either side.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/DisputeVoting.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/MainApp.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/DisputeVoting.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/MainApp.tsx"
+        ]
+      },
+      {
+        "id": "REQ-15",
+        "summary": "Create appeal submission interface allowing publishers and warriors to submit written dispute reasoning. Display a form with text area for detailed arguments, character count (minimum 100 characters), and evidence attachment capability. Show submission status and timestamp for transparency.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/AppealSubmission.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/DisputeVoting.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/AppealSubmission.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/DisputeVoting.tsx"
+        ]
+      },
+      {
+        "id": "REQ-16",
+        "summary": "Extend quest data model to include deposit amount, deposit rate, dispute status (none, first_appeal, second_appeal, third_appeal), voting records, appeal submissions, and auto-release timer. Add state machine to track quest lifecycle from creation through completion/dispute resolution to final payout.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-17",
+        "summary": "Display warrior credit score and current deposit rate prominently in the Personal Center tab. Show a progress indicator visualizing the journey from 50% to 2% deposit rate, highlighting successful completions and remaining tasks to reach minimum deposit. Include a credit history section showing past quest outcomes and penalty events.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/CreditScoreDisplay.tsx",
+          "frontend/src/components/PersonalCenter.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/i18n/translations.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/CreditScoreDisplay.tsx",
+          "frontend/src/components/PersonalCenter.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/i18n/translations.ts"
+        ]
+      },
+      {
+        "id": "REQ-18",
+        "summary": "Update Quest Card component in Bounty Board to display required deposit amount in ICP based on the logged-in warrior's current credit score. Show both the bounty pool amount and the calculated deposit requirement. Update the Accept Challenge button to trigger deposit collection using ICP Ledger integration before locking the contract.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/QuestCard.tsx",
+          "frontend/src/components/DepositConfirmationDialog.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/QuestCard.tsx",
+          "frontend/src/i18n/translations.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/QuestCard.tsx",
+          "frontend/src/components/DepositConfirmationDialog.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/QuestCard.tsx",
+          "frontend/src/i18n/translations.ts"
+        ]
+      },
+      {
+        "id": "REQ-9",
+        "summary": "Integrate ICP Ledger Canister to enable real ICP token transfers for all bounty deposits, rewards, and platform fees. Implement secure canister-to-canister calls to the ICP Ledger for deposit locking, reward distribution, and automated transfers.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      }
+    ]
+  },
+  "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "build-request.json",
+    "build-template/README.md",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/App.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/AppealSubmission.tsx",
+    "frontend/src/components/BountyBoard.tsx",
+    "frontend/src/components/CreditScoreDisplay.tsx",
+    "frontend/src/components/DepositConfirmationDialog.tsx",
+    "frontend/src/components/DisputeVoting.tsx",
+    "frontend/src/components/LanguageSelection.tsx",
+    "frontend/src/components/LaunchMission.tsx",
+    "frontend/src/components/MainApp.tsx",
+    "frontend/src/components/PersonalCenter.tsx",
+    "frontend/src/components/QuestCard.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useLanguage.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/i18n/translations.ts",
+    "frontend/src/types.ts",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --radius: 0.5rem;
+        
+        /* High-tech dark theme colors */
+        --background: 0.12 0 0;
+        --foreground: 0.98 0 0;
+        --card: 0.16 0 0;
+        --card-foreground: 0.98 0 0;
+        --popover: 0.18 0 0;
+        --popover-foreground: 0.98 0 0;
+        --primary: 0.75 0.15 195;
+        --primary-foreground: 0.05 0 0;
+        --secondary: 0.22 0 0;
+        --secondary-foreground: 0.98 0 0;
+        --muted: 0.25 0 0;
+        --muted-foreground: 0.65 0 0;
+        --accent: 0.28 0 0;
+        --accent-foreground: 0.98 0 0;
+        --destructive: 0.65 0.22 25;
+        --destructive-foreground: 0.98 0 0;
+        --border: 0.3 0 0;
+        --input: 0.25 0 0;
+        --ring: 0.75 0.15 195;
+        
+        /* Neon accent colors */
+        --neon-cyan: 0.75 0.15 195;
+        --neon-magenta: 0.65 0.25 330;
+        --neon-blue: 0.70 0.18 250;
+        
+        --chart-1: 0.75 0.15 195;
+        --chart-2: 0.70 0.18 250;
+        --chart-3: 0.65 0.25 330;
+        --chart-4: 0.68 0.20 140;
+        --chart-5: 0.72 0.22 40;
+    }
+
+    .dark {
+        --background: 0.08 0 0;
+        --foreground: 0.98 0 0;
+        --card: 0.12 0 0;
+        --card-foreground: 0.98 0 0;
+        --popover: 0.14 0 0;
+        --popover-foreground: 0.98 0 0;
+        --primary: 0.75 0.15 195;
+        --primary-foreground: 0.05 0 0;
+        --secondary: 0.18 0 0;
+        --secondary-foreground: 0.98 0 0;
+        --muted: 0.20 0 0;
+        --muted-foreground: 0.60 0 0;
+        --accent: 0.24 0 0;
+        --accent-foreground: 0.98 0 0;
+        --destructive: 0.65 0.22 25;
+        --destructive-foreground: 0.98 0 0;
+        --border: 0.25 0 0;
+        --input: 0.20 0 0;
+        --ring: 0.75 0.15 195;
+    }
+
+    * {
+        @apply border-border;
+    }
+    
+    body {
+        @apply bg-background text-foreground;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Orbitron', 'Inter', sans-serif;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+}
+
+@layer utilities {
+    .text-neon-cyan {
+        color: oklch(var(--neon-cyan));
+    }
+    
+    .text-neon-magenta {
+        color: oklch(var(--neon-magenta));
+    }
+    
+    .text-neon-blue {
+        color: oklch(var(--neon-blue));
+    }
+    
+    .bg-neon-cyan {
+        background-color: oklch(var(--neon-cyan));
+    }
+    
+    .bg-neon-magenta {
+        background-color: oklch(var(--neon-magenta));
+    }
+    
+    .bg-neon-blue {
+        background-color: oklch(var(--neon-blue));
+    }
+    
+    .border-neon-cyan {
+        border-color: oklch(var(--neon-cyan));
+    }
+    
+    .border-neon-magenta {
+        border-color: oklch(var(--neon-magenta));
+    }
+    
+    .border-neon-blue {
+        border-color: oklch(var(--neon-blue));
+    }
+    
+    .shadow-neon-cyan {
+        box-shadow: 0 0 20px oklch(var(--neon-cyan) / 0.5);
+    }
+    
+    .shadow-neon-magenta {
+        box-shadow: 0 0 20px oklch(var(--neon-magenta) / 0.5);
+    }
+    
+    .shadow-neon-blue {
+        box-shadow: 0 0 20px oklch(var(--neon-blue) / 0.5);
+    }
+}

@@ -1,0 +1,100 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-22T10:35:22.396Z",
+  "summary": "The diff implements foundational user profile management with credit score and deposit tracking in the backend, plus frontend UI components for deposit confirmation, dispute voting, and appeal submission. However, critical backend logic is missing: no ICP Ledger integration, no quest data model, no automated reward distribution, no dispute resolution system, and no state machine. Most frontend components are placeholders awaiting backend implementation.",
+  "missing_requirements": [
+    {
+      "id": "REQ-9",
+      "requirement": "Integrate ICP Ledger Canister to enable real ICP token transfers for all bounty deposits, rewards, and platform fees",
+      "reason": "No ICP Ledger integration code found in backend. No canister-to-canister calls, no e8s conversion logic for actual transfers, no deposit locking mechanism on-chain",
+      "evidence": [
+        "backend/main.mo",
+        "frontend/src/components/DepositConfirmationDialog.tsx"
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "requirement": "Create automated reward distribution system with 6% platform fee deduction and atomic transfers",
+      "reason": "No backend implementation for 24-hour auto-release timer, no platform fee calculation, no atomic transfer logic, no reward distribution system",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-13",
+      "requirement": "Implement three-tier dispute resolution system with weighted voting and appeal tiers",
+      "reason": "Backend has no dispute resolution logic, no voting system, no weighted vote calculations, no appeal tier tracking, no auto-release timer implementation",
+      "evidence": [
+        "backend/main.mo",
+        "frontend/src/components/DisputeVoting.tsx"
+      ]
+    },
+    {
+      "id": "REQ-16",
+      "requirement": "Extend quest data model to include deposit amount, dispute status, voting records, appeal submissions, and auto-release timer with state machine",
+      "reason": "Backend has no quest data model at all. No quest creation, tracking, or state machine implementation found",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-14",
+      "requirement": "Build community voting interface for dispute resolution with real-time vote weights and duplicate vote prevention",
+      "reason": "Frontend DisputeVoting component is a placeholder with hardcoded data. No backend voting logic, no duplicate vote prevention, no vote weight calculation",
+      "evidence": [
+        "frontend/src/components/DisputeVoting.tsx",
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-15",
+      "requirement": "Create appeal submission interface with 100-character minimum and evidence attachment capability",
+      "reason": "Frontend AppealSubmission component has no backend integration. Form exists but submissions are not stored or processed",
+      "evidence": [
+        "frontend/src/components/AppealSubmission.tsx",
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-18",
+      "requirement": "Update Quest Card component to display required deposit and trigger ICP Ledger deposit collection before locking contract",
+      "reason": "QuestCard shows calculated deposit but has no actual ICP transfer implementation. DepositConfirmationDialog has placeholder logic only",
+      "evidence": [
+        "frontend/src/components/QuestCard.tsx",
+        "frontend/src/components/DepositConfirmationDialog.tsx"
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "requirement": "Implement deposit penalty reset mechanism for quest abandonment or dispute loss",
+      "reason": "Backend has no logic to detect quest abandonment, no dispute outcome tracking, no penalty reset mechanism",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    }
+  ],
+  "hallucinated_features": [],
+  "confidence": 0.92,
+  "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/App.tsx",
+    "frontend/src/components/AppealSubmission.tsx",
+    "frontend/src/components/BountyBoard.tsx",
+    "frontend/src/components/CreditScoreDisplay.tsx",
+    "frontend/src/components/DepositConfirmationDialog.tsx",
+    "frontend/src/components/DisputeVoting.tsx",
+    "frontend/src/components/LanguageSelection.tsx",
+    "frontend/src/components/LaunchMission.tsx",
+    "frontend/src/components/MainApp.tsx",
+    "frontend/src/components/PersonalCenter.tsx",
+    "frontend/src/components/QuestCard.tsx",
+    "frontend/src/hooks/useLanguage.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/i18n/translations.ts",
+    "frontend/src/types.ts",
+    "project_state.json"
+  ]
+}

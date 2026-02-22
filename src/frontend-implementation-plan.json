@@ -1,0 +1,135 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "ICP Financial Payment System Frontend - Dispute Resolution, Credit Display, and Deposit UI",
+  "requirements": [
+    {
+      "id": "REQ-14",
+      "summary": "Build community voting interface for dispute resolution with real-time weighted vote calculation and duplicate vote prevention",
+      "acceptanceCriteria": [
+        "Voting interface displays quest details and dispute context",
+        "Users can view both publisher and warrior arguments",
+        "Real-time vote count shows weighted percentages",
+        "Each user can vote only once per dispute",
+        "Voting closes when either side reaches >50% total weight",
+        "Results are displayed immediately after voting closes"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/DisputeVoting.tsx",
+          "operation": "create",
+          "description": "Create component displaying disputed quest details, both parties' arguments, vote casting interface, and real-time weighted vote distribution (publisher 30%, admin 15%, community 55%). Include voting deadline countdown, prevent duplicate votes, and auto-close when either side exceeds 50% threshold. Use the authorization component to verify user authentication before allowing votes."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add React Query hooks for fetching disputed quests, casting votes, and subscribing to vote updates. Include hooks: useDisputedQuests(), useCastVote(), useDisputeVoteResults(disputeId). Ensure proper error handling for unauthorized votes and duplicate vote attempts."
+        },
+        {
+          "path": "frontend/src/components/MainApp.tsx",
+          "operation": "modify",
+          "description": "Add a fourth tab 'Dispute Resolution' to the existing three-tab layout (Bounty Board, Launch Mission, Personal Center). Wire the DisputeVoting component into this new tab. Update localStorage persistence to include the new tab option."
+        }
+      ]
+    },
+    {
+      "id": "REQ-15",
+      "summary": "Create appeal submission interface for publishers and warriors to submit written dispute reasoning with character validation and evidence attachment",
+      "acceptanceCriteria": [
+        "Form allows both parties to submit dispute reasoning text",
+        "Minimum 100 character requirement enforced",
+        "Submission includes timestamp and party identifier",
+        "Users can view their own and opponent's submissions",
+        "Interface shows current appeal tier and next steps"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AppealSubmission.tsx",
+          "operation": "create",
+          "description": "Create form component with textarea for detailed dispute arguments, character counter enforcing minimum 100 characters, and evidence attachment capability using the blob-storage component. Display submission status, timestamp, current appeal tier indicator, and next steps. Show both parties' submissions when available. Use the authorization component to verify user is either the publisher or warrior before allowing submission."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add React Query hooks for submitting appeals and fetching appeal history. Include hooks: useSubmitAppeal(disputeId), useAppealHistory(disputeId). Handle file upload progress tracking when evidence attachments are included."
+        },
+        {
+          "path": "frontend/src/components/DisputeVoting.tsx",
+          "operation": "modify",
+          "description": "Integrate AppealSubmission component into the voting interface. Show appeal submission button for authorized parties and display submitted appeals within the dispute context. Add conditional rendering based on current appeal tier."
+        }
+      ]
+    },
+    {
+      "id": "REQ-17",
+      "summary": "Display warrior credit score and deposit rate in Personal Center with progress visualization and credit history",
+      "acceptanceCriteria": [
+        "Personal Center displays current deposit rate percentage",
+        "Progress bar shows path from 50% to 2% with current position",
+        "Credit history lists successful completions with timestamps",
+        "Penalty events (abandonments, lost disputes) are clearly marked",
+        "Estimated tasks remaining to reach 2% minimum is calculated and shown"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/CreditScoreDisplay.tsx",
+          "operation": "create",
+          "description": "Create component displaying current deposit rate percentage with prominent styling, progress bar visualizing journey from 50% to 2% (highlighting current position), successful completion count, and estimated quests remaining to reach 2% minimum. Calculate remaining tasks as: Math.ceil((currentRate - 2) / 3). Include credit history section showing past quest outcomes with timestamps and penalty events marked with warning icons."
+        },
+        {
+          "path": "frontend/src/components/PersonalCenter.tsx",
+          "operation": "modify",
+          "description": "Add CreditScoreDisplay component at the top of Personal Center above the existing tabs. Fetch user profile data using existing useGetCallerUserProfile hook to populate credit score, deposit rate, and successful quest count. Ensure responsive layout on mobile devices."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add React Query hook useCreditHistory() to fetch detailed credit events (successful completions, penalties, deposit rate changes) with timestamps. Return array of credit events sorted by date descending."
+        },
+        {
+          "path": "frontend/src/i18n/translations.ts",
+          "operation": "modify",
+          "description": "Add translation keys for credit score section: depositRate, creditScore, successfulQuests, questsToMinimum, creditHistory, penaltyEvent, completedQuest. Include translations in both English and Simplified Chinese."
+        }
+      ]
+    },
+    {
+      "id": "REQ-18",
+      "summary": "Update Quest Card to display personalized deposit amounts and trigger ICP deposit collection on quest acceptance",
+      "acceptanceCriteria": [
+        "Quest cards show calculated deposit amount based on warrior's rate",
+        "Accept button displays required deposit in ICP",
+        "Clicking Accept triggers ICP transfer confirmation dialog",
+        "Successful deposit locks the quest and updates UI state",
+        "Failed deposits show error messages without locking quest"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/QuestCard.tsx",
+          "operation": "modify",
+          "description": "Add deposit amount calculation and display below reward pool. Calculate deposit as: (rewardPool * userDepositRate / 100). Show both bounty pool and required deposit in ICP with clear labels. Update Accept Challenge button to show 'Accept & Pay X ICP Deposit' text. Add loading state during deposit transaction. Use existing useAcceptQuest hook but extend it to handle deposit transfer before quest acceptance."
+        },
+        {
+          "path": "frontend/src/components/DepositConfirmationDialog.tsx",
+          "operation": "create",
+          "description": "Create modal dialog component showing deposit transaction summary (quest title, reward pool, deposit amount, user's current deposit rate). Include confirmation button to proceed with ICP transfer and cancel button. Display transaction progress during transfer and success/error states. Close dialog automatically on successful deposit and quest lock."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Extend useAcceptQuest hook to handle two-step process: (1) initiate ICP deposit transfer to backend, (2) lock quest contract upon successful deposit. Add error handling for insufficient balance, transfer failures, and partial transactions. Return deposit transaction status and error messages."
+        },
+        {
+          "path": "frontend/src/components/QuestCard.tsx",
+          "operation": "modify",
+          "description": "Wire DepositConfirmationDialog to Accept Challenge button click. Pass quest details and calculated deposit amount as props. Handle dialog open/close state and trigger deposit flow on confirmation. Show toast notifications for successful deposits or transfer errors."
+        },
+        {
+          "path": "frontend/src/i18n/translations.ts",
+          "operation": "modify",
+          "description": "Add translation keys for deposit UI: depositRequired, depositAmount, confirmDeposit, depositInProgress, depositSuccess, depositFailed, insufficientBalance, acceptAndPayDeposit. Include translations in both English and Simplified Chinese."
+        }
+      ]
+    }
+  ]
+}
