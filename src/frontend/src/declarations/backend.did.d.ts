@@ -10,6 +10,11 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface BountyContribution {
+  'contributorId' : Principal,
+  'amountE8' : bigint,
+  'timestamp' : bigint,
+}
 export interface CheckInRecord {
   'photoUrl' : [] | [string],
   'dayNumber' : bigint,
@@ -23,20 +28,21 @@ export interface QuestImmutable {
   'status' : QuestStatus,
   'completedAt' : [] | [bigint],
   'depositAmount' : bigint,
+  'reward' : bigint,
   'title' : string,
   'hypeCount' : bigint,
   'difficulty' : Difficulty,
   'createdAt' : bigint,
+  'bountyContributions' : Array<BountyContribution>,
   'publisherId' : Principal,
   'dailyCheckIns' : Array<CheckInRecord>,
   'description' : string,
-  'crowdfundingContributions' : Array<[Principal, bigint]>,
-  'rewardPool' : bigint,
   'warriorId' : [] | [Principal],
   'questId' : bigint,
   'participantCount' : bigint,
   'completionTarget' : bigint,
   'acceptedAt' : [] | [bigint],
+  'originalBountyAmountE8' : bigint,
   'currentStreak' : bigint,
   'depositRate' : bigint,
 }
@@ -61,7 +67,8 @@ export type TransactionStatus = { 'pending' : null } |
 export type TransactionType = { 'deposit' : null } |
   { 'withdrawal' : null } |
   { 'taskPayment' : null } |
-  { 'taskDeduction' : null };
+  { 'taskDeduction' : null } |
+  { 'bountyContribution' : null };
 export interface UserProfile {
   'name' : string,
   'totalEarned' : bigint,
@@ -102,7 +109,7 @@ export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'abandonQuest' : ActorMethod<[bigint], undefined>,
   'acceptQuest' : ActorMethod<[bigint], undefined>,
-  'addToPot' : ActorMethod<[bigint, bigint], undefined>,
+  'addToBounty' : ActorMethod<[bigint, bigint], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'createABQuest' : ActorMethod<
     [string, string, string, string, bigint, Difficulty, [] | [bigint]],

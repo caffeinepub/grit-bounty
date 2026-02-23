@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
 import { useGetCallerUserProfile, useGetMyPostedBounties, useGetMyAcceptedQuests } from '../hooks/useQueries';
-import { QuestStatus } from '../backend';
+import { QuestStatus, QuestImmutable } from '../backend';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { Loader2, Trophy, Target, Camera, Eye, Trash2, LogOut, AlertTriangle, XCircle, Wallet } from 'lucide-react';
+import { Loader2, Trophy, Target, Camera, Eye, Trash2, LogOut, AlertTriangle, XCircle } from 'lucide-react';
 import CreditScoreDisplay from './CreditScoreDisplay';
 import DailyCheckIn from './DailyCheckIn';
 import VisualComparison from './VisualComparison';
@@ -25,10 +25,14 @@ export default function PersonalCenter() {
 
   const [checkInQuestId, setCheckInQuestId] = useState<bigint | null>(null);
   const [viewProgressQuestId, setViewProgressQuestId] = useState<bigint | null>(null);
-  const [deleteQuestId, setDeleteQuestId] = useState<bigint | null>(null);
-  const [exitQuestId, setExitQuestId] = useState<bigint | null>(null);
-  const [abandonQuestId, setAbandonQuestId] = useState<bigint | null>(null);
-  const [cancelQuestId, setCancelQuestId] = useState<bigint | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedDeleteQuest, setSelectedDeleteQuest] = useState<QuestImmutable | null>(null);
+  const [exitDialogOpen, setExitDialogOpen] = useState(false);
+  const [selectedExitQuest, setSelectedExitQuest] = useState<QuestImmutable | null>(null);
+  const [abandonDialogOpen, setAbandonDialogOpen] = useState(false);
+  const [selectedAbandonQuest, setSelectedAbandonQuest] = useState<QuestImmutable | null>(null);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [selectedCancelQuest, setSelectedCancelQuest] = useState<QuestImmutable | null>(null);
 
   const getStatusColor = (status: QuestStatus) => {
     switch (status) {
@@ -83,29 +87,57 @@ export default function PersonalCenter() {
 
   const checkInQuest = acceptedQuests.find((q) => q.questId === checkInQuestId);
   const viewProgressQuest = acceptedQuests.find((q) => q.questId === viewProgressQuestId);
-  const deleteQuest = postedBounties.find((q) => q.questId === deleteQuestId);
-  const exitQuest = postedBounties.find((q) => q.questId === exitQuestId);
-  const abandonQuest = acceptedQuests.find((q) => q.questId === abandonQuestId);
-  const cancelQuest = postedBounties.find((q) => q.questId === cancelQuestId);
 
-  const handleDeleteClick = (questId: bigint) => {
-    console.log('[PersonalCenter] Delete button clicked for questId:', questId.toString());
-    setDeleteQuestId(questId);
+  const handleDeleteClick = (quest: QuestImmutable) => {
+    console.log('[PersonalCenter] Delete button clicked for questId:', quest.questId.toString());
+    setSelectedDeleteQuest(quest);
+    setDeleteDialogOpen(true);
   };
 
-  const handleExitClick = (questId: bigint) => {
-    console.log('[PersonalCenter] Exit button clicked for questId:', questId.toString());
-    setExitQuestId(questId);
+  const handleExitClick = (quest: QuestImmutable) => {
+    console.log('[PersonalCenter] Exit button clicked for questId:', quest.questId.toString());
+    setSelectedExitQuest(quest);
+    setExitDialogOpen(true);
   };
 
-  const handleAbandonClick = (questId: bigint) => {
-    console.log('[PersonalCenter] Abandon button clicked for questId:', questId.toString());
-    setAbandonQuestId(questId);
+  const handleAbandonClick = (quest: QuestImmutable) => {
+    console.log('[PersonalCenter] Abandon button clicked for questId:', quest.questId.toString());
+    setSelectedAbandonQuest(quest);
+    setAbandonDialogOpen(true);
   };
 
-  const handleCancelClick = (questId: bigint) => {
-    console.log('[PersonalCenter] Cancel button clicked for questId:', questId.toString());
-    setCancelQuestId(questId);
+  const handleCancelClick = (quest: QuestImmutable) => {
+    console.log('[PersonalCenter] Cancel button clicked for questId:', quest.questId.toString());
+    setSelectedCancelQuest(quest);
+    setCancelDialogOpen(true);
+  };
+
+  const handleDeleteDialogClose = (open: boolean) => {
+    setDeleteDialogOpen(open);
+    if (!open) {
+      setSelectedDeleteQuest(null);
+    }
+  };
+
+  const handleExitDialogClose = (open: boolean) => {
+    setExitDialogOpen(open);
+    if (!open) {
+      setSelectedExitQuest(null);
+    }
+  };
+
+  const handleAbandonDialogClose = (open: boolean) => {
+    setAbandonDialogOpen(open);
+    if (!open) {
+      setSelectedAbandonQuest(null);
+    }
+  };
+
+  const handleCancelDialogClose = (open: boolean) => {
+    setCancelDialogOpen(open);
+    if (!open) {
+      setSelectedCancelQuest(null);
+    }
   };
 
   return (
@@ -147,7 +179,7 @@ export default function PersonalCenter() {
             <div className="grid gap-6 md:grid-cols-2">
               {acceptedQuests.map((quest) => {
                 const progressPercentage = (quest.dailyCheckIns.length / Number(quest.completionTarget)) * 100;
-                const rewardPoolICP = Number(quest.rewardPool) / 100000000;
+                const rewardPoolICP = Number(quest.reward) / 100000000;
                 const depositAmountICP = Number(quest.depositAmount) / 100000000;
 
                 return (
@@ -219,7 +251,7 @@ export default function PersonalCenter() {
                             )}
                           </div>
                           <Button
-                            onClick={() => handleAbandonClick(quest.questId)}
+                            onClick={() => handleAbandonClick(quest)}
                             variant="destructive"
                             size="sm"
                             className="w-full"
@@ -229,27 +261,14 @@ export default function PersonalCenter() {
                           </Button>
                         </div>
                       )}
-
-                      {(quest.status === QuestStatus.pendingVerification || quest.status === QuestStatus.completed) &&
-                        quest.dailyCheckIns.length > 0 && (
-                          <Button
-                            onClick={() => setViewProgressQuestId(quest.questId)}
-                            variant="outline"
-                            size="sm"
-                            className="w-full border-neon-blue/30"
-                          >
-                            <Eye className="mr-2 h-4 w-4" />
-                            {t('personalCenter.viewProgress')}
-                          </Button>
-                        )}
                     </CardContent>
                   </Card>
                 );
               })}
             </div>
           ) : (
-            <div className="flex items-center justify-center py-12">
-              <p className="text-lg text-muted-foreground">{t('personalCenter.noAcceptedQuests')}</p>
+            <div className="text-center py-12 text-muted-foreground">
+              {t('personalCenter.noAcceptedQuests')}
             </div>
           )}
         </TabsContent>
@@ -257,15 +276,14 @@ export default function PersonalCenter() {
         <TabsContent value="posted" className="mt-6">
           {postedLoading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-neon-magenta" />
+              <Loader2 className="h-8 w-8 animate-spin text-neon-blue" />
             </div>
           ) : postedBounties.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2">
               {postedBounties.map((quest) => {
-                const rewardPoolICP = Number(quest.rewardPool) / 100000000;
-                const hasWarrior = quest.warriorId !== undefined;
-                const hasCrowdfunding = quest.crowdfundingContributions.length > 0;
-                const canCancel = quest.status === QuestStatus.active && !hasWarrior;
+                const rewardPoolICP = Number(quest.reward) / 100000000;
+                const hypeCount = Number(quest.hypeCount);
+                const hasBountyContributions = quest.bountyContributions.length > 0;
 
                 return (
                   <Card
@@ -297,51 +315,49 @@ export default function PersonalCenter() {
 
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">{t('personalCenter.hypeCount')}</span>
-                        <span className="font-semibold">{Number(quest.hypeCount)}</span>
+                        <span className="font-semibold">{hypeCount}</span>
                       </div>
 
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">{t('personalCenter.warrior')}</span>
-                        <span className="font-semibold">
-                          {hasWarrior ? t('personalCenter.statusInProgress') : t('personalCenter.statusActive')}
-                        </span>
-                      </div>
+                      {quest.warriorId && (
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">{t('personalCenter.warrior')}</span>
+                          <span className="font-mono text-xs truncate max-w-[150px]">
+                            {quest.warriorId.toString().slice(0, 10)}...
+                          </span>
+                        </div>
+                      )}
 
-                      {quest.status === QuestStatus.active && (
-                        <div className="space-y-2 pt-2">
-                          {canCancel && (
+                      {quest.status === QuestStatus.active && !quest.warriorId && (
+                        <div className="flex gap-2 pt-2">
+                          {hasBountyContributions ? (
                             <Button
-                              onClick={() => handleCancelClick(quest.questId)}
+                              onClick={() => handleExitClick(quest)}
                               variant="outline"
                               size="sm"
-                              className="w-full border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10"
+                              className="flex-1 border-orange-500/30 text-orange-400 hover:bg-orange-500/20"
+                            >
+                              <LogOut className="mr-2 h-4 w-4" />
+                              {t('personalCenter.exitQuest')}
+                            </Button>
+                          ) : (
+                            <Button
+                              onClick={() => handleCancelClick(quest)}
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 border-blue-500/30 text-blue-400 hover:bg-blue-500/20"
                             >
                               <XCircle className="mr-2 h-4 w-4" />
                               {t('personalCenter.cancelQuest')}
                             </Button>
                           )}
-                          {!hasWarrior && !hasCrowdfunding && (
-                            <Button
-                              onClick={() => handleDeleteClick(quest.questId)}
-                              variant="destructive"
-                              size="sm"
-                              className="w-full"
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              {t('personalCenter.deleteQuest')}
-                            </Button>
-                          )}
-                          {!hasWarrior && hasCrowdfunding && (
-                            <Button
-                              onClick={() => handleExitClick(quest.questId)}
-                              variant="outline"
-                              size="sm"
-                              className="w-full border-orange-500/30 text-orange-400 hover:bg-orange-500/10"
-                            >
-                              <LogOut className="mr-2 h-4 w-4" />
-                              {t('personalCenter.exitQuest')}
-                            </Button>
-                          )}
+                          <Button
+                            onClick={() => handleDeleteClick(quest)}
+                            variant="destructive"
+                            size="sm"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            {t('personalCenter.deleteQuest')}
+                          </Button>
                         </div>
                       )}
                     </CardContent>
@@ -350,8 +366,8 @@ export default function PersonalCenter() {
               })}
             </div>
           ) : (
-            <div className="flex items-center justify-center py-12">
-              <p className="text-lg text-muted-foreground">{t('personalCenter.noPostedBounties')}</p>
+            <div className="text-center py-12 text-muted-foreground">
+              {t('personalCenter.noPostedBounties')}
             </div>
           )}
         </TabsContent>
@@ -359,7 +375,7 @@ export default function PersonalCenter() {
 
       {checkInQuest && (
         <DailyCheckIn
-          open={checkInQuestId !== null}
+          open={!!checkInQuestId}
           onOpenChange={(open) => !open && setCheckInQuestId(null)}
           quest={checkInQuest}
         />
@@ -367,43 +383,35 @@ export default function PersonalCenter() {
 
       {viewProgressQuest && (
         <VisualComparison
-          open={viewProgressQuestId !== null}
+          open={!!viewProgressQuestId}
           onOpenChange={(open) => !open && setViewProgressQuestId(null)}
           quest={viewProgressQuest}
         />
       )}
 
-      {deleteQuest && (
-        <DeleteQuestDialog
-          open={deleteQuestId !== null}
-          onOpenChange={(open) => !open && setDeleteQuestId(null)}
-          quest={deleteQuest}
-        />
-      )}
+      <DeleteQuestDialog
+        open={deleteDialogOpen}
+        onOpenChange={handleDeleteDialogClose}
+        quest={selectedDeleteQuest}
+      />
 
-      {exitQuest && (
-        <ExitQuestDialog
-          open={exitQuestId !== null}
-          onOpenChange={(open) => !open && setExitQuestId(null)}
-          quest={exitQuest}
-        />
-      )}
+      <ExitQuestDialog
+        open={exitDialogOpen}
+        onOpenChange={handleExitDialogClose}
+        quest={selectedExitQuest}
+      />
 
-      {abandonQuest && (
-        <AbandonQuestDialog
-          open={abandonQuestId !== null}
-          onOpenChange={(open) => !open && setAbandonQuestId(null)}
-          quest={abandonQuest}
-        />
-      )}
+      <AbandonQuestDialog
+        open={abandonDialogOpen}
+        onOpenChange={handleAbandonDialogClose}
+        quest={selectedAbandonQuest}
+      />
 
-      {cancelQuest && (
-        <CancelQuestDialog
-          open={cancelQuestId !== null}
-          onOpenChange={(open) => !open && setCancelQuestId(null)}
-          quest={cancelQuest}
-        />
-      )}
+      <CancelQuestDialog
+        open={cancelDialogOpen}
+        onOpenChange={handleCancelDialogClose}
+        quest={selectedCancelQuest}
+      />
     </div>
   );
 }

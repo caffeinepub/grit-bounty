@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
-import { useGetCallerUserProfile, useAcceptQuest, useAddToPot } from '../hooks/useQueries';
+import { useGetCallerUserProfile, useAcceptQuest, useGetUserProfile } from '../hooks/useQueries';
 import { QuestImmutable } from '../backend';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Coins, Shield, Plus, Users } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Eye, Coins, Shield, Plus, Users, ChevronDown, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import DepositConfirmationDialog from './DepositConfirmationDialog';
-import AddToPotDialog from './AddToPotDialog';
+import AddBountyDialog from './AddBountyDialog';
 import type { Identity } from '@dfinity/agent';
 
 interface QuestCardProps {
@@ -21,15 +22,24 @@ export default function QuestCard({ quest, userIdentity }: QuestCardProps) {
   const { data: userProfile } = useGetCallerUserProfile();
   const { mutateAsync: acceptQuest, isPending: isAccepting } = useAcceptQuest();
   const [showDepositDialog, setShowDepositDialog] = useState(false);
-  const [showAddToPotDialog, setShowAddToPotDialog] = useState(false);
+  const [showAddBountyDialog, setShowAddBountyDialog] = useState(false);
+  const [showContributors, setShowContributors] = useState(false);
 
   const depositRate = userProfile ? Number(userProfile.depositRate) : 50;
-  const rewardPoolICP = Number(quest.rewardPool) / 100000000;
+  const rewardPoolICP = Number(quest.reward) / 100000000;
   const participantCount = Number(quest.participantCount);
   const perWarriorReward = rewardPoolICP / participantCount;
   const depositAmount = (perWarriorReward * depositRate) / 100;
 
   const isOwnQuest = userIdentity && quest.publisherId.toString() === userIdentity.getPrincipal().toString();
+
+  // Calculate original bounty and additional contributions
+  const originalBountyICP = Number(quest.originalBountyAmountE8) / 100000000;
+  const additionalContributions = quest.bountyContributions || [];
+  const totalAdditionalICP = additionalContributions.reduce(
+    (sum, contrib) => sum + Number(contrib.amountE8) / 100000000,
+    0
+  );
 
   const handleAcceptClick = () => {
     setShowDepositDialog(true);
@@ -44,8 +54,8 @@ export default function QuestCard({ quest, userIdentity }: QuestCardProps) {
     }
   };
 
-  const handleAddToPot = () => {
-    setShowAddToPotDialog(true);
+  const handleAddBounty = () => {
+    setShowAddBountyDialog(true);
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -92,11 +102,45 @@ export default function QuestCard({ quest, userIdentity }: QuestCardProps) {
               <span className="text-muted-foreground">{t('bountyBoard.warriors')}</span>
             </div>
           </div>
-          {quest.crowdfundingContributions.length > 0 && (
-            <div className="text-xs text-muted-foreground">
-              {quest.crowdfundingContributions.length} {t('bountyBoard.contributors')}
+
+          {/* Bounty Breakdown */}
+          <div className="space-y-2 p-3 rounded-lg bg-muted/30 border border-border/50">
+            <div className="flex justify-between text-xs">
+              <span className="text-muted-foreground">{t('bountyBoard.originalBounty')}</span>
+              <span className="font-medium">{originalBountyICP.toFixed(4)} ICP</span>
             </div>
-          )}
+            {totalAdditionalICP > 0 && (
+              <>
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">{t('bountyBoard.additionalBounties')}</span>
+                  <span className="font-medium text-neon-cyan">+{totalAdditionalICP.toFixed(4)} ICP</span>
+                </div>
+                {additionalContributions.length > 0 && (
+                  <Collapsible open={showContributors} onOpenChange={setShowContributors}>
+                    <CollapsibleTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full h-auto py-1 px-2 text-xs hover:bg-muted/50"
+                      >
+                        <TrendingUp className="h-3 w-3 mr-1" />
+                        {additionalContributions.length} {t('bountyBoard.contributors')}
+                        <ChevronDown
+                          className={`h-3 w-3 ml-auto transition-transform ${showContributors ? 'rotate-180' : ''}`}
+                        />
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-1 mt-2">
+                      {additionalContributions.map((contrib, index) => (
+                        <ContributorItem key={index} contribution={contrib} />
+                      ))}
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
+              </>
+            )}
+          </div>
+
           <div className="flex items-center gap-2 p-2 rounded-lg bg-neon-cyan/10 border border-neon-cyan/30">
             <Shield className="h-4 w-4 text-neon-cyan shrink-0" />
             <div className="flex-1 text-xs">
@@ -117,10 +161,11 @@ export default function QuestCard({ quest, userIdentity }: QuestCardProps) {
                 {t('deposit.acceptAndPayDeposit')}
               </Button>
               <Button
-                onClick={handleAddToPot}
+                onClick={handleAddBounty}
                 variant="outline"
                 size="icon"
                 className="border-neon-magenta/30 hover:bg-neon-magenta/20"
+                title={t('addBounty.title')}
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -138,20 +183,34 @@ export default function QuestCard({ quest, userIdentity }: QuestCardProps) {
         open={showDepositDialog}
         onOpenChange={setShowDepositDialog}
         questTitle={quest.title}
-        rewardPool={quest.rewardPool}
+        rewardPool={quest.reward}
         participantCount={quest.participantCount}
         depositAmount={depositAmount}
         depositRate={depositRate}
         onConfirm={handleConfirmDeposit}
       />
 
-      <AddToPotDialog
-        open={showAddToPotDialog}
-        onOpenChange={setShowAddToPotDialog}
+      <AddBountyDialog
+        open={showAddBountyDialog}
+        onOpenChange={setShowAddBountyDialog}
         questId={quest.questId}
         questTitle={quest.title}
-        currentRewardPool={quest.rewardPool}
+        currentRewardPool={quest.reward}
       />
     </>
+  );
+}
+
+// Contributor item component with profile name fetching
+function ContributorItem({ contribution }: { contribution: { contributorId: any; amountE8: bigint; timestamp: bigint } }) {
+  const { data: profile } = useGetUserProfile(contribution.contributorId);
+  const amountICP = Number(contribution.amountE8) / 100000000;
+  const contributorName = profile?.name || contribution.contributorId.toString().slice(0, 10) + '...';
+
+  return (
+    <div className="flex justify-between items-center text-xs p-2 rounded bg-muted/50">
+      <span className="text-muted-foreground truncate flex-1">{contributorName}</span>
+      <span className="font-medium text-neon-cyan ml-2">{amountICP.toFixed(4)} ICP</span>
+    </div>
   );
 }

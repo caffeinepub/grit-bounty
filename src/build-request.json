@@ -1,142 +1,71 @@
 {
   "kind": "build_request",
-  "title": "Integrate real ICP wallet with deposits, withdrawals, and transaction history",
-  "projectName": "Grit Bounty",
+  "title": "Fix non-responsive Cancel and Delete buttons in Personal Center",
   "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Display user's ICP wallet address in the Personal Center to enable external deposits from exchanges or other wallets",
-      "target": "both",
+      "text": "Fix the Cancel Quest button (取消任务) in PersonalCenter to trigger the CancelQuestDialog when clicked. Ensure the button properly opens the dialog and handles the cancellation flow.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-recent"
+          "msg-latest"
         ],
         "quotes": [
-          "icp充值的时候需要显示ICP地址让用户转账过来"
+          "我点击取消任务或者删除没有任何反应"
         ]
       },
       "acceptanceCriteria": [
-        "Wallet section appears in Personal Center component",
-        "User's unique ICP deposit address is displayed prominently",
-        "Address is copyable for easy sharing"
+        "Clicking the Cancel Quest button opens the CancelQuestDialog",
+        "Dialog displays quest details and refund amount",
+        "User can confirm or cancel the operation",
+        "Success/error feedback is shown after action"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Show current ICP balance in the wallet section of Personal Center",
-      "target": "both",
+      "text": "Fix the Delete button (删除) in PersonalCenter to trigger the DeleteQuestDialog when clicked. Ensure the button properly opens the dialog and handles the deletion flow.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-recent"
+          "msg-latest"
         ],
         "quotes": [
-          "钱包显示当前余额"
+          "我点击取消任务或者删除没有任何反应"
         ]
       },
       "acceptanceCriteria": [
-        "Current ICP balance is fetched from backend and displayed",
-        "Balance updates automatically after transactions",
-        "Balance is formatted clearly with ICP denomination"
+        "Clicking the Delete button opens the DeleteQuestDialog",
+        "Dialog displays confirmation warning with quest title",
+        "User can confirm or cancel the deletion",
+        "Success/error feedback is shown after action"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Implement ICP withdrawal feature allowing users to send ICP to any destination address with 0.01% transaction fee and no minimum amount restriction",
-      "target": "both",
+      "text": "Add visual feedback (loading states, disabled states, or click animations) to both Cancel and Delete buttons during processing to improve user experience and prevent double-clicks.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "用户提供目标ICP地址就行 手续费设置为百分之0.01吧 没有最低金额限制"
+          "msg-latest"
         ]
       },
       "acceptanceCriteria": [
-        "Withdrawal form accepts destination ICP address input",
-        "Withdrawal form accepts amount to send",
-        "0.01% fee is calculated and displayed before confirmation",
-        "No minimum withdrawal amount validation",
-        "Withdrawal executes real ICP ledger transfer",
-        "Success/failure feedback is shown to user"
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Display transaction history in wallet section showing time, transaction type (deposit/withdrawal/task deduction/task payment), amount, and status for each transaction",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "历史记录需要显示交易时间跟类型（充值/提现/任务扣款/任务收款）、金额、状态"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Transaction history list displays all wallet transactions",
-        "Each entry shows timestamp in readable format",
-        "Transaction type is clearly labeled (Deposit, Withdrawal, Task Deduction, Task Payment)",
-        "Amount is displayed with ICP denomination",
-        "Transaction status is shown (Pending, Completed, Failed)",
-        "History is sorted by most recent first"
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "Integrate Internet Computer ICP Ledger canister to handle real cryptocurrency deposits and track incoming transfers to user wallet addresses",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "要用真实的icp钱包",
-          "可以支持ICP币从外部转账"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend generates unique ICP account identifiers for each user",
-        "System monitors ICP Ledger for incoming deposits to user accounts",
-        "Deposits are credited to user's internal balance",
-        "Deposit transactions are recorded in transaction history"
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "text": "Integrate ICP Ledger canister for outbound transfers to enable real cryptocurrency withdrawals to external addresses",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "提现功能用户需要从钱包提现到交易所或者其他钱包"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend validates destination ICP addresses",
-        "System deducts withdrawal amount plus 0.01% fee from user balance",
-        "Real ICP transfer is executed via Ledger canister",
-        "Withdrawal transactions are recorded with status tracking",
-        "Failed withdrawals refund the user's balance"
+        "Buttons show loading state during mutation processing",
+        "Buttons are disabled during processing to prevent duplicate submissions",
+        "Clear visual indication when action is in progress"
       ]
     }
   ],
   "constraints": [
-    "Do not modify existing quest management functionality",
-    "Do not modify existing balance checking logic",
-    "Do not modify existing quest cancellation and refund mechanisms",
-    "Must use real ICP Ledger integration, not simulated tokens",
-    "Must integrate with Internet Computer's native ICP Ledger canister"
+    "Do not modify the CancelQuestDialog or DeleteQuestDialog components themselves",
+    "Maintain existing quest state management logic",
+    "Preserve all existing styling and layout"
   ],
   "nonGoals": [
-    "Supporting cryptocurrencies other than ICP",
-    "Implementing exchange rate conversions",
-    "Adding withdrawal limits or KYC verification",
-    "Creating automated exchange integrations",
-    "Supporting batch transactions",
-    "Implementing recurring payments or subscriptions"
+    "Changing the dialog designs or content",
+    "Adding new quest management features",
+    "Modifying backend quest cancellation or deletion logic"
   ],
   "imageRequirements": {
     "required": [],

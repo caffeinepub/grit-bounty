@@ -22,24 +22,30 @@ export interface CheckInRecord {
     timestamp: bigint;
     statusText: string;
 }
+export interface BountyContribution {
+    contributorId: Principal;
+    amountE8: bigint;
+    timestamp: bigint;
+}
 export interface QuestImmutable {
     status: QuestStatus;
     completedAt?: bigint;
     depositAmount: bigint;
+    reward: bigint;
     title: string;
     hypeCount: bigint;
     difficulty: Difficulty;
     createdAt: bigint;
+    bountyContributions: Array<BountyContribution>;
     publisherId: Principal;
     dailyCheckIns: Array<CheckInRecord>;
     description: string;
-    crowdfundingContributions: Array<[Principal, bigint]>;
-    rewardPool: bigint;
     warriorId?: Principal;
     questId: bigint;
     participantCount: bigint;
     completionTarget: bigint;
     acceptedAt?: bigint;
+    originalBountyAmountE8: bigint;
     currentStreak: bigint;
     depositRate: bigint;
 }
@@ -72,7 +78,8 @@ export enum TransactionType {
     deposit = "deposit",
     withdrawal = "withdrawal",
     taskPayment = "taskPayment",
-    taskDeduction = "taskDeduction"
+    taskDeduction = "taskDeduction",
+    bountyContribution = "bountyContribution"
 }
 export enum UserRole {
     admin = "admin",
@@ -82,10 +89,10 @@ export enum UserRole {
 export interface backendInterface {
     abandonQuest(questId: bigint): Promise<void>;
     acceptQuest(questId: bigint): Promise<void>;
-    addToPot(questId: bigint, contribution: bigint): Promise<void>;
+    addToBounty(questId: bigint, amountE8: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    createABQuest(titleA: string, descriptionA: string, titleB: string, descriptionB: string, rewardPool: bigint, difficulty: Difficulty, participantCount: bigint | null): Promise<[bigint, bigint]>;
-    createQuest(title: string, description: string, rewardPool: bigint, difficulty: Difficulty, participantCount: bigint | null): Promise<bigint>;
+    createABQuest(titleA: string, descriptionA: string, titleB: string, descriptionB: string, reward: bigint, difficulty: Difficulty, participantCount: bigint | null): Promise<[bigint, bigint]>;
+    createQuest(title: string, description: string, reward: bigint, difficulty: Difficulty, participantCount: bigint | null): Promise<bigint>;
     deleteQuest(questId: bigint): Promise<string>;
     exitQuest(questId: bigint): Promise<void>;
     getActiveQuests(difficulty: Difficulty | null): Promise<Array<QuestImmutable>>;

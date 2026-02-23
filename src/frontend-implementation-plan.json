@@ -1,125 +1,65 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Integrate ICP Wallet UI with Deposits, Withdrawals, and Transaction History",
+  "title": "Fix non-responsive Cancel and Delete buttons in Personal Center",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Display user's ICP wallet address in Personal Center for external deposits",
+      "summary": "Fix the Cancel Quest button to trigger CancelQuestDialog when clicked",
       "acceptanceCriteria": [
-        "Wallet section appears in Personal Center component",
-        "User's unique ICP deposit address is displayed prominently",
-        "Address is copyable for easy sharing"
+        "Clicking the Cancel Quest button opens the CancelQuestDialog",
+        "Dialog displays quest details and refund amount",
+        "User can confirm or cancel the operation",
+        "Success/error feedback is shown after action"
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/PersonalCenter.tsx",
           "operation": "modify",
-          "description": "Add a Wallet section below the profile information that displays the user's ICP deposit address. Include a copy-to-clipboard button using the existing shadcn/ui components. The address should be fetched from a new backend method and displayed in a monospace font for readability. Verify the authorization component's usage instructions before implementing to ensure proper authentication guards."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Add a new useQuery hook called useGetWalletAddress that fetches the user's ICP deposit address from the backend. Enable the query only when the actor is available and the user is authenticated. Follow the same pattern as useGetCallerUserProfile for proper loading state handling."
+          "description": "Add state management for CancelQuestDialog (open state and selected quest). Wire the Cancel Quest button (取消任务) to set the selected quest and open the dialog by calling setIsCancelDialogOpen(true) when clicked. Ensure the button click handler passes the correct quest object to the dialog state."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Show current ICP balance in the wallet section of Personal Center",
+      "summary": "Fix the Delete button to trigger DeleteQuestDialog when clicked",
       "acceptanceCriteria": [
-        "Current ICP balance is fetched from backend and displayed",
-        "Balance updates automatically after transactions",
-        "Balance is formatted clearly with ICP denomination"
+        "Clicking the Delete button opens the DeleteQuestDialog",
+        "Dialog displays confirmation warning with quest title",
+        "User can confirm or cancel the deletion",
+        "Success/error feedback is shown after action"
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/PersonalCenter.tsx",
           "operation": "modify",
-          "description": "Add ICP balance display in the Wallet section showing the current balance with 'ICP' denomination. Format the balance with 8 decimal places (e8 format) and make it prominent using a larger font size and accent color. Position it above the deposit address."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Add a new useQuery hook called useGetWalletBalance that fetches the user's current ICP balance from the backend. Configure automatic refetching with a reasonable interval (e.g., 30 seconds) and invalidate this query after withdrawal and deposit mutations complete."
-        },
-        {
-          "path": "frontend/src/utils/formatters.ts",
-          "operation": "create",
-          "description": "Create utility functions for formatting ICP amounts. Include formatICPBalance that converts e8 bigint amounts to human-readable strings with 8 decimal places, and formatICPWithUnit that appends 'ICP' to the formatted amount. Handle edge cases like zero balances and very large numbers."
+          "description": "Add state management for DeleteQuestDialog (open state and selected quest). Wire the Delete button (删除) to set the selected quest and open the dialog by calling setIsDeleteDialogOpen(true) when clicked. Ensure the button click handler passes the correct quest object to the dialog state."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Implement ICP withdrawal feature with 0.01% fee and destination address input",
+      "summary": "Add visual feedback to Cancel and Delete buttons during processing",
       "acceptanceCriteria": [
-        "Withdrawal form accepts destination ICP address input",
-        "Withdrawal form accepts amount to send",
-        "0.01% fee is calculated and displayed before confirmation",
-        "No minimum withdrawal amount validation",
-        "Withdrawal executes real ICP ledger transfer",
-        "Success/failure feedback is shown to user"
+        "Buttons show loading state during mutation processing",
+        "Buttons are disabled during processing to prevent duplicate submissions",
+        "Clear visual indication when action is in progress"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/WithdrawalDialog.tsx",
-          "operation": "create",
-          "description": "Create a Dialog component for ICP withdrawals with fields for destination ICP address (text input with validation) and amount (number input). Calculate and display the 0.01% transaction fee below the amount input, showing both the fee and net amount received. Include a confirmation step showing all details before executing. Use shadcn/ui Dialog, Input, and Button components. Show loading state during withdrawal execution and display success/error toast notifications. Verify the authorization component's usage instructions before implementing to ensure the user must be authenticated."
-        },
-        {
           "path": "frontend/src/components/PersonalCenter.tsx",
           "operation": "modify",
-          "description": "Add a 'Withdraw ICP' button in the Wallet section that opens the WithdrawalDialog. Position it next to the balance display. Disable the button if the balance is zero or if the wallet data is still loading."
+          "description": "Track mutation loading states from CancelQuestDialog and DeleteQuestDialog. Add disabled and loading visual states to the Cancel Quest and Delete buttons when their respective mutations are in progress. Use existing Tailwind classes for disabled styling (opacity-50, cursor-not-allowed) and consider adding a loading spinner or text indicator during processing."
         },
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/components/CancelQuestDialog.tsx",
           "operation": "modify",
-          "description": "Add a useMutation hook called useWithdrawICP that calls the backend withdrawal method with destination address and amount parameters. On success, invalidate the wallet balance query and transaction history query to refresh displayed data. Handle errors with appropriate error messages including validation failures from the backend."
+          "description": "Ensure the cancel quest mutation loading state is properly tracked and can be accessed by parent components. Add visual feedback within the dialog (disabled confirm button, loading spinner) during mutation processing to prevent double-clicks."
         },
         {
-          "path": "frontend/src/utils/validators.ts",
-          "operation": "create",
-          "description": "Create validation utilities for ICP addresses and withdrawal amounts. Include validateICPAddress that checks address format, and validateWithdrawalAmount that ensures the amount plus fee doesn't exceed the user's balance. Return user-friendly error messages for each validation failure."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Display transaction history showing time, type, amount, and status",
-      "acceptanceCriteria": [
-        "Transaction history list displays all wallet transactions",
-        "Each entry shows timestamp in readable format",
-        "Transaction type is clearly labeled (Deposit, Withdrawal, Task Deduction, Task Payment)",
-        "Amount is displayed with ICP denomination",
-        "Transaction status is shown (Pending, Completed, Failed)",
-        "History is sorted by most recent first"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/TransactionHistory.tsx",
-          "operation": "create",
-          "description": "Create a component displaying a scrollable list of transaction history entries. Each entry shows a formatted timestamp, transaction type badge with color coding (green for deposit/payment, red for withdrawal/deduction), amount with ICP denomination, and status badge (pending/completed/failed). Use shadcn/ui Table or Card components for layout. Show empty state when no transactions exist. Sort transactions by timestamp descending (most recent first)."
-        },
-        {
-          "path": "frontend/src/components/PersonalCenter.tsx",
+          "path": "frontend/src/components/DeleteQuestDialog.tsx",
           "operation": "modify",
-          "description": "Add the TransactionHistory component below the Wallet section in PersonalCenter. Include a section header 'Transaction History' with appropriate spacing. The history should be collapsible or in a separate tab if space is limited."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Add a new useQuery hook called useGetTransactionHistory that fetches the transaction history from the backend using getTransactionsView. Enable the query only when the actor is available and the user is authenticated. Configure to refetch when the tab becomes visible and invalidate after withdrawal or deposit operations."
-        },
-        {
-          "path": "frontend/src/utils/formatters.ts",
-          "operation": "modify",
-          "description": "Add formatting functions for transaction data: formatTransactionType that converts backend transaction type enums to translated display strings, formatTransactionStatus for status badges, and formatTimestamp that converts bigint timestamps to human-readable date-time strings in the user's locale."
-        },
-        {
-          "path": "frontend/src/i18n/translations.ts",
-          "operation": "modify",
-          "description": "Add translation keys for the wallet section including wallet address label, balance label, withdraw button text, transaction history header, transaction type labels (deposit, withdrawal, taskPayment, taskDeduction), and transaction status labels (pending, success, failed). Include translations for all three supported languages (English, Simplified Chinese, Traditional Chinese)."
+          "description": "Ensure the delete quest mutation loading state is properly tracked and can be accessed by parent components. Add visual feedback within the dialog (disabled confirm button, loading spinner) during mutation processing to prevent double-clicks."
         }
       ]
     }

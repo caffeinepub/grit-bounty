@@ -104,24 +104,30 @@ export interface CheckInRecord {
     timestamp: bigint;
     statusText: string;
 }
+export interface BountyContribution {
+    contributorId: Principal;
+    amountE8: bigint;
+    timestamp: bigint;
+}
 export interface QuestImmutable {
     status: QuestStatus;
     completedAt?: bigint;
     depositAmount: bigint;
+    reward: bigint;
     title: string;
     hypeCount: bigint;
     difficulty: Difficulty;
     createdAt: bigint;
+    bountyContributions: Array<BountyContribution>;
     publisherId: Principal;
     dailyCheckIns: Array<CheckInRecord>;
     description: string;
-    crowdfundingContributions: Array<[Principal, bigint]>;
-    rewardPool: bigint;
     warriorId?: Principal;
     questId: bigint;
     participantCount: bigint;
     completionTarget: bigint;
     acceptedAt?: bigint;
+    originalBountyAmountE8: bigint;
     currentStreak: bigint;
     depositRate: bigint;
 }
@@ -165,7 +171,8 @@ export enum TransactionType {
     deposit = "deposit",
     withdrawal = "withdrawal",
     taskPayment = "taskPayment",
-    taskDeduction = "taskDeduction"
+    taskDeduction = "taskDeduction",
+    bountyContribution = "bountyContribution"
 }
 export enum UserRole {
     admin = "admin",
@@ -182,10 +189,10 @@ export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     abandonQuest(questId: bigint): Promise<void>;
     acceptQuest(questId: bigint): Promise<void>;
-    addToPot(questId: bigint, contribution: bigint): Promise<void>;
+    addToBounty(questId: bigint, amountE8: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    createABQuest(titleA: string, descriptionA: string, titleB: string, descriptionB: string, rewardPool: bigint, difficulty: Difficulty, participantCount: bigint | null): Promise<[bigint, bigint]>;
-    createQuest(title: string, description: string, rewardPool: bigint, difficulty: Difficulty, participantCount: bigint | null): Promise<bigint>;
+    createABQuest(titleA: string, descriptionA: string, titleB: string, descriptionB: string, reward: bigint, difficulty: Difficulty, participantCount: bigint | null): Promise<[bigint, bigint]>;
+    createQuest(title: string, description: string, reward: bigint, difficulty: Difficulty, participantCount: bigint | null): Promise<bigint>;
     deleteQuest(questId: bigint): Promise<string>;
     exitQuest(questId: bigint): Promise<void>;
     getActiveQuests(difficulty: Difficulty | null): Promise<Array<QuestImmutable>>;
@@ -200,7 +207,7 @@ export interface backendInterface {
     submitCompletion(questId: bigint): Promise<void>;
     submitDailyCheckIn(questId: bigint, statusText: string, photoUrl: string | null): Promise<void>;
 }
-import type { CheckInRecord as _CheckInRecord, Difficulty as _Difficulty, QuestImmutable as _QuestImmutable, QuestStatus as _QuestStatus, Transaction as _Transaction, TransactionStatus as _TransactionStatus, TransactionType as _TransactionType, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
+import type { BountyContribution as _BountyContribution, CheckInRecord as _CheckInRecord, Difficulty as _Difficulty, QuestImmutable as _QuestImmutable, QuestStatus as _QuestStatus, Transaction as _Transaction, TransactionStatus as _TransactionStatus, TransactionType as _TransactionType, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
@@ -329,17 +336,17 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async addToPot(arg0: bigint, arg1: bigint): Promise<void> {
+    async addToBounty(arg0: bigint, arg1: bigint): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.addToPot(arg0, arg1);
+                const result = await this.actor.addToBounty(arg0, arg1);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.addToPot(arg0, arg1);
+            const result = await this.actor.addToBounty(arg0, arg1);
             return result;
         }
     }
@@ -623,40 +630,42 @@ function from_candid_record_n16(_uploadFile: (file: ExternalBlob) => Promise<Uin
     status: _QuestStatus;
     completedAt: [] | [bigint];
     depositAmount: bigint;
+    reward: bigint;
     title: string;
     hypeCount: bigint;
     difficulty: _Difficulty;
     createdAt: bigint;
+    bountyContributions: Array<_BountyContribution>;
     publisherId: Principal;
     dailyCheckIns: Array<_CheckInRecord>;
     description: string;
-    crowdfundingContributions: Array<[Principal, bigint]>;
-    rewardPool: bigint;
     warriorId: [] | [Principal];
     questId: bigint;
     participantCount: bigint;
     completionTarget: bigint;
     acceptedAt: [] | [bigint];
+    originalBountyAmountE8: bigint;
     currentStreak: bigint;
     depositRate: bigint;
 }): {
     status: QuestStatus;
     completedAt?: bigint;
     depositAmount: bigint;
+    reward: bigint;
     title: string;
     hypeCount: bigint;
     difficulty: Difficulty;
     createdAt: bigint;
+    bountyContributions: Array<BountyContribution>;
     publisherId: Principal;
     dailyCheckIns: Array<CheckInRecord>;
     description: string;
-    crowdfundingContributions: Array<[Principal, bigint]>;
-    rewardPool: bigint;
     warriorId?: Principal;
     questId: bigint;
     participantCount: bigint;
     completionTarget: bigint;
     acceptedAt?: bigint;
+    originalBountyAmountE8: bigint;
     currentStreak: bigint;
     depositRate: bigint;
 } {
@@ -664,20 +673,21 @@ function from_candid_record_n16(_uploadFile: (file: ExternalBlob) => Promise<Uin
         status: from_candid_QuestStatus_n17(_uploadFile, _downloadFile, value.status),
         completedAt: record_opt_to_undefined(from_candid_opt_n19(_uploadFile, _downloadFile, value.completedAt)),
         depositAmount: value.depositAmount,
+        reward: value.reward,
         title: value.title,
         hypeCount: value.hypeCount,
         difficulty: from_candid_Difficulty_n20(_uploadFile, _downloadFile, value.difficulty),
         createdAt: value.createdAt,
+        bountyContributions: value.bountyContributions,
         publisherId: value.publisherId,
         dailyCheckIns: from_candid_vec_n22(_uploadFile, _downloadFile, value.dailyCheckIns),
         description: value.description,
-        crowdfundingContributions: value.crowdfundingContributions,
-        rewardPool: value.rewardPool,
         warriorId: record_opt_to_undefined(from_candid_opt_n26(_uploadFile, _downloadFile, value.warriorId)),
         questId: value.questId,
         participantCount: value.participantCount,
         completionTarget: value.completionTarget,
         acceptedAt: record_opt_to_undefined(from_candid_opt_n19(_uploadFile, _downloadFile, value.acceptedAt)),
+        originalBountyAmountE8: value.originalBountyAmountE8,
         currentStreak: value.currentStreak,
         depositRate: value.depositRate
     };
@@ -795,8 +805,10 @@ function from_candid_variant_n37(_uploadFile: (file: ExternalBlob) => Promise<Ui
     taskPayment: null;
 } | {
     taskDeduction: null;
+} | {
+    bountyContribution: null;
 }): TransactionType {
-    return "deposit" in value ? TransactionType.deposit : "withdrawal" in value ? TransactionType.withdrawal : "taskPayment" in value ? TransactionType.taskPayment : "taskDeduction" in value ? TransactionType.taskDeduction : value;
+    return "deposit" in value ? TransactionType.deposit : "withdrawal" in value ? TransactionType.withdrawal : "taskPayment" in value ? TransactionType.taskPayment : "taskDeduction" in value ? TransactionType.taskDeduction : "bountyContribution" in value ? TransactionType.bountyContribution : value;
 }
 function from_candid_vec_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_QuestImmutable>): Array<QuestImmutable> {
     return value.map((x)=>from_candid_QuestImmutable_n15(_uploadFile, _downloadFile, x));

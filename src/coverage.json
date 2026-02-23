@@ -1,114 +1,64 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-23T04:46:03.441Z",
+  "generatedAt": "2026-02-23T05:35:27.554Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 6,
-    "implemented": 4,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Display user's ICP wallet address in the Personal Center to enable external deposits from exchanges or other wallets",
+        "summary": "Fix the Cancel Quest button (取消任务) in PersonalCenter to trigger the CancelQuestDialog when clicked. Ensure the button properly opens the dialog and handles the cancellation flow.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/PersonalCenter.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/components/PersonalCenter.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/PersonalCenter.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/components/PersonalCenter.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Show current ICP balance in the wallet section of Personal Center",
+        "summary": "Fix the Delete button (删除) in PersonalCenter to trigger the DeleteQuestDialog when clicked. Ensure the button properly opens the dialog and handles the deletion flow.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/PersonalCenter.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/utils/formatters.ts"
+          "frontend/src/components/PersonalCenter.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/PersonalCenter.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/utils/formatters.ts"
+          "frontend/src/components/PersonalCenter.tsx"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "Implement ICP withdrawal feature allowing users to send ICP to any destination address with 0.01% transaction fee and no minimum amount restriction",
+        "summary": "Add visual feedback (loading states, disabled states, or click animations) to both Cancel and Delete buttons during processing to improve user experience and prevent double-clicks.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/WithdrawalDialog.tsx",
           "frontend/src/components/PersonalCenter.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/utils/validators.ts"
+          "frontend/src/components/CancelQuestDialog.tsx",
+          "frontend/src/components/DeleteQuestDialog.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/WithdrawalDialog.tsx",
           "frontend/src/components/PersonalCenter.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/utils/validators.ts"
+          "frontend/src/components/CancelQuestDialog.tsx",
+          "frontend/src/components/DeleteQuestDialog.tsx"
         ]
-      },
-      {
-        "id": "REQ-4",
-        "summary": "Display transaction history in wallet section showing time, transaction type (deposit/withdrawal/task deduction/task payment), amount, and status for each transaction",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/TransactionHistory.tsx",
-          "frontend/src/components/PersonalCenter.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/utils/formatters.ts",
-          "frontend/src/i18n/translations.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/TransactionHistory.tsx",
-          "frontend/src/components/PersonalCenter.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/utils/formatters.ts",
-          "frontend/src/i18n/translations.ts"
-        ]
-      },
-      {
-        "id": "REQ-5",
-        "summary": "Integrate Internet Computer ICP Ledger canister to handle real cryptocurrency deposits and track incoming transfers to user wallet addresses",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-6",
-        "summary": "Integrate ICP Ledger canister for outbound transfers to enable real cryptocurrency withdrawals to external addresses",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
+    "frontend/src/components/AbandonQuestDialog.tsx",
+    "frontend/src/components/CancelQuestDialog.tsx",
+    "frontend/src/components/DeleteQuestDialog.tsx",
+    "frontend/src/components/ExitQuestDialog.tsx",
     "frontend/src/components/PersonalCenter.tsx",
-    "frontend/src/components/TransactionHistory.tsx",
-    "frontend/src/components/WalletSection.tsx",
-    "frontend/src/components/WithdrawalDialog.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/i18n/translations.ts",
-    "frontend/src/utils/formatters.ts",
-    "frontend/src/utils/validators.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

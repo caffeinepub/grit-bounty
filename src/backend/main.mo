@@ -4,14 +4,15 @@ import List "mo:core/List";
 import Nat "mo:core/Nat";
 import Time "mo:core/Time";
 import Nat64 "mo:core/Nat64";
+import Int "mo:core/Int";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 import MixinStorage "blob-storage/Mixin";
 import Runtime "mo:core/Runtime";
 import ICP "mo:core/Nat64";
-import Migration "migration";
 
-(with migration = Migration.run)
+
+
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
@@ -21,22 +22,13 @@ actor {
     #withdrawal;
     #taskPayment;
     #taskDeduction;
+    #bountyContribution;
   };
 
   public type TransactionStatus = {
     #pending;
     #success;
     #failed;
-  };
-
-  public type Transaction = {
-    id : Nat;
-    timestamp : Int;
-    transactionType : TransactionType;
-    amountE8 : Nat64;
-    from : Principal;
-    to : Principal;
-    status : TransactionStatus;
   };
 
   public type Difficulty = {
@@ -54,6 +46,12 @@ actor {
     #cancelled;
   };
 
+  public type BountyContribution = {
+    contributorId : Principal;
+    amountE8 : Nat64;
+    timestamp : Int;
+  };
+
   public type CheckInRecord = {
     dayNumber : Nat;
     timestamp : Int;
@@ -65,22 +63,56 @@ actor {
     questId : Nat;
     title : Text;
     description : Text;
-    rewardPool : Nat64;
     difficulty : Difficulty;
     publisherId : Principal;
     warriorId : ?Principal;
     status : QuestStatus;
+    reward : Nat64;
+    originalBountyAmountE8 : Nat64;
+    bountyContributions : List.List<BountyContribution>;
     depositAmount : Nat64;
     depositRate : Nat;
     createdAt : Int;
     acceptedAt : ?Int;
     completedAt : ?Int;
     hypeCount : Nat;
-    crowdfundingContributions : List.List<(Principal, Nat64)>;
     dailyCheckIns : List.List<CheckInRecord>;
     completionTarget : Nat;
     currentStreak : Nat;
     participantCount : Nat;
+  };
+
+  public type QuestImmutable = {
+    questId : Nat;
+    title : Text;
+    description : Text;
+    reward : Nat64;
+    difficulty : Difficulty;
+    publisherId : Principal;
+    warriorId : ?Principal;
+    status : QuestStatus;
+    originalBountyAmountE8 : Nat64;
+    bountyContributions : [BountyContribution];
+    depositAmount : Nat64;
+    depositRate : Nat;
+    createdAt : Int;
+    acceptedAt : ?Int;
+    completedAt : ?Int;
+    hypeCount : Nat;
+    dailyCheckIns : [CheckInRecord];
+    completionTarget : Nat;
+    currentStreak : Nat;
+    participantCount : Nat;
+  };
+
+  public type Transaction = {
+    id : Nat;
+    timestamp : Int;
+    transactionType : TransactionType;
+    amountE8 : Nat64;
+    from : Principal;
+    to : Principal;
+    status : TransactionStatus;
   };
 
   public type UserProfile = {
@@ -91,36 +123,44 @@ actor {
     totalDeposited : Nat64;
   };
 
-  public type QuestImmutable = {
-    questId : Nat;
-    title : Text;
-    description : Text;
-    rewardPool : Nat64;
-    difficulty : Difficulty;
-    publisherId : Principal;
-    warriorId : ?Principal;
-    status : QuestStatus;
-    depositAmount : Nat64;
-    depositRate : Nat;
-    createdAt : Int;
-    acceptedAt : ?Int;
-    completedAt : ?Int;
-    hypeCount : Nat;
-    crowdfundingContributions : [(Principal, Nat64)];
-    dailyCheckIns : [CheckInRecord];
-    completionTarget : Nat;
-    currentStreak : Nat;
-    participantCount : Nat;
-  };
-
   let userProfiles = Map.empty<Principal, UserProfile>();
+  let userBalances = Map.empty<Principal, Nat64>();
   let quests = Map.empty<Nat, Quest>();
-  var nextQuestId = 0;
+  var nextQuestId = 1;
   var systemBountyBalance : Nat64 = 0;
   var nextTransactionId = 0;
   let transactions = Map.empty<Nat, Transaction>();
 
   include MixinStorage();
+
+  private func getUserBalance(user : Principal) : Nat64 {
+    switch (userBalances.get(user)) {
+      case (null) { 0 };
+      case (?balance) { balance };
+    };
+  };
+
+  private func setUserBalance(user : Principal, balance : Nat64) {
+    userBalances.add(user, balance);
+  };
+
+  private func recordTransaction(txType : TransactionType, amount : Nat64, from : Principal, to : Principal, status : TransactionStatus) : Nat {
+    let txId = nextTransactionId;
+    nextTransactionId += 1;
+
+    let tx : Transaction = {
+      id = txId;
+      timestamp = Time.now();
+      transactionType = txType;
+      amountE8 = amount;
+      from;
+      to;
+      status;
+    };
+
+    transactions.add(txId, tx);
+    txId;
+  };
 
   public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
@@ -178,35 +218,32 @@ actor {
       };
     };
 
-    let resultsList = List.empty<QuestImmutable>();
-    filtered.values().toArray().forEach(
+    filtered.values().toArray().map(
       func(q) {
-        resultsList.add(
-          {
-            questId = q.questId;
-            title = q.title;
-            description = q.description;
-            rewardPool = q.rewardPool;
-            difficulty = q.difficulty;
-            publisherId = q.publisherId;
-            warriorId = q.warriorId;
-            status = q.status;
-            depositAmount = q.depositAmount;
-            depositRate = q.depositRate;
-            createdAt = q.createdAt;
-            acceptedAt = q.acceptedAt;
-            completedAt = q.completedAt;
-            hypeCount = q.hypeCount;
-            crowdfundingContributions = q.crowdfundingContributions.toArray();
-            dailyCheckIns = q.dailyCheckIns.toArray();
-            completionTarget = q.completionTarget;
-            currentStreak = q.currentStreak;
-            participantCount = q.participantCount;
-          }
-        );
+        {
+          questId = q.questId;
+          title = q.title;
+          description = q.description;
+          reward = q.reward;
+          difficulty = q.difficulty;
+          publisherId = q.publisherId;
+          warriorId = q.warriorId;
+          status = q.status;
+          originalBountyAmountE8 = q.originalBountyAmountE8;
+          bountyContributions = q.bountyContributions.toArray();
+          depositAmount = q.depositAmount;
+          depositRate = q.depositRate;
+          createdAt = q.createdAt;
+          acceptedAt = q.acceptedAt;
+          completedAt = q.completedAt;
+          hypeCount = q.hypeCount;
+          dailyCheckIns = q.dailyCheckIns.toArray();
+          completionTarget = q.completionTarget;
+          currentStreak = q.currentStreak;
+          participantCount = q.participantCount;
+        };
       }
     );
-    resultsList.toArray();
   };
 
   public query ({ caller }) func getMyPostedBounties() : async [QuestImmutable] {
@@ -220,35 +257,32 @@ actor {
       }
     );
 
-    let resultsList = List.empty<QuestImmutable>();
-    filteredQuests.values().toArray().forEach(
+    filteredQuests.values().toArray().map(
       func(q) {
-        resultsList.add(
-          {
-            questId = q.questId;
-            title = q.title;
-            description = q.description;
-            rewardPool = q.rewardPool;
-            difficulty = q.difficulty;
-            publisherId = q.publisherId;
-            warriorId = q.warriorId;
-            status = q.status;
-            depositAmount = q.depositAmount;
-            depositRate = q.depositRate;
-            createdAt = q.createdAt;
-            acceptedAt = q.acceptedAt;
-            completedAt = q.completedAt;
-            hypeCount = q.hypeCount;
-            crowdfundingContributions = q.crowdfundingContributions.toArray();
-            dailyCheckIns = q.dailyCheckIns.toArray();
-            completionTarget = q.completionTarget;
-            currentStreak = q.currentStreak;
-            participantCount = q.participantCount;
-          }
-        );
+        {
+          questId = q.questId;
+          title = q.title;
+          description = q.description;
+          reward = q.reward;
+          difficulty = q.difficulty;
+          publisherId = q.publisherId;
+          warriorId = q.warriorId;
+          status = q.status;
+          originalBountyAmountE8 = q.originalBountyAmountE8;
+          bountyContributions = q.bountyContributions.toArray();
+          depositAmount = q.depositAmount;
+          depositRate = q.depositRate;
+          createdAt = q.createdAt;
+          acceptedAt = q.acceptedAt;
+          completedAt = q.completedAt;
+          hypeCount = q.hypeCount;
+          dailyCheckIns = q.dailyCheckIns.toArray();
+          completionTarget = q.completionTarget;
+          currentStreak = q.currentStreak;
+          participantCount = q.participantCount;
+        };
       }
     );
-    resultsList.toArray();
   };
 
   public query ({ caller }) func getMyAcceptedQuests() : async [QuestImmutable] {
@@ -265,74 +299,135 @@ actor {
       }
     );
 
-    let resultsList = List.empty<QuestImmutable>();
-    filteredQuests.values().toArray().forEach(
+    filteredQuests.values().toArray().map(
       func(q) {
-        resultsList.add(
-          {
-            questId = q.questId;
-            title = q.title;
-            description = q.description;
-            rewardPool = q.rewardPool;
-            difficulty = q.difficulty;
-            publisherId = q.publisherId;
-            warriorId = q.warriorId;
-            status = q.status;
-            depositAmount = q.depositAmount;
-            depositRate = q.depositRate;
-            createdAt = q.createdAt;
-            acceptedAt = q.acceptedAt;
-            completedAt = q.completedAt;
-            hypeCount = q.hypeCount;
-            crowdfundingContributions = q.crowdfundingContributions.toArray();
-            dailyCheckIns = q.dailyCheckIns.toArray();
-            completionTarget = q.completionTarget;
-            currentStreak = q.currentStreak;
-            participantCount = q.participantCount;
-          }
-        );
+        {
+          questId = q.questId;
+          title = q.title;
+          description = q.description;
+          reward = q.reward;
+          difficulty = q.difficulty;
+          publisherId = q.publisherId;
+          warriorId = q.warriorId;
+          status = q.status;
+          originalBountyAmountE8 = q.originalBountyAmountE8;
+          bountyContributions = q.bountyContributions.toArray();
+          depositAmount = q.depositAmount;
+          depositRate = q.depositRate;
+          createdAt = q.createdAt;
+          acceptedAt = q.acceptedAt;
+          completedAt = q.completedAt;
+          hypeCount = q.hypeCount;
+          dailyCheckIns = q.dailyCheckIns.toArray();
+          completionTarget = q.completionTarget;
+          currentStreak = q.currentStreak;
+          participantCount = q.participantCount;
+        };
       }
     );
-    resultsList.toArray();
   };
 
-  public shared ({ caller }) func addToPot(questId : Nat, contribution : Nat64) : async () {
+  public type BountyTransaction = {
+    contributorId : Principal;
+    amountE8 : Nat64;
+    timestamp : Int;
+  };
+
+  public shared ({ caller }) func addToBounty(questId : Nat, amountE8 : Nat64) : async () {
+    // Authorization: Only authenticated users can contribute
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can contribute to quests");
+      Runtime.trap("Unauthorized: Only users can contribute to bounties");
     };
 
-    switch (quests.get(questId)) {
+    // Validate amount
+    if (amountE8 == 0) {
+      Runtime.trap("Contribution amount must be greater than zero");
+    };
+
+    // Get quest and validate
+    let quest = switch (quests.get(questId)) {
       case (null) { Runtime.trap("Quest not found") };
-      case (?quest) {
-        if (quest.status != #active) {
-          Runtime.trap("Quest is not active");
-        };
-
-        let updatedContributions = quest.crowdfundingContributions.clone();
-        updatedContributions.add((caller, contribution));
-
-        let updatedQuest : Quest = {
-          quest with
-          rewardPool = quest.rewardPool + contribution;
-          hypeCount = quest.hypeCount + 1;
-          crowdfundingContributions = updatedContributions;
-        };
-
-        quests.add(questId, updatedQuest);
-      };
+      case (?quest) { quest };
     };
+
+    if (quest.status != #active) {
+      Runtime.trap("Quest is not active");
+    };
+
+    // Authorization: Prevent conflicts of interest
+    // Publisher cannot contribute to their own quest
+    if (quest.publisherId == caller) {
+      Runtime.trap("Unauthorized: Quest publisher cannot contribute to their own quest");
+    };
+
+    // Warrior cannot contribute to quest they accepted
+    switch (quest.warriorId) {
+      case (?warriorId) {
+        if (warriorId == caller) {
+          Runtime.trap("Unauthorized: Quest warrior cannot contribute to their own quest");
+        };
+      };
+      case (null) {};
+    };
+
+    // Validate user has sufficient balance
+    let userBalance = getUserBalance(caller);
+    if (userBalance < amountE8) {
+      Runtime.trap("Insufficient balance: User does not have enough funds");
+    };
+
+    // Deduct from user's wallet
+    let newUserBalance = userBalance - amountE8;
+    setUserBalance(caller, newUserBalance);
+
+    // Create contribution record
+    let bountyContribution : BountyContribution = {
+      contributorId = caller;
+      amountE8;
+      timestamp = Time.now();
+    };
+
+    // Update quest with contribution
+    let currentContributions = quest.bountyContributions.clone();
+    currentContributions.add(bountyContribution);
+    let updatedQuest : Quest = {
+      quest with
+      bountyContributions = currentContributions;
+      reward = quest.reward + amountE8;
+      hypeCount = quest.hypeCount + 1;
+    };
+
+    quests.add(questId, updatedQuest);
+
+    // Add to system escrow
+    systemBountyBalance += amountE8;
+
+    // Record transaction
+    let systemPrincipal = Principal.fromText("aaaaa-aa");
+    ignore recordTransaction(#bountyContribution, amountE8, caller, systemPrincipal, #success);
   };
 
-  public shared ({ caller }) func createQuest(title : Text, description : Text, rewardPool : Nat64, difficulty : Difficulty, participantCount : ?Nat) : async Nat {
+  public shared ({ caller }) func createQuest(title : Text, description : Text, reward : Nat64, difficulty : Difficulty, participantCount : ?Nat) : async Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can create quests");
     };
 
-    if (rewardPool == 0) {
+    if (reward == 0) {
       Runtime.trap("Reward pool must be greater than zero");
     };
 
-    systemBountyBalance += rewardPool;
+    // Validate user has sufficient balance for initial bounty
+    let userBalance = getUserBalance(caller);
+    if (userBalance < reward) {
+      Runtime.trap("Insufficient balance: User does not have enough funds to create quest");
+    };
+
+    // Deduct initial bounty from user's wallet
+    let newUserBalance = userBalance - reward;
+    setUserBalance(caller, newUserBalance);
+
+    // Add to system escrow
+    systemBountyBalance += reward;
 
     let questId = nextQuestId;
     nextQuestId += 1;
@@ -341,18 +436,19 @@ actor {
       questId;
       title;
       description;
-      rewardPool;
+      reward;
       difficulty;
       publisherId = caller;
       warriorId = null;
       status = #active;
+      originalBountyAmountE8 = reward;
+      bountyContributions = List.empty<BountyContribution>();
       depositAmount = 0;
       depositRate = 50;
       createdAt = Time.now();
       acceptedAt = null;
       completedAt = null;
       hypeCount = 0;
-      crowdfundingContributions = List.empty<(Principal, Nat64)>();
       dailyCheckIns = List.empty<CheckInRecord>();
       completionTarget = 21;
       currentStreak = 0;
@@ -364,6 +460,10 @@ actor {
 
     quests.add(questId, newQuest);
 
+    // Record transaction
+    let systemPrincipal = Principal.fromText("aaaaa-aa");
+    ignore recordTransaction(#deposit, reward, caller, systemPrincipal, #success);
+
     questId;
   };
 
@@ -372,7 +472,7 @@ actor {
     descriptionA : Text,
     titleB : Text,
     descriptionB : Text,
-    rewardPool : Nat64,
+    reward : Nat64,
     difficulty : Difficulty,
     participantCount : ?Nat,
   ) : async (Nat, Nat) {
@@ -380,11 +480,23 @@ actor {
       Runtime.trap("Unauthorized: Only users can create A/B quests");
     };
 
-    if (rewardPool == 0) {
+    if (reward == 0) {
       Runtime.trap("Reward pool must be greater than zero");
     };
 
-    let totalCost = rewardPool * 2;
+    let totalCost = reward * 2;
+
+    // Validate user has sufficient balance for both quests
+    let userBalance = getUserBalance(caller);
+    if (userBalance < totalCost) {
+      Runtime.trap("Insufficient balance: User does not have enough funds to create A/B quests");
+    };
+
+    // Deduct total cost from user's wallet
+    let newUserBalance = userBalance - totalCost;
+    setUserBalance(caller, newUserBalance);
+
+    // Add to system escrow
     systemBountyBalance += totalCost;
 
     let questIdA = nextQuestId;
@@ -402,18 +514,19 @@ actor {
       questId = questIdA;
       title = titleA;
       description = descriptionA;
-      rewardPool = rewardPool;
+      reward;
       difficulty;
       publisherId = caller;
       warriorId = null;
       status = #active;
+      originalBountyAmountE8 = reward;
+      bountyContributions = List.empty<BountyContribution>();
       depositAmount = 0;
       depositRate = 50;
       createdAt = Time.now();
       acceptedAt = null;
       completedAt = null;
       hypeCount = 0;
-      crowdfundingContributions = List.empty<(Principal, Nat64)>();
       dailyCheckIns = List.empty<CheckInRecord>();
       completionTarget = 21;
       currentStreak = 0;
@@ -424,18 +537,19 @@ actor {
       questId = questIdB;
       title = titleB;
       description = descriptionB;
-      rewardPool = rewardPool;
+      reward;
       difficulty;
       publisherId = caller;
       warriorId = null;
       status = #active;
+      originalBountyAmountE8 = reward;
+      bountyContributions = List.empty<BountyContribution>();
       depositAmount = 0;
       depositRate = 50;
       createdAt = Time.now();
       acceptedAt = null;
       completedAt = null;
       hypeCount = 0;
-      crowdfundingContributions = List.empty<(Principal, Nat64)>();
       dailyCheckIns = List.empty<CheckInRecord>();
       completionTarget = 21;
       currentStreak = 0;
@@ -444,6 +558,10 @@ actor {
 
     quests.add(questIdA, questA);
     quests.add(questIdB, questB);
+
+    // Record transaction
+    let systemPrincipal = Principal.fromText("aaaaa-aa");
+    ignore recordTransaction(#deposit, totalCost, caller, systemPrincipal, #success);
 
     (questIdA, questIdB);
   };
@@ -465,11 +583,23 @@ actor {
           case (null) {};
         };
 
+        // Authorization: Cannot accept your own quest
         if (quest.publisherId == caller) {
-          Runtime.trap("Cannot accept your own quest");
+          Runtime.trap("Unauthorized: Cannot accept your own quest");
         };
 
-        let depositAmount = (quest.rewardPool * Nat64.fromNat(quest.depositRate)) / (100 : Nat64);
+        let depositAmount = (quest.reward * Nat64.fromNat(quest.depositRate)) / (100 : Nat64);
+
+        // Validate warrior has sufficient balance for deposit
+        let warriorBalance = getUserBalance(caller);
+        if (warriorBalance < depositAmount) {
+          Runtime.trap("Insufficient balance: Warrior does not have enough funds for deposit");
+        };
+
+        // Deduct deposit from warrior's wallet
+        let newWarriorBalance = warriorBalance - depositAmount;
+        setUserBalance(caller, newWarriorBalance);
+
         let updatedQuest : Quest = {
           quest with
           status = #inProgress;
@@ -479,6 +609,10 @@ actor {
         };
 
         quests.add(questId, updatedQuest);
+
+        // Record transaction
+        let systemPrincipal = Principal.fromText("aaaaa-aa");
+        ignore recordTransaction(#deposit, depositAmount, caller, systemPrincipal, #success);
       };
     };
   };
@@ -494,6 +628,7 @@ actor {
         switch (quest.warriorId) {
           case (null) { Runtime.trap("Quest not yet accepted by any warrior") };
           case (?warriorId) {
+            // Authorization: Only the assigned warrior can submit check-ins
             if (warriorId != caller) {
               Runtime.trap("Unauthorized: You are not the warrior for this quest");
             };
@@ -537,6 +672,7 @@ actor {
         switch (quest.warriorId) {
           case (null) { Runtime.trap("Quest not yet accepted by any warrior") };
           case (?warriorId) {
+            // Authorization: Only the assigned warrior can submit completion
             if (warriorId != caller) {
               Runtime.trap("Unauthorized: You are not the warrior for this quest");
             };
@@ -579,13 +715,23 @@ actor {
           Runtime.trap("Quest cannot be deleted (already accepted by a warrior)");
         };
 
+        // Authorization: Only the publisher can delete their quest
         if (quest.publisherId != caller) {
           Runtime.trap("Unauthorized: Only the publisher can delete this quest");
         };
 
-        systemBountyBalance -= quest.rewardPool;
+        // Refund the original bounty to publisher
+        let publisherBalance = getUserBalance(caller);
+        setUserBalance(caller, publisherBalance + quest.reward);
+
+        systemBountyBalance -= quest.reward;
 
         quests.remove(questId);
+
+        // Record refund transaction
+        let systemPrincipal = Principal.fromText("aaaaa-aa");
+        ignore recordTransaction(#withdrawal, quest.reward, systemPrincipal, caller, #success);
+
         "";
       };
     };
@@ -599,13 +745,17 @@ actor {
     switch (quests.get(questId)) {
       case (null) { Runtime.trap("Quest not found") };
       case (?quest) {
+        // Authorization: Only the quest publisher can exit
         if (quest.publisherId != caller) {
           Runtime.trap("Unauthorized: Only the quest publisher can exit");
         };
 
-        let hasContributions = not quest.crowdfundingContributions.isEmpty();
+        let hasContributions = switch (quest.bountyContributions.first()) {
+          case (null) { false };
+          case (_) { true };
+        };
         if (not hasContributions) {
-          Runtime.trap("Cannot exit: No crowdfunding contributions found");
+          Runtime.trap("Cannot exit: No bounty contributions found");
         };
 
         if (quest.warriorId != null) {
@@ -635,6 +785,7 @@ actor {
         switch (quest.warriorId) {
           case (null) { Runtime.trap("Invalid abandon action: No warrior assigned to quest yet") };
           case (?warriorId) {
+            // Authorization: Only the assigned warrior can abandon
             if (caller != warriorId) {
               Runtime.trap("Unauthorized: You are not the warrior for this quest");
             };

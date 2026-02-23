@@ -1,47 +1,44 @@
 import { useState } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
-import { useExitQuest } from '../hooks/useQueries';
 import { QuestImmutable } from '../backend';
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Loader2, AlertCircle, Coins, LogOut, Users } from 'lucide-react';
+import { useExitQuest, useGetUserProfile } from '../hooks/useQueries';
 
 interface ExitQuestDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  quest: QuestImmutable;
+  quest: QuestImmutable | null;
 }
 
 export default function ExitQuestDialog({ open, onOpenChange, quest }: ExitQuestDialogProps) {
   const { t } = useLanguage();
-  const exitQuestMutation = useExitQuest();
-  const [isExiting, setIsExiting] = useState(false);
+  const { mutateAsync: exitQuest, isPending } = useExitQuest();
+  const [error, setError] = useState<string | null>(null);
 
-  // Calculate publisher's initial contribution
-  const totalCrowdfunding = quest.crowdfundingContributions.reduce(
-    (sum, [_, amount]) => sum + Number(amount),
-    0
-  );
-  const publisherContribution = Number(quest.rewardPool) - totalCrowdfunding;
-  const publisherContributionICP = publisherContribution / 100000000;
+  if (!quest) return null;
+
+  const originalBountyICP = Number(quest.originalBountyAmountE8) / 100000000;
+  const totalContributionsICP =
+    quest.bountyContributions.reduce((sum, contrib) => sum + Number(contrib.amountE8), 0) / 100000000;
+  const refundAmountICP = originalBountyICP;
 
   const handleConfirm = async () => {
-    setIsExiting(true);
+    setError(null);
     try {
-      await exitQuestMutation.mutateAsync(quest.questId);
+      await exitQuest(quest.questId);
       onOpenChange(false);
-    } catch (error) {
-      console.error('Exit quest error:', error);
-    } finally {
-      setIsExiting(false);
+    } catch (err: any) {
+      setError(err.message || t('exitQuest.exitError'));
     }
   };
 
@@ -49,55 +46,119 @@ export default function ExitQuestDialog({ open, onOpenChange, quest }: ExitQuest
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="border-orange-500/30 bg-card/95 backdrop-blur">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-orange-400">
+          <AlertDialogTitle className="text-orange-400 flex items-center gap-2">
+            <LogOut className="h-5 w-5" />
             {t('exitQuest.title')}
           </AlertDialogTitle>
-          <AlertDialogDescription className="space-y-3">
-            <p className="text-muted-foreground">
-              {t('exitQuest.description')}
-            </p>
-            <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-3 space-y-2">
-              <p className="font-semibold text-foreground">{quest.title}</p>
-              <div className="space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t('exitQuest.yourContribution')}</span>
-                  <span className="font-semibold text-neon-cyan">
-                    {publisherContributionICP.toFixed(4)} ICP
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t('exitQuest.crowdfunding')}</span>
-                  <span className="font-semibold">
-                    {quest.crowdfundingContributions.length} {t('exitQuest.contributors')}
-                  </span>
-                </div>
-              </div>
-              <p className="text-sm text-orange-400 mt-2">
-                {t('exitQuest.refundInfo')}
-              </p>
-            </div>
-          </AlertDialogDescription>
+          <AlertDialogDescription>{t('exitQuest.description')}</AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isExiting}>
-            {t('exitQuest.cancel')}
-          </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleConfirm}
-            disabled={isExiting}
-            className="bg-orange-600 hover:bg-orange-700"
+
+        <div className="space-y-4 py-4">
+          {/* Quest Info */}
+          <div>
+            <p className="text-xs text-muted-foreground mb-1">{t('exitQuest.questTitle')}</p>
+            <p className="font-semibold line-clamp-2">{quest.title}</p>
+          </div>
+
+          <Separator />
+
+          {/* Bounty Breakdown */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">{t('exitQuest.originalBounty')}</span>
+              <span className="font-semibold">{originalBountyICP.toFixed(4)} ICP</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">{t('exitQuest.contributions')}</span>
+              <span className="font-semibold text-neon-magenta">{totalContributionsICP.toFixed(4)} ICP</span>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Contributors List */}
+          {quest.bountyContributions.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Users className="h-4 w-4" />
+                <span>{t('exitQuest.contributors')}</span>
+              </div>
+              <div className="space-y-1 max-h-32 overflow-y-auto">
+                {quest.bountyContributions.map((contrib, idx) => {
+                  const contributorId = contrib.contributorId.toString();
+                  const amountICP = Number(contrib.amountE8) / 100000000;
+                  return (
+                    <ContributorRow key={idx} contributorId={contributorId} amountICP={amountICP} />
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <Separator />
+
+          {/* Refund Details */}
+          <div className="flex items-center justify-between p-3 rounded-lg bg-green-500/10 border border-green-500/30">
+            <span className="font-semibold text-green-400">{t('exitQuest.refundAmount')}</span>
+            <span className="text-xl font-bold text-green-400 flex items-center gap-1">
+              <Coins className="h-5 w-5" />
+              {refundAmountICP.toFixed(4)} ICP
+            </span>
+          </div>
+
+          {/* Warning Box */}
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-orange-500/10 border border-orange-500/30">
+            <AlertCircle className="h-4 w-4 text-orange-400 mt-0.5 shrink-0" />
+            <p className="text-xs text-orange-400">{t('exitQuest.warning')}</p>
+          </div>
+
+          {/* Error Display */}
+          {error && (
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/30">
+              <AlertCircle className="h-4 w-4 text-red-400 mt-0.5 shrink-0" />
+              <p className="text-xs text-red-400">{error}</p>
+            </div>
+          )}
+        </div>
+
+        <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isPending}
+            className="w-full sm:w-auto"
           >
-            {isExiting ? (
+            {t('exitQuest.back')}
+          </Button>
+          <Button
+            onClick={handleConfirm}
+            disabled={isPending}
+            className="w-full sm:w-auto bg-orange-500 text-white hover:bg-orange-600 font-semibold"
+          >
+            {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 {t('exitQuest.exiting')}
               </>
             ) : (
-              t('exitQuest.confirm')
+              t('exitQuest.confirmExit')
             )}
-          </AlertDialogAction>
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+  );
+}
+
+function ContributorRow({ contributorId, amountICP }: { contributorId: string; amountICP: number }) {
+  const { data: profile } = useGetUserProfile(contributorId as any);
+
+  return (
+    <div className="flex items-center justify-between text-xs p-2 rounded bg-muted/30">
+      <span className="font-mono truncate max-w-[150px]">
+        {profile?.name || `${contributorId.slice(0, 10)}...`}
+      </span>
+      <span className="font-semibold text-neon-cyan">{amountICP.toFixed(4)} ICP</span>
+    </div>
   );
 }

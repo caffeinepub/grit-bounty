@@ -17,7 +17,7 @@ import { useCancelQuest } from '../hooks/useQueries';
 interface CancelQuestDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  quest: QuestImmutable | undefined;
+  quest: QuestImmutable | null;
 }
 
 export default function CancelQuestDialog({ open, onOpenChange, quest }: CancelQuestDialogProps) {
@@ -27,7 +27,7 @@ export default function CancelQuestDialog({ open, onOpenChange, quest }: CancelQ
 
   if (!quest) return null;
 
-  const rewardPoolICP = Number(quest.rewardPool) / 100000000;
+  const rewardPoolICP = Number(quest.reward) / 100000000;
 
   const handleConfirm = async () => {
     setError(null);

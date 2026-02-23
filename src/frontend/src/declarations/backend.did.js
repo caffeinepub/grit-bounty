@@ -37,6 +37,11 @@ export const QuestStatus = IDL.Variant({
   'completed' : IDL.Null,
   'inProgress' : IDL.Null,
 });
+export const BountyContribution = IDL.Record({
+  'contributorId' : IDL.Principal,
+  'amountE8' : IDL.Nat64,
+  'timestamp' : IDL.Int,
+});
 export const CheckInRecord = IDL.Record({
   'photoUrl' : IDL.Opt(IDL.Text),
   'dayNumber' : IDL.Nat,
@@ -47,20 +52,21 @@ export const QuestImmutable = IDL.Record({
   'status' : QuestStatus,
   'completedAt' : IDL.Opt(IDL.Int),
   'depositAmount' : IDL.Nat64,
+  'reward' : IDL.Nat64,
   'title' : IDL.Text,
   'hypeCount' : IDL.Nat,
   'difficulty' : Difficulty,
   'createdAt' : IDL.Int,
+  'bountyContributions' : IDL.Vec(BountyContribution),
   'publisherId' : IDL.Principal,
   'dailyCheckIns' : IDL.Vec(CheckInRecord),
   'description' : IDL.Text,
-  'crowdfundingContributions' : IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Nat64)),
-  'rewardPool' : IDL.Nat64,
   'warriorId' : IDL.Opt(IDL.Principal),
   'questId' : IDL.Nat,
   'participantCount' : IDL.Nat,
   'completionTarget' : IDL.Nat,
   'acceptedAt' : IDL.Opt(IDL.Int),
+  'originalBountyAmountE8' : IDL.Nat64,
   'currentStreak' : IDL.Nat,
   'depositRate' : IDL.Nat,
 });
@@ -81,6 +87,7 @@ export const TransactionType = IDL.Variant({
   'withdrawal' : IDL.Null,
   'taskPayment' : IDL.Null,
   'taskDeduction' : IDL.Null,
+  'bountyContribution' : IDL.Null,
 });
 export const Transaction = IDL.Record({
   'id' : IDL.Nat,
@@ -122,7 +129,7 @@ export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'abandonQuest' : IDL.Func([IDL.Nat], [], []),
   'acceptQuest' : IDL.Func([IDL.Nat], [], []),
-  'addToPot' : IDL.Func([IDL.Nat, IDL.Nat64], [], []),
+  'addToBounty' : IDL.Func([IDL.Nat, IDL.Nat64], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'createABQuest' : IDL.Func(
       [
@@ -205,6 +212,11 @@ export const idlFactory = ({ IDL }) => {
     'completed' : IDL.Null,
     'inProgress' : IDL.Null,
   });
+  const BountyContribution = IDL.Record({
+    'contributorId' : IDL.Principal,
+    'amountE8' : IDL.Nat64,
+    'timestamp' : IDL.Int,
+  });
   const CheckInRecord = IDL.Record({
     'photoUrl' : IDL.Opt(IDL.Text),
     'dayNumber' : IDL.Nat,
@@ -215,20 +227,21 @@ export const idlFactory = ({ IDL }) => {
     'status' : QuestStatus,
     'completedAt' : IDL.Opt(IDL.Int),
     'depositAmount' : IDL.Nat64,
+    'reward' : IDL.Nat64,
     'title' : IDL.Text,
     'hypeCount' : IDL.Nat,
     'difficulty' : Difficulty,
     'createdAt' : IDL.Int,
+    'bountyContributions' : IDL.Vec(BountyContribution),
     'publisherId' : IDL.Principal,
     'dailyCheckIns' : IDL.Vec(CheckInRecord),
     'description' : IDL.Text,
-    'crowdfundingContributions' : IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Nat64)),
-    'rewardPool' : IDL.Nat64,
     'warriorId' : IDL.Opt(IDL.Principal),
     'questId' : IDL.Nat,
     'participantCount' : IDL.Nat,
     'completionTarget' : IDL.Nat,
     'acceptedAt' : IDL.Opt(IDL.Int),
+    'originalBountyAmountE8' : IDL.Nat64,
     'currentStreak' : IDL.Nat,
     'depositRate' : IDL.Nat,
   });
@@ -249,6 +262,7 @@ export const idlFactory = ({ IDL }) => {
     'withdrawal' : IDL.Null,
     'taskPayment' : IDL.Null,
     'taskDeduction' : IDL.Null,
+    'bountyContribution' : IDL.Null,
   });
   const Transaction = IDL.Record({
     'id' : IDL.Nat,
@@ -290,7 +304,7 @@ export const idlFactory = ({ IDL }) => {
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'abandonQuest' : IDL.Func([IDL.Nat], [], []),
     'acceptQuest' : IDL.Func([IDL.Nat], [], []),
-    'addToPot' : IDL.Func([IDL.Nat, IDL.Nat64], [], []),
+    'addToBounty' : IDL.Func([IDL.Nat, IDL.Nat64], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'createABQuest' : IDL.Func(
         [

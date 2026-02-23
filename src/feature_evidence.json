@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-display-user-s-icp-wallet-address-in-the-personal-center-to-enable-external-deposits-from-exchanges-or-other-wallets",
-      "featureTitle": "Display user's ICP wallet address in the Personal Center to enable external deposits from exchanges or other wallets",
+      "featureId": "feature-fix-the-cancel-quest-button-in-personalcenter-to-trigger-the-cancelquestdialog-when-clicked-ensure-the-button-properly-opens-the-dialog-and-handles-the-cancellation-flow",
+      "featureTitle": "Fix the Cancel Quest button (取消任务) in PersonalCenter to trigger the CancelQuestDialog when clicked. Ensure the button properly opens the dialog and handles the cancellation flow.",
       "files": [
-        "frontend/src/components/PersonalCenter.tsx",
-        "frontend/src/hooks/useQueries.ts"
+        "frontend/src/components/PersonalCenter.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -24,12 +23,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-show-current-icp-balance-in-the-wallet-section-of-personal-center",
-      "featureTitle": "Show current ICP balance in the wallet section of Personal Center",
+      "featureId": "feature-fix-the-delete-button-in-personalcenter-to-trigger-the-deletequestdialog-when-clicked-ensure-the-button-properly-opens-the-dialog-and-handles-the-deletion-flow",
+      "featureTitle": "Fix the Delete button (删除) in PersonalCenter to trigger the DeleteQuestDialog when clicked. Ensure the button properly opens the dialog and handles the deletion flow.",
       "files": [
-        "frontend/src/components/PersonalCenter.tsx",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/utils/formatters.ts"
+        "frontend/src/components/PersonalCenter.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -47,13 +44,12 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-icp-withdrawal-feature-allowing-users-to-send-icp-to-any-destination-address-with-0-01-transaction-fee-and-no-minimum-amount-restriction",
-      "featureTitle": "Implement ICP withdrawal feature allowing users to send ICP to any destination address with 0.01% transaction fee and no minimum amount restriction",
+      "featureId": "feature-add-visual-feedback-loading-states-disabled-states-or-click-animations-to-both-cancel-and-delete-buttons-during-processing-to-improve-user-experience-and-prevent-double-clicks",
+      "featureTitle": "Add visual feedback (loading states, disabled states, or click animations) to both Cancel and Delete buttons during processing to improve user experience and prevent double-clicks.",
       "files": [
-        "frontend/src/components/PersonalCenter.tsx",
-        "frontend/src/components/WithdrawalDialog.tsx",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/utils/validators.ts"
+        "frontend/src/components/CancelQuestDialog.tsx",
+        "frontend/src/components/DeleteQuestDialog.tsx",
+        "frontend/src/components/PersonalCenter.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -67,31 +63,6 @@
       ],
       "testIds": [
         "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-display-transaction-history-in-wallet-section-showing-time-transaction-type-deposit-withdrawal-task-deduction-task-payment-amount-and-status-for-each-transaction",
-      "featureTitle": "Display transaction history in wallet section showing time, transaction type (deposit/withdrawal/task deduction/task payment), amount, and status for each transaction",
-      "files": [
-        "frontend/src/components/PersonalCenter.tsx",
-        "frontend/src/components/TransactionHistory.tsx",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/i18n/translations.ts",
-        "frontend/src/utils/formatters.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "http-outcalls@3.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
       ],
       "confidence": "high"
     }

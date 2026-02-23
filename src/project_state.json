@@ -1,44 +1,34 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Task bounty platform with ICP wallet integration for real cryptocurrency payments",
-  "architectural_notes": [
-    "Must integrate real ICP Ledger for cryptocurrency transactions",
-    "Wallet withdrawal fee: 0.01%, no minimum amount limit",
-    "Transaction types: deposit, withdrawal, task deduction, task payment"
+  "summary": "New project",
+  "architectural_notes": [],
+  "known_issues": [
+    "Cancel task and delete buttons are not responding to clicks"
   ],
-  "known_issues": [],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-display-user-s-icp-wallet-address-in-the-personal-center-to-enable-external-deposits-from-exchanges-or-other-wallets",
-      "title": "Display user's ICP wallet address in the Personal Center to enable external deposits from exchanges or other wallets",
+      "id": "feature-fix-the-cancel-quest-button-in-personalcenter-to-trigger-the-cancelquestdialog-when-clicked-ensure-the-button-properly-opens-the-dialog-and-handles-the-cancellation-flow",
+      "title": "Fix the Cancel Quest button (取消任务) in PersonalCenter to trigger the CancelQuestDialog when clicked. Ensure the button properly opens the dialog and handles the cancellation flow.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-show-current-icp-balance-in-the-wallet-section-of-personal-center",
-      "title": "Show current ICP balance in the wallet section of Personal Center",
+      "id": "feature-fix-the-delete-button-in-personalcenter-to-trigger-the-deletequestdialog-when-clicked-ensure-the-button-properly-opens-the-dialog-and-handles-the-deletion-flow",
+      "title": "Fix the Delete button (删除) in PersonalCenter to trigger the DeleteQuestDialog when clicked. Ensure the button properly opens the dialog and handles the deletion flow.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-icp-withdrawal-feature-allowing-users-to-send-icp-to-any-destination-address-with-0-01-transaction-fee-and-no-minimum-amount-restriction",
-      "title": "Implement ICP withdrawal feature allowing users to send ICP to any destination address with 0.01% transaction fee and no minimum amount restriction",
+      "id": "feature-add-visual-feedback-loading-states-disabled-states-or-click-animations-to-both-cancel-and-delete-buttons-during-processing-to-improve-user-experience-and-prevent-double-clicks",
+      "title": "Add visual feedback (loading states, disabled states, or click animations) to both Cancel and Delete buttons during processing to improve user experience and prevent double-clicks.",
       "reqIds": [
         "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-display-transaction-history-in-wallet-section-showing-time-transaction-type-deposit-withdrawal-task-deduction-task-payment-amount-and-status-for-each-transaction",
-      "title": "Display transaction history in wallet section showing time, transaction type (deposit/withdrawal/task deduction/task payment), amount, and status for each transaction",
-      "reqIds": [
-        "REQ-4"
       ],
       "version": 1
     }
@@ -46,40 +36,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add ICP wallet to profile center showing balance and ICP deposit address",
+      "summary": "Fix cancel task and delete buttons to provide user feedback/response when clicked",
       "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Implement ICP withdrawal with 0.01% fee and user-provided destination address",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Display transaction history with time, type (deposit/withdrawal/task deduction/task payment), amount, and status",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-8",
-      "summary": "Integrate Internet Computer ICP Ledger canister to handle real cryptocurrency deposits and track incoming transfers to user wallet addresses",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-9",
-      "summary": "Integrate ICP Ledger canister for outbound transfers to enable real cryptocurrency withdrawals to external addresses",
-      "reqIds": [
-        "REQ-6"
-      ],
       "status": "pending"
     }
   ],
-  "projectName": "Grit Bounty",
+  "projectName": "Fix non-responsive Cancel and Delete buttons in Personal Center",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

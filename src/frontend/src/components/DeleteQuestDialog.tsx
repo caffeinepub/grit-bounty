@@ -16,12 +16,14 @@ import { Loader2 } from 'lucide-react';
 interface DeleteQuestDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  quest: QuestImmutable;
+  quest: QuestImmutable | null;
 }
 
 export default function DeleteQuestDialog({ open, onOpenChange, quest }: DeleteQuestDialogProps) {
   const { t } = useLanguage();
   const deleteQuestMutation = useDeleteQuest();
+
+  if (!quest) return null;
 
   console.log('[DeleteQuestDialog] Rendered with quest:', quest.questId.toString());
 

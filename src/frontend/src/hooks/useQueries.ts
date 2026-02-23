@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import { useInternetIdentity } from './useInternetIdentity';
 import { UserProfile, QuestImmutable, Difficulty, Transaction } from '../backend';
+import { Principal } from '@dfinity/principal';
 import { toast } from 'sonner';
 
 export function useGetCallerUserProfile() {
@@ -22,6 +23,21 @@ export function useGetCallerUserProfile() {
     isLoading: actorFetching || query.isLoading,
     isFetched: !!actor && query.isFetched,
   };
+}
+
+export function useGetUserProfile(principal: Principal) {
+  const { actor, isFetching: actorFetching } = useActor();
+
+  return useQuery<UserProfile | null>({
+    queryKey: ['userProfile', principal.toString()],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.getUserProfile(principal);
+    },
+    enabled: !!actor && !actorFetching && !!principal,
+    retry: false,
+    staleTime: 60000, // Cache for 1 minute
+  });
 }
 
 export function useGetWalletAddress() {
@@ -208,10 +224,28 @@ export function useAddToPot() {
   return useMutation({
     mutationFn: async ({ questId, contribution }: { questId: bigint; contribution: bigint }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.addToPot(questId, contribution);
+      return actor.addToBounty(questId, contribution);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
+      queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
+    },
+  });
+}
+
+export function useAddBounty() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ questId, amountE8 }: { questId: bigint; amountE8: bigint }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.addToBounty(questId, amountE8);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
+      queryClient.invalidateQueries({ queryKey: ['myPostedBounties'] });
+      queryClient.invalidateQueries({ queryKey: ['callerBalance'] });
       queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
     },
   });
@@ -332,6 +366,31 @@ export function useDeleteQuest() {
   });
 }
 
+export function useCancelQuest() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (questId: bigint) => {
+      console.log('[useCancelQuest] Mutation called with questId:', questId.toString());
+      if (!actor) throw new Error('Actor not available');
+      return actor.deleteQuest(questId);
+    },
+    onSuccess: () => {
+      console.log('[useCancelQuest] Quest cancelled successfully');
+      toast.success('Quest cancelled successfully!');
+      queryClient.invalidateQueries({ queryKey: ['myPostedBounties'] });
+      queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
+      queryClient.invalidateQueries({ queryKey: ['callerBalance'] });
+      queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
+    },
+    onError: (error: Error) => {
+      console.error('[useCancelQuest] Failed to cancel quest:', error);
+      toast.error(error.message || 'Failed to cancel quest');
+    },
+  });
+}
+
 export function useExitQuest() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
@@ -344,10 +403,9 @@ export function useExitQuest() {
     },
     onSuccess: () => {
       console.log('[useExitQuest] Quest exited successfully');
-      toast.success('Successfully exited quest. Your contribution has been refunded.');
+      toast.success('Successfully exited quest');
       queryClient.invalidateQueries({ queryKey: ['myPostedBounties'] });
       queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
-      queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
     },
     onError: (error: Error) => {
       console.error('[useExitQuest] Failed to exit quest:', error);
@@ -368,11 +426,10 @@ export function useAbandonQuest() {
     },
     onSuccess: () => {
       console.log('[useAbandonQuest] Quest abandoned successfully');
-      toast.success('Quest abandoned. Your deposit has been forfeited and deposit rate reset to 50%.');
+      toast.success('Quest abandoned');
       queryClient.invalidateQueries({ queryKey: ['myAcceptedQuests'] });
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
       queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
-      queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
+      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
     },
     onError: (error: Error) => {
       console.error('[useAbandonQuest] Failed to abandon quest:', error);
@@ -381,29 +438,21 @@ export function useAbandonQuest() {
   });
 }
 
-export function useCancelQuest() {
+export function useSubmitCompletion() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (questId: bigint) => {
-      console.log('[useCancelQuest] Mutation called with questId:', questId.toString());
       if (!actor) throw new Error('Actor not available');
-      // Backend doesn't have cancelQuest yet, so we'll use deleteQuest for now
-      // which already handles the refund logic
-      return actor.deleteQuest(questId);
+      return actor.submitCompletion(questId);
     },
     onSuccess: () => {
-      console.log('[useCancelQuest] Quest cancelled successfully');
-      toast.success('Quest cancelled successfully. Full refund has been returned to your balance.');
-      queryClient.invalidateQueries({ queryKey: ['myPostedBounties'] });
-      queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
-      queryClient.invalidateQueries({ queryKey: ['callerBalance'] });
-      queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
+      toast.success('Quest completion submitted!');
+      queryClient.invalidateQueries({ queryKey: ['myAcceptedQuests'] });
     },
     onError: (error: Error) => {
-      console.error('[useCancelQuest] Failed to cancel quest:', error);
-      toast.error(error.message || 'Failed to cancel quest');
+      toast.error(error.message || 'Failed to submit completion');
     },
   });
 }
