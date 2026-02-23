@@ -11,13 +11,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Loader2, Coins, Shield, AlertCircle } from 'lucide-react';
+import { Loader2, Coins, Shield, AlertCircle, Users } from 'lucide-react';
 
 interface DepositConfirmationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   questTitle: string;
   rewardPool: bigint;
+  participantCount: bigint;
   depositAmount: number;
   depositRate: number;
   onConfirm: () => Promise<void>;
@@ -28,6 +29,7 @@ export default function DepositConfirmationDialog({
   onOpenChange,
   questTitle,
   rewardPool,
+  participantCount,
   depositAmount,
   depositRate,
   onConfirm,
@@ -50,6 +52,8 @@ export default function DepositConfirmationDialog({
   };
 
   const rewardPoolICP = Number(rewardPool) / 100000000;
+  const participants = Number(participantCount);
+  const perWarriorReward = rewardPoolICP / participants;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -74,10 +78,25 @@ export default function DepositConfirmationDialog({
           {/* Financial Details */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">{t('deposit.rewardPool')}</span>
+              <span className="text-sm text-muted-foreground">{t('deposit.totalRewardPool')}</span>
               <span className="font-semibold text-neon-magenta flex items-center gap-1">
                 <Coins className="h-4 w-4" />
                 {rewardPoolICP.toFixed(4)} ICP
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">{t('deposit.warriorsNeeded')}</span>
+              <span className="font-semibold flex items-center gap-1">
+                <Users className="h-4 w-4" />
+                {participants}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between p-2 rounded-lg bg-neon-magenta/10 border border-neon-magenta/30">
+              <span className="text-sm text-muted-foreground">{t('deposit.perWarriorReward')}</span>
+              <span className="font-bold text-neon-magenta">
+                {perWarriorReward.toFixed(4)} ICP
               </span>
             </div>
 

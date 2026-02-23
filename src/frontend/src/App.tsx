@@ -1,39 +1,79 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useInternetIdentity } from './hooks/useInternetIdentity';
-import { useGetCallerUserProfile } from './hooks/useQueries';
-import SplashScreen from './components/SplashScreen';
+import { useActor } from './hooks/useActor';
+import { useQueryClient } from '@tanstack/react-query';
+import { LanguageProvider } from './hooks/useLanguage';
 import MainApp from './components/MainApp';
 import Layout from './components/Layout';
+import SplashScreen from './components/SplashScreen';
 import { Toaster } from '@/components/ui/sonner';
+import { Loader2 } from 'lucide-react';
+
+type FlowStep = 'splash' | 'authenticating' | 'authenticated';
 
 export default function App() {
-  const { identity } = useInternetIdentity();
-  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
-  const [hasSeenSplash, setHasSeenSplash] = useState(false);
+  const { identity, login, loginStatus, isInitializing } = useInternetIdentity();
+  const { actor, isFetching: actorFetching } = useActor();
+  const queryClient = useQueryClient();
+  const [flowStep, setFlowStep] = useState<FlowStep>('splash');
 
   const isAuthenticated = !!identity;
-  
-  // Show splash screen if authenticated and has profile
-  const showSplash = isAuthenticated && userProfile && !hasSeenSplash;
-  const showMainApp = isAuthenticated && userProfile && hasSeenSplash;
 
+  // Manage flow progression
   useEffect(() => {
-    const splashSeen = sessionStorage.getItem('splashSeen');
-    if (splashSeen === 'true') {
-      setHasSeenSplash(true);
+    if (isInitializing) {
+      return;
     }
-  }, []);
 
-  const handleEnterApp = () => {
-    sessionStorage.setItem('splashSeen', 'true');
-    setHasSeenSplash(true);
+    if (isAuthenticated && actor && !actorFetching) {
+      setFlowStep('authenticated');
+    } else if (loginStatus === 'logging-in') {
+      setFlowStep('authenticating');
+    }
+  }, [isAuthenticated, actor, actorFetching, loginStatus, isInitializing]);
+
+  const handleLoginClick = async () => {
+    try {
+      setFlowStep('authenticating');
+      await login();
+    } catch (error: any) {
+      console.error('Login error:', error);
+      setFlowStep('splash');
+    }
   };
 
   return (
-    <Layout>
-      <Toaster />
-      {showSplash && <SplashScreen onEnter={handleEnterApp} />}
-      {showMainApp && <MainApp />}
-    </Layout>
+    <LanguageProvider>
+      {/* Show splash screen first */}
+      {flowStep === 'splash' && (
+        <>
+          <Toaster />
+          <SplashScreen onLoginClick={handleLoginClick} />
+        </>
+      )}
+
+      {/* Show authenticating state */}
+      {(flowStep === 'authenticating' || isInitializing || (isAuthenticated && actorFetching)) && (
+        <Layout>
+          <Toaster />
+          <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
+            <div className="text-center">
+              <Loader2 className="h-12 w-12 animate-spin text-neon-cyan mx-auto mb-4" />
+              <p className="text-lg text-muted-foreground">
+                {loginStatus === 'logging-in' ? 'Authenticating...' : 'Initializing...'}
+              </p>
+            </div>
+          </div>
+        </Layout>
+      )}
+
+      {/* Show main app after authentication */}
+      {flowStep === 'authenticated' && isAuthenticated && actor && (
+        <Layout>
+          <Toaster />
+          <MainApp />
+        </Layout>
+      )}
+    </LanguageProvider>
   );
 }

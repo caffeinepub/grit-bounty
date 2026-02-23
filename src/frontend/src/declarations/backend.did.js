@@ -24,6 +24,46 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const Difficulty = IDL.Variant({
+  'easy' : IDL.Null,
+  'hard' : IDL.Null,
+  'medium' : IDL.Null,
+});
+export const QuestStatus = IDL.Variant({
+  'pendingVerification' : IDL.Null,
+  'active' : IDL.Null,
+  'cancelled' : IDL.Null,
+  'disputed' : IDL.Null,
+  'completed' : IDL.Null,
+  'inProgress' : IDL.Null,
+});
+export const CheckInRecord = IDL.Record({
+  'photoUrl' : IDL.Opt(IDL.Text),
+  'dayNumber' : IDL.Nat,
+  'timestamp' : IDL.Int,
+  'statusText' : IDL.Text,
+});
+export const QuestImmutable = IDL.Record({
+  'status' : QuestStatus,
+  'completedAt' : IDL.Opt(IDL.Int),
+  'depositAmount' : IDL.Nat64,
+  'title' : IDL.Text,
+  'hypeCount' : IDL.Nat,
+  'difficulty' : Difficulty,
+  'createdAt' : IDL.Int,
+  'publisherId' : IDL.Principal,
+  'dailyCheckIns' : IDL.Vec(CheckInRecord),
+  'description' : IDL.Text,
+  'crowdfundingContributions' : IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Nat64)),
+  'rewardPool' : IDL.Nat64,
+  'warriorId' : IDL.Opt(IDL.Principal),
+  'questId' : IDL.Nat,
+  'participantCount' : IDL.Nat,
+  'completionTarget' : IDL.Nat,
+  'acceptedAt' : IDL.Opt(IDL.Int),
+  'currentStreak' : IDL.Nat,
+  'depositRate' : IDL.Nat,
+});
 export const UserProfile = IDL.Record({
   'name' : IDL.Text,
   'totalEarned' : IDL.Nat64,
@@ -60,9 +100,39 @@ export const idlService = IDL.Service({
     ),
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+  'abandonQuest' : IDL.Func([IDL.Nat], [], []),
+  'acceptQuest' : IDL.Func([IDL.Nat], [], []),
+  'addToPot' : IDL.Func([IDL.Nat, IDL.Nat64], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'createABQuest' : IDL.Func(
+      [
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Nat64,
+        Difficulty,
+        IDL.Opt(IDL.Nat),
+      ],
+      [IDL.Nat, IDL.Nat],
+      [],
+    ),
+  'createQuest' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Nat64, Difficulty, IDL.Opt(IDL.Nat)],
+      [IDL.Nat],
+      [],
+    ),
+  'deleteQuest' : IDL.Func([IDL.Nat], [IDL.Text], []),
+  'exitQuest' : IDL.Func([IDL.Nat], [], []),
+  'getActiveQuests' : IDL.Func(
+      [IDL.Opt(Difficulty)],
+      [IDL.Vec(QuestImmutable)],
+      ['query'],
+    ),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getMyAcceptedQuests' : IDL.Func([], [IDL.Vec(QuestImmutable)], ['query']),
+  'getMyPostedBounties' : IDL.Func([], [IDL.Vec(QuestImmutable)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
@@ -70,6 +140,12 @@ export const idlService = IDL.Service({
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'submitCompletion' : IDL.Func([IDL.Nat], [], []),
+  'submitDailyCheckIn' : IDL.Func(
+      [IDL.Nat, IDL.Text, IDL.Opt(IDL.Text)],
+      [],
+      [],
+    ),
 });
 
 export const idlInitArgs = [];
@@ -90,6 +166,46 @@ export const idlFactory = ({ IDL }) => {
     'admin' : IDL.Null,
     'user' : IDL.Null,
     'guest' : IDL.Null,
+  });
+  const Difficulty = IDL.Variant({
+    'easy' : IDL.Null,
+    'hard' : IDL.Null,
+    'medium' : IDL.Null,
+  });
+  const QuestStatus = IDL.Variant({
+    'pendingVerification' : IDL.Null,
+    'active' : IDL.Null,
+    'cancelled' : IDL.Null,
+    'disputed' : IDL.Null,
+    'completed' : IDL.Null,
+    'inProgress' : IDL.Null,
+  });
+  const CheckInRecord = IDL.Record({
+    'photoUrl' : IDL.Opt(IDL.Text),
+    'dayNumber' : IDL.Nat,
+    'timestamp' : IDL.Int,
+    'statusText' : IDL.Text,
+  });
+  const QuestImmutable = IDL.Record({
+    'status' : QuestStatus,
+    'completedAt' : IDL.Opt(IDL.Int),
+    'depositAmount' : IDL.Nat64,
+    'title' : IDL.Text,
+    'hypeCount' : IDL.Nat,
+    'difficulty' : Difficulty,
+    'createdAt' : IDL.Int,
+    'publisherId' : IDL.Principal,
+    'dailyCheckIns' : IDL.Vec(CheckInRecord),
+    'description' : IDL.Text,
+    'crowdfundingContributions' : IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Nat64)),
+    'rewardPool' : IDL.Nat64,
+    'warriorId' : IDL.Opt(IDL.Principal),
+    'questId' : IDL.Nat,
+    'participantCount' : IDL.Nat,
+    'completionTarget' : IDL.Nat,
+    'acceptedAt' : IDL.Opt(IDL.Int),
+    'currentStreak' : IDL.Nat,
+    'depositRate' : IDL.Nat,
   });
   const UserProfile = IDL.Record({
     'name' : IDL.Text,
@@ -127,9 +243,39 @@ export const idlFactory = ({ IDL }) => {
       ),
     '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+    'abandonQuest' : IDL.Func([IDL.Nat], [], []),
+    'acceptQuest' : IDL.Func([IDL.Nat], [], []),
+    'addToPot' : IDL.Func([IDL.Nat, IDL.Nat64], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'createABQuest' : IDL.Func(
+        [
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Nat64,
+          Difficulty,
+          IDL.Opt(IDL.Nat),
+        ],
+        [IDL.Nat, IDL.Nat],
+        [],
+      ),
+    'createQuest' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Nat64, Difficulty, IDL.Opt(IDL.Nat)],
+        [IDL.Nat],
+        [],
+      ),
+    'deleteQuest' : IDL.Func([IDL.Nat], [IDL.Text], []),
+    'exitQuest' : IDL.Func([IDL.Nat], [], []),
+    'getActiveQuests' : IDL.Func(
+        [IDL.Opt(Difficulty)],
+        [IDL.Vec(QuestImmutable)],
+        ['query'],
+      ),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getMyAcceptedQuests' : IDL.Func([], [IDL.Vec(QuestImmutable)], ['query']),
+    'getMyPostedBounties' : IDL.Func([], [IDL.Vec(QuestImmutable)], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
@@ -137,6 +283,12 @@ export const idlFactory = ({ IDL }) => {
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'submitCompletion' : IDL.Func([IDL.Nat], [], []),
+    'submitDailyCheckIn' : IDL.Func(
+        [IDL.Nat, IDL.Text, IDL.Opt(IDL.Text)],
+        [],
+        [],
+      ),
   });
 };
 

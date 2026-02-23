@@ -10,6 +10,42 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface CheckInRecord {
+  'photoUrl' : [] | [string],
+  'dayNumber' : bigint,
+  'timestamp' : bigint,
+  'statusText' : string,
+}
+export type Difficulty = { 'easy' : null } |
+  { 'hard' : null } |
+  { 'medium' : null };
+export interface QuestImmutable {
+  'status' : QuestStatus,
+  'completedAt' : [] | [bigint],
+  'depositAmount' : bigint,
+  'title' : string,
+  'hypeCount' : bigint,
+  'difficulty' : Difficulty,
+  'createdAt' : bigint,
+  'publisherId' : Principal,
+  'dailyCheckIns' : Array<CheckInRecord>,
+  'description' : string,
+  'crowdfundingContributions' : Array<[Principal, bigint]>,
+  'rewardPool' : bigint,
+  'warriorId' : [] | [Principal],
+  'questId' : bigint,
+  'participantCount' : bigint,
+  'completionTarget' : bigint,
+  'acceptedAt' : [] | [bigint],
+  'currentStreak' : bigint,
+  'depositRate' : bigint,
+}
+export type QuestStatus = { 'pendingVerification' : null } |
+  { 'active' : null } |
+  { 'cancelled' : null } |
+  { 'disputed' : null } |
+  { 'completed' : null } |
+  { 'inProgress' : null };
 export interface UserProfile {
   'name' : string,
   'totalEarned' : bigint,
@@ -48,12 +84,33 @@ export interface _SERVICE {
   >,
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  'abandonQuest' : ActorMethod<[bigint], undefined>,
+  'acceptQuest' : ActorMethod<[bigint], undefined>,
+  'addToPot' : ActorMethod<[bigint, bigint], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'createABQuest' : ActorMethod<
+    [string, string, string, string, bigint, Difficulty, [] | [bigint]],
+    [bigint, bigint]
+  >,
+  'createQuest' : ActorMethod<
+    [string, string, bigint, Difficulty, [] | [bigint]],
+    bigint
+  >,
+  'deleteQuest' : ActorMethod<[bigint], string>,
+  'exitQuest' : ActorMethod<[bigint], undefined>,
+  'getActiveQuests' : ActorMethod<[[] | [Difficulty]], Array<QuestImmutable>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getMyAcceptedQuests' : ActorMethod<[], Array<QuestImmutable>>,
+  'getMyPostedBounties' : ActorMethod<[], Array<QuestImmutable>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'submitCompletion' : ActorMethod<[bigint], undefined>,
+  'submitDailyCheckIn' : ActorMethod<
+    [bigint, string, [] | [string]],
+    undefined
+  >,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

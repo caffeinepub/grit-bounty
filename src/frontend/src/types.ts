@@ -8,6 +8,15 @@ export enum Language {
   French = 'French',
   Japanese = 'Japanese',
   Korean = 'Korean',
+  German = 'German',
+  Arabic = 'Arabic',
+  Portuguese = 'Portuguese',
+  Russian = 'Russian',
+  Italian = 'Italian',
+  Dutch = 'Dutch',
+  Hindi = 'Hindi',
+  Turkish = 'Turkish',
+  Polish = 'Polish',
 }
 
 export enum Difficulty {

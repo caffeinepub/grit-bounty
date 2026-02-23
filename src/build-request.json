@@ -1,241 +1,38 @@
 {
   "kind": "build_request",
-  "title": "Implement ICP Financial Payment System with Dynamic Deposit and Dispute Resolution",
-  "projectName": "Grit Bounty",
+  "title": "Fix language switching to update entire interface",
   "priority": "high",
   "requirements": [
     {
-      "id": "REQ-9",
-      "text": "Integrate ICP Ledger Canister to enable real ICP token transfers for all bounty deposits, rewards, and platform fees. Implement secure canister-to-canister calls to the ICP Ledger for deposit locking, reward distribution, and automated transfers.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "真实的ICP转账",
-          "通过 ICP Ledger Canister 执行真实代币转账"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend integrates with ICP Ledger Canister for real token transfers",
-        "All ICP amounts are converted to e8s format for ledger transactions",
-        "Deposit locks are recorded on-chain when warriors accept quests",
-        "Successful transfers return transaction receipts"
-      ]
-    },
-    {
-      "id": "REQ-10",
-      "text": "Implement dynamic deposit calculation system starting at 50% of the bounty pool. Track each warrior's successful quest completion count and reduce their deposit rate by 3% per successful completion until reaching a minimum of 2% (achievable after 16 successful completions). Store warrior credit scores in user profiles.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "押金机制：固定收取奖金的 50% 作为押金",
-          "每成功完成一次任务，下次押金减少 3%",
-          "持续循环直到押金降至 2%"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Initial deposit is calculated as 50% of the bounty pool amount",
-        "Each successful quest completion reduces the warrior's deposit rate by 3%",
-        "Minimum deposit rate is capped at 2%",
-        "User profile stores current deposit rate and successful completion count",
-        "Deposit calculation uses the warrior's current credit-based rate"
-      ]
-    },
-    {
-      "id": "REQ-11",
-      "text": "Implement deposit penalty reset mechanism: when a warrior abandons a quest mid-way or loses a dispute vote, reset their deposit rate back to 50% and restart the credit accumulation cycle from zero. Update the user profile to reflect the penalty.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "如果中途放弃任务或争议投票失败，押金重置为 50% 并重新循环"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Quest abandonment triggers deposit rate reset to 50%",
-        "Losing a dispute vote triggers deposit rate reset to 50%",
-        "Successful completion count is reset to 0 on penalty",
-        "User profile updates persist the penalty state"
-      ]
-    },
-    {
-      "id": "REQ-12",
-      "text": "Create automated reward distribution system with 6% platform fee deduction. When a quest completes successfully without disputes, automatically transfer 6% to the platform treasury, return the warrior's deposit to their account, and transfer 94% of the bounty pool to the warrior. Execute all transfers atomically within 24 hours if no objections are raised.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "自动分账：6% 平台费 + 94% 赏金池 + 押金返还给勇士",
-          "自动发放：24 小时内无异议自动转账"
-        ]
-      },
-      "acceptanceCriteria": [
-        "System waits 24 hours after quest completion before auto-distribution",
-        "Platform fee of 6% is calculated and transferred to platform treasury",
-        "Warrior receives 94% of bounty pool plus full deposit refund",
-        "All three transfers (platform fee, bounty, deposit) execute atomically",
-        "Failed transfers trigger rollback and alert mechanisms"
-      ]
-    },
-    {
-      "id": "REQ-13",
-      "text": "Implement three-tier dispute resolution system. First tier (auto-release): if no party raises an objection within 24 hours of quest completion, automatically distribute funds. Second tier (first appeal): if either party disputes, enable weighted voting with publisher holding 30% weight, platform admin holding 15% weight, and community votes totaling 55% weight. Third tier (second appeal): require both parties to submit written reasoning, then wait 24 hours; if no further objections, release funds. Fourth tier (third appeal): grant platform admin 100% final decision authority.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "自动发放：24 小时内无异议自动转账",
-          "一次申诉：发布者 30% + 平台管理员 15% + 社区投票 55%",
-          "三次申诉：平台管理员 100% 最终裁决权"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Quest completion triggers 24-hour auto-release timer",
-        "Either party can raise dispute to enter first appeal",
-        "First appeal calculates weighted vote: 30% publisher + 15% admin + 55% community",
-        "Side with >50% total weight wins first appeal",
-        "Second appeal requires written dispute reasoning from both parties",
-        "Third appeal grants admin full override authority",
-        "Each tier has clear state transitions and timestamps"
-      ]
-    },
-    {
-      "id": "REQ-14",
-      "text": "Build community voting interface for dispute resolution. Display disputed quest details, both parties' arguments, and allow logged-in users to cast votes. Calculate vote weights in real-time and display current vote distribution (publisher 30%, admin 15%, community votes 55%). Show voting deadline and prevent duplicate votes. Close voting when total votes exceed 50% threshold for either side.",
+      "id": "REQ-1",
+      "text": "Fix the language switching mechanism so that when a user selects a new language from the dropdown, all text across the entire application interface updates immediately to reflect the chosen language",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-recent"
+          "msg-last"
         ],
         "quotes": [
-          "软件里面加上一个投票区的界面",
-          "只要一方超过百分之50支持就判定这方赢",
-          "一次申诉：发布者 30% + 平台管理员 15% + 社区投票 55%"
+          "切换语言后应用没有正确更新 现在选择完语言整个界面没有切换语言"
         ]
       },
       "acceptanceCriteria": [
-        "Voting interface displays quest details and dispute context",
-        "Users can view both publisher and warrior arguments",
-        "Real-time vote count shows weighted percentages",
-        "Each user can vote only once per dispute",
-        "Voting closes when either side reaches >50% total weight",
-        "Results are displayed immediately after voting closes"
-      ]
-    },
-    {
-      "id": "REQ-15",
-      "text": "Create appeal submission interface allowing publishers and warriors to submit written dispute reasoning. Display a form with text area for detailed arguments, character count (minimum 100 characters), and evidence attachment capability. Show submission status and timestamp for transparency.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "二次申诉：需提交争议理由",
-          "任务完成验证方式百分之50由我决定 百分之40由发布者决定 剩余百分之10由软件里面的用户投票决定"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Form allows both parties to submit dispute reasoning text",
-        "Minimum 100 character requirement enforced",
-        "Submission includes timestamp and party identifier",
-        "Users can view their own and opponent's submissions",
-        "Interface shows current appeal tier and next steps"
-      ]
-    },
-    {
-      "id": "REQ-16",
-      "text": "Extend quest data model to include deposit amount, deposit rate, dispute status (none, first_appeal, second_appeal, third_appeal), voting records, appeal submissions, and auto-release timer. Add state machine to track quest lifecycle from creation through completion/dispute resolution to final payout.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "三级争议解决机制",
-          "自动发放：24 小时内无异议自动转账"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Quest model stores deposit amount and warrior's deposit rate",
-        "Dispute status field tracks current appeal tier",
-        "Voting records store voter identities and weighted votes",
-        "Appeal submissions are stored with timestamps",
-        "Auto-release timer tracks 24-hour waiting periods",
-        "State machine prevents invalid state transitions"
-      ]
-    },
-    {
-      "id": "REQ-17",
-      "text": "Display warrior credit score and current deposit rate prominently in the Personal Center tab. Show a progress indicator visualizing the journey from 50% to 2% deposit rate, highlighting successful completions and remaining tasks to reach minimum deposit. Include a credit history section showing past quest outcomes and penalty events.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "每成功完成一次任务，下次押金减少 3%",
-          "循环 3 次后，押金永久降至 1%"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Personal Center displays current deposit rate percentage",
-        "Progress bar shows path from 50% to 2% with current position",
-        "Credit history lists successful completions with timestamps",
-        "Penalty events (abandonments, lost disputes) are clearly marked",
-        "Estimated tasks remaining to reach 2% minimum is calculated and shown"
-      ]
-    },
-    {
-      "id": "REQ-18",
-      "text": "Update Quest Card component in Bounty Board to display required deposit amount in ICP based on the logged-in warrior's current credit score. Show both the bounty pool amount and the calculated deposit requirement. Update the Accept Challenge button to trigger deposit collection using ICP Ledger integration before locking the contract.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "Include an Accept Challenge button on each quest that requires an ICP deposit to lock the contract",
-          "押金机制：固定收取奖金的 50% 作为押金"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Quest cards show calculated deposit amount based on warrior's rate",
-        "Accept button displays required deposit in ICP",
-        "Clicking Accept triggers ICP transfer confirmation dialog",
-        "Successful deposit locks the quest and updates UI state",
-        "Failed deposits show error messages without locking quest"
+        "After selecting a language from the dropdown, all visible text in the UI immediately updates to the selected language",
+        "The language change persists across page refreshes",
+        "All components (SplashScreen, MainApp, BountyBoard, LaunchMission, PersonalCenter, QuestCard, etc.) display text in the selected language",
+        "No manual page refresh is required for the language change to take effect"
       ]
     }
   ],
   "constraints": [
-    "All ICP Ledger interactions must handle e8s conversions correctly (1 ICP = 100,000,000 e8s)",
-    "Deposit rate must never fall below 2% regardless of successful completions",
-    "Platform admin role must be verified before allowing admin voting weight or final arbitration",
-    "All financial transactions must be atomic to prevent partial transfers",
-    "24-hour auto-release timers must be timezone-agnostic and use canister timestamps",
-    "Voting must prevent duplicate votes from the same principal ID",
-    "Quest state transitions must follow strict state machine rules to prevent invalid states"
+    "Do not modify files or components other than those directly related to the language switching mechanism",
+    "Preserve existing localStorage persistence for language selection",
+    "Keep the current useLanguage hook structure intact"
   ],
   "nonGoals": [
-    "Support for other cryptocurrencies or tokens beyond ICP",
-    "External blockchain integrations or cross-chain transfers",
-    "Automated AI-based dispute resolution",
-    "Real-time WebSocket notifications for voting updates",
-    "Video or image evidence uploads for disputes",
-    "Advanced analytics dashboards for platform revenue",
-    "Gamification features like badges or leaderboards based on credit scores"
+    "Adding new languages to the system",
+    "Modifying translation content or keys",
+    "Changing UI component layouts or styling",
+    "Altering backend functionality"
   ],
   "imageRequirements": {
     "required": [],

@@ -1,230 +1,24 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 5,
-  "summary": "Grit Bounty: A SocialFi persistence-verification platform built on ICP with multi-language support, 3-tab navigation (Bounty Board, Launch Mission, Personal Center), ICP-based financial transactions with dynamic deposit system (50% initial deposit reducing by 3% per successful completion to 2% minimum), three-tier dispute resolution mechanism (auto-release, appeals with weighted voting, final admin arbitration), and a 6% platform fee system.",
-  "architectural_notes": [
-    "Platform built on Internet Computer Protocol (ICP) with Canister-based fund management",
-    "Multi-language support via i18n layer (6 languages: Chinese, English, Spanish, French, Japanese, Korean)",
-    "3-tab navigation architecture: Bounty Board, Launch Mission, Personal Center",
-    "Financial flow: Deposit → Canister lock → Task completion → 6% platform fee → 94% + deposit to warrior",
-    "Dark theme UI with high-tech aesthetic",
-    "Dynamic deposit system: Initial 50% deposit reduces by 3% per successful task, minimum 2%; resets to 50% on failure/dispute loss",
-    "Three-tier dispute resolution: 24h auto-release → weighted appeal (30% publisher/15% admin/55% community) → reasoned second appeal → 100% admin final decision",
-    "Community voting mechanism with 50%+ threshold for dispute resolution; requires reasoning submissions on second appeal",
-    "Warrior credit tracking system maintains completion history and current deposit percentage status"
+  "projectStateVersion": 3,
+  "summary": "New project with language switching functionality",
+  "architectural_notes": [],
+  "known_issues": [
+    "Language switching does not update the entire interface after language selection"
   ],
-  "known_issues": [],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-create-an-initial-language-selection-screen-that-appears-on-first-app-entry-offering-six-language-options-simplified-chinese-english-spanish-french-japanese-and-korean-store-the-user-s-language-preference-and-apply-it-globally-across-all-ui-text-notifications-and-ai-summaries-throughout-the-application",
-      "title": "Create an initial language selection screen that appears on first app entry, offering six language options: Simplified Chinese, English, Spanish, French, Japanese, and Korean. Store the user's language preference and apply it globally across all UI text, notifications, and AI summaries throughout the application.",
+      "id": "feature-fix-the-language-switching-mechanism-so-that-when-a-user-selects-a-new-language-from-the-dropdown-all-text-across-the-entire-application-interface-updates-immediately-to-reflect-the-chosen-language",
+      "title": "Fix the language switching mechanism so that when a user selects a new language from the dropdown, all text across the entire application interface updates immediately to reflect the chosen language",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
-    },
-    {
-      "id": "feature-design-and-implement-a-splash-screen-with-a-high-tech-dark-theme-that-displays-after-language-selection-show-the-motivational-text-will-persistence-make-you-stronger-or-is-it-just-meaningless-if-what-if-became-reality-would-you-truly-be-superior-with-a-prominent-enter-button-that-transitions-users-to-the-main-application",
-      "title": "Design and implement a splash screen with a high-tech dark theme that displays after language selection. Show the motivational text: \"Will persistence make you stronger, or is it just meaningless? If 'What If' became reality, would you truly be superior?\" with a prominent ENTER button that transitions users to the main application.",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-a-3-tab-navigation-system-with-tabs-labeled-bounty-board-launch-mission-and-personal-center-ensure-seamless-switching-between-tabs-with-persistent-state-management",
-      "title": "Implement a 3-tab navigation system with tabs labeled Bounty Board, Launch Mission, and Personal Center. Ensure seamless switching between tabs with persistent state management.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-build-the-bounty-board-tab-tab-1-to-display-a-list-of-active-quests-each-quest-card-must-show-the-quest-title-hype-count-number-of-spectators-total-pot-amount-in-icp-and-difficulty-level-implement-difficulty-filters-for-easy-medium-hard-extreme-and-impossible-include-an-accept-challenge-button-on-each-quest-that-requires-an-icp-deposit-to-lock-the-contract",
-      "title": "Build the Bounty Board tab (Tab 1) to display a list of active quests. Each quest card must show the quest title, Hype count (number of spectators), Total Pot amount in ICP, and difficulty level. Implement difficulty filters for Easy, Medium, Hard, Extreme, and Impossible. Include an Accept Challenge button on each quest that requires an ICP deposit to lock the contract.",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-the-launch-mission-tab-tab-2-with-an-interface-for-users-to-create-new-tasks-include-input-fields-for-task-title-detailed-rules-description-and-initial-reward-pool-amount-implement-crowdfunding-mode-to-allow-community-members-to-add-funds-to-the-pot-and-a-b-comparison-mode-where-two-warriors-accept-opposing-tasks-simultaneously",
-      "title": "Create the Launch Mission tab (Tab 2) with an interface for users to create new tasks. Include input fields for task title, detailed rules description, and initial reward pool amount. Implement Crowdfunding Mode to allow community members to add funds to the pot, and A/B Comparison Mode where two warriors accept opposing tasks simultaneously.",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-develop-the-personal-center-tab-tab-3-to-display-two-sections-my-posted-bounties-and-my-accepted-quests-include-a-visual-comparison-gallery-feature-showing-day-1-vs-today-comparisons-for-each-quest-add-real-time-progress-bars-for-active-quests-to-visualize-completion-status",
-      "title": "Develop the Personal Center tab (Tab 3) to display two sections: My Posted Bounties and My Accepted Quests. Include a Visual Comparison Gallery feature showing Day 1 vs Today comparisons for each quest. Add real-time progress bars for active quests to visualize completion status.",
-      "reqIds": [
-        "REQ-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-establish-a-cohesive-high-tech-visual-design-system-with-a-dark-theme-aesthetic-use-futuristic-ui-elements-sharp-edges-neon-accent-colors-and-tech-inspired-typography-apply-this-design-language-consistently-across-all-screens-including-language-selection-splash-screen-and-the-three-main-tabs-to-create-an-immersive-socialfi-experience",
-      "title": "Establish a cohesive high-tech visual design system with a dark theme aesthetic. Use futuristic UI elements, sharp edges, neon accent colors, and tech-inspired typography. Apply this design language consistently across all screens including language selection, splash screen, and the three main tabs to create an immersive SocialFi experience.",
-      "reqIds": [
-        "REQ-8"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-build-community-voting-interface-for-dispute-resolution-display-disputed-quest-details-both-parties-arguments-and-allow-logged-in-users-to-cast-votes-calculate-vote-weights-in-real-time-and-display-current-vote-distribution-publisher-30-admin-15-community-votes-55-show-voting-deadline-and-prevent-duplicate-votes-close-voting-when-total-votes-exceed-50-threshold-for-either-side",
-      "title": "Build community voting interface for dispute resolution. Display disputed quest details, both parties' arguments, and allow logged-in users to cast votes. Calculate vote weights in real-time and display current vote distribution (publisher 30%, admin 15%, community votes 55%). Show voting deadline and prevent duplicate votes. Close voting when total votes exceed 50% threshold for either side.",
-      "reqIds": [
-        "REQ-14"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-appeal-submission-interface-allowing-publishers-and-warriors-to-submit-written-dispute-reasoning-display-a-form-with-text-area-for-detailed-arguments-character-count-minimum-100-characters-and-evidence-attachment-capability-show-submission-status-and-timestamp-for-transparency",
-      "title": "Create appeal submission interface allowing publishers and warriors to submit written dispute reasoning. Display a form with text area for detailed arguments, character count (minimum 100 characters), and evidence attachment capability. Show submission status and timestamp for transparency.",
-      "reqIds": [
-        "REQ-15"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-display-warrior-credit-score-and-current-deposit-rate-prominently-in-the-personal-center-tab-show-a-progress-indicator-visualizing-the-journey-from-50-to-2-deposit-rate-highlighting-successful-completions-and-remaining-tasks-to-reach-minimum-deposit-include-a-credit-history-section-showing-past-quest-outcomes-and-penalty-events",
-      "title": "Display warrior credit score and current deposit rate prominently in the Personal Center tab. Show a progress indicator visualizing the journey from 50% to 2% deposit rate, highlighting successful completions and remaining tasks to reach minimum deposit. Include a credit history section showing past quest outcomes and penalty events.",
-      "reqIds": [
-        "REQ-17"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-quest-card-component-in-bounty-board-to-display-required-deposit-amount-in-icp-based-on-the-logged-in-warrior-s-current-credit-score-show-both-the-bounty-pool-amount-and-the-calculated-deposit-requirement-update-the-accept-challenge-button-to-trigger-deposit-collection-using-icp-ledger-integration-before-locking-the-contract",
-      "title": "Update Quest Card component in Bounty Board to display required deposit amount in ICP based on the logged-in warrior's current credit score. Show both the bounty pool amount and the calculated deposit requirement. Update the Accept Challenge button to trigger deposit collection using ICP Ledger integration before locking the contract.",
-      "reqIds": [
-        "REQ-18"
-      ],
-      "version": 1
     }
   ],
-  "new_feature_requests": [
-    {
-      "id": "AR-1",
-      "summary": "Initial language selection screen supporting 6 languages (Chinese, English, Spanish, French, Japanese, Korean)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Splash screen with motivational text and ENTER button in high-tech dark theme",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Tab 1: Bounty Board with quest listings, Hype count, Total Pot (ICP), difficulty filters, and Accept Challenge action",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Tab 2: Launch Mission interface with task creation, crowdfunding mode, and A/B comparison mode",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Tab 3: Personal Center with posted bounties, accepted quests, visual comparison gallery, and progress bars",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-6",
-      "summary": "ICP Canister integration for secure fund management with 6% platform fee and 94% warrior payout logic",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-13",
-      "summary": "Integrate ICP Canister-based financial logic to securely manage all bounty funds. Implement automated platform fee deduction of 6% from the total bounty pool upon successful task completion. Calculate warrior payout as 94% of the total bounty pool plus their original deposit, and execute the transfer automatically when conditions are met.",
-      "reqIds": [
-        "REQ-7"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-14",
-      "summary": "Dynamic deposit system: 50% initial deposit, reducing 3% per successful task completion down to 2% minimum; resets to 50% on abandonment or dispute loss",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-15",
-      "summary": "Three-tier dispute resolution: Auto-release after 24h no objection; First appeal (30% publisher + 15% admin + 55% community vote); Second appeal with reasoning submission; Third appeal with 100% admin decision",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-16",
-      "summary": "Community voting interface for dispute resolution with 50%+ threshold to determine winner",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-17",
-      "summary": "Appeal submission interface allowing both parties to provide dispute reasoning for community voting",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-18",
-      "summary": "Integrate ICP Ledger Canister to enable real ICP token transfers for all bounty deposits, rewards, and platform fees. Implement secure canister-to-canister calls to the ICP Ledger for deposit locking, reward distribution, and automated transfers.",
-      "reqIds": [
-        "REQ-9"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-19",
-      "summary": "Implement dynamic deposit calculation system starting at 50% of the bounty pool. Track each warrior's successful quest completion count and reduce their deposit rate by 3% per successful completion until reaching a minimum of 2% (achievable after 16 successful completions). Store warrior credit scores in user profiles.",
-      "reqIds": [
-        "REQ-10"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-20",
-      "summary": "Implement deposit penalty reset mechanism: when a warrior abandons a quest mid-way or loses a dispute vote, reset their deposit rate back to 50% and restart the credit accumulation cycle from zero. Update the user profile to reflect the penalty.",
-      "reqIds": [
-        "REQ-11"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-21",
-      "summary": "Create automated reward distribution system with 6% platform fee deduction. When a quest completes successfully without disputes, automatically transfer 6% to the platform treasury, return the warrior's deposit to their account, and transfer 94% of the bounty pool to the warrior. Execute all transfers atomically within 24 hours if no objections are raised.",
-      "reqIds": [
-        "REQ-12"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-22",
-      "summary": "Implement three-tier dispute resolution system. First tier (auto-release): if no party raises an objection within 24 hours of quest completion, automatically distribute funds. Second tier (first appeal): if either party disputes, enable weighted voting with publisher holding 30% weight, platform admin holding 15% weight, and community votes totaling 55% weight. Third tier (second appeal): require both parties to submit written reasoning, then wait 24 hours; if no further objections, release funds. Fourth tier (third appeal): grant platform admin 100% final decision authority.",
-      "reqIds": [
-        "REQ-13"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-25",
-      "summary": "Extend quest data model to include deposit amount, deposit rate, dispute status (none, first_appeal, second_appeal, third_appeal), voting records, appeal submissions, and auto-release timer. Add state machine to track quest lifecycle from creation through completion/dispute resolution to final payout.",
-      "reqIds": [
-        "REQ-16"
-      ],
-      "status": "pending"
-    }
-  ],
-  "gameProjectType": "none",
-  "projectName": "Grit Bounty",
+  "new_feature_requests": [],
+  "projectName": "Fix language switching to update entire interface",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

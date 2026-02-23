@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
 import { useCreateQuest } from '../hooks/useQueries';
-import { Difficulty } from '../types';
+import { Difficulty } from '../backend';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,17 +13,28 @@ import { toast } from 'sonner';
 
 export default function LaunchMission() {
   const { t } = useLanguage();
-  const { mutate: createQuest, isPending } = useCreateQuest();
+  const { mutateAsync: createQuest, isPending } = useCreateQuest();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [rewardPool, setRewardPool] = useState('');
   const [difficulty, setDifficulty] = useState<Difficulty>(Difficulty.easy);
+  const [participantCount, setParticipantCount] = useState('1');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title || !description || !rewardPool) {
+    if (!title.trim()) {
+      toast.error(t('launchMission.titleRequired'));
+      return;
+    }
+
+    if (!description.trim() || description.length < 20) {
+      toast.error(t('launchMission.descriptionTooShort'));
+      return;
+    }
+
+    if (!rewardPool) {
       toast.error(t('launchMission.fillAllFields'));
       return;
     }
@@ -34,28 +45,33 @@ export default function LaunchMission() {
       return;
     }
 
+    const participants = parseInt(participantCount);
+    if (isNaN(participants) || participants < 1 || participants > 100) {
+      toast.error(t('launchMission.invalidParticipantCount'));
+      return;
+    }
+
     const rewardPoolE8s = BigInt(Math.floor(rewardAmount * 100000000));
 
-    createQuest(
-      {
+    try {
+      // TODO: Implement ICP payment before quest creation
+      // For now, we'll proceed directly to quest creation
+      const questId = await createQuest({
         title,
         description,
         rewardPool: rewardPoolE8s,
         difficulty,
-      },
-      {
-        onSuccess: () => {
-          toast.success(t('launchMission.createSuccess'));
-          setTitle('');
-          setDescription('');
-          setRewardPool('');
-          setDifficulty(Difficulty.easy);
-        },
-        onError: (error) => {
-          toast.error(t('launchMission.createError') + ': ' + error.message);
-        },
-      }
-    );
+        participantCount: BigInt(participants),
+      });
+      toast.success(t('launchMission.createSuccess') + ` (ID: ${questId})`);
+      setTitle('');
+      setDescription('');
+      setRewardPool('');
+      setDifficulty(Difficulty.easy);
+      setParticipantCount('1');
+    } catch (error: any) {
+      toast.error(t('launchMission.createError') + ': ' + error.message);
+    }
   };
 
   return (
@@ -95,6 +111,26 @@ export default function LaunchMission() {
                 className="min-h-[150px] resize-none"
                 disabled={isPending}
               />
+              <p className="text-xs text-muted-foreground">
+                {description.length} / 20 {t('launchMission.minCharacters')}
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="participantCount">{t('launchMission.participantCount')}</Label>
+              <Input
+                id="participantCount"
+                type="number"
+                min="1"
+                max="100"
+                value={participantCount}
+                onChange={(e) => setParticipantCount(e.target.value)}
+                placeholder={t('launchMission.participantCountPlaceholder')}
+                disabled={isPending}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t('launchMission.participantCountHint')}
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -124,8 +160,6 @@ export default function LaunchMission() {
                   <SelectItem value={Difficulty.easy}>{t('difficulty.easy')}</SelectItem>
                   <SelectItem value={Difficulty.medium}>{t('difficulty.medium')}</SelectItem>
                   <SelectItem value={Difficulty.hard}>{t('difficulty.hard')}</SelectItem>
-                  <SelectItem value={Difficulty.extreme}>{t('difficulty.extreme')}</SelectItem>
-                  <SelectItem value={Difficulty.impossible}>{t('difficulty.impossible')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -2,6 +2,7 @@ import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { LogIn, LogOut } from 'lucide-react';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { login, clear, loginStatus, identity } = useInternetIdentity();
@@ -36,26 +37,29 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <img src="/assets/generated/logo.dim_256x256.png" alt="Grit Bounty" className="h-10 w-10" />
             <h1 className="text-2xl font-bold tracking-tight text-neon-cyan">GRIT BOUNTY</h1>
           </div>
-          <Button
-            onClick={handleAuth}
-            disabled={disabled}
-            variant={isAuthenticated ? 'outline' : 'default'}
-            className={isAuthenticated ? 'border-neon-magenta/50 text-neon-magenta hover:bg-neon-magenta/10' : 'bg-neon-cyan text-black hover:bg-neon-cyan/90'}
-          >
-            {loginStatus === 'logging-in' ? (
-              'Connecting...'
-            ) : isAuthenticated ? (
-              <>
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </>
-            ) : (
-              <>
-                <LogIn className="mr-2 h-4 w-4" />
-                Login
-              </>
-            )}
-          </Button>
+          <div className="flex items-center gap-3">
+            {isAuthenticated && <LanguageSwitcher />}
+            <Button
+              onClick={handleAuth}
+              disabled={disabled}
+              variant={isAuthenticated ? 'outline' : 'default'}
+              className={isAuthenticated ? 'border-neon-magenta/50 text-neon-magenta hover:bg-neon-magenta/10' : 'bg-neon-cyan text-black hover:bg-neon-cyan/90'}
+            >
+              {loginStatus === 'logging-in' ? (
+                'Connecting...'
+              ) : isAuthenticated ? (
+                <>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </>
+              ) : (
+                <>
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Login
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </header>
       <main className="pt-16">{children}</main>
