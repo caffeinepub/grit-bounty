@@ -1,35 +1,36 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Grit Bounty - A task bounty platform on Internet Computer where users can post challenges/tasks with ICP rewards, and 'warriors' can accept and complete them for bounties. Currently building the introduction page to explain the platform concept.",
+  "summary": "Grit Bounty - a habit-forming task bounty platform on Internet Computer where publishers set challenges and warriors compete to complete them",
   "architectural_notes": [
-    "Grit Bounty platform concept: Task bounty system where users post challenges with ICP stakes, warriors accept tasks with collateral deposits, and platform handles automated settlement with 6% fee",
-    "Warrior credit system: Initial 50% deposit requirement, reduces 3% per successful task completion down to minimum 2% (after 16 completions), resets to 50% on failure"
+    "Payment collection occurs after user confirms task details in confirmation dialog",
+    "Bounty funds are locked in task smart contract, not platform account",
+    "No modification to existing features outside task publication flow"
   ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-add-a-semi-transparent-how-it-works-text-link-below-the-enter-button-on-the-splash-screen-that-opens-an-introduction-modal-when-clicked",
-      "title": "Add a semi-transparent 'How it works? (运作规则)' text link below the ENTER button on the splash screen that opens an introduction modal when clicked",
+      "id": "feature-when-user-clicks-the-publish-button-after-filling-task-information-title-description-reward-amount-difficulty-participant-count-show-a-confirmation-dialog-displaying-all-task-details-before-final-submission",
+      "title": "When user clicks the publish button after filling task information (title, description, reward amount, difficulty, participant count), show a confirmation dialog displaying all task details before final submission",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-create-an-introduction-modal-component-that-displays-the-complete-grit-bounty-concept-and-rules-in-a-scrollable-format-with-proper-typography-hierarchy-and-sections",
-      "title": "Create an introduction modal component that displays the complete Grit Bounty concept and rules in a scrollable format with proper typography hierarchy and sections",
+      "id": "feature-if-the-publisher-account-balance-is-insufficient-to-cover-the-bounty-amount-display-an-error-message-and-prevent-task-publication",
+      "title": "If the publisher account balance is insufficient to cover the bounty amount, display an error message and prevent task publication",
       "reqIds": [
-        "REQ-2"
+        "REQ-3"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-translation-keys-for-the-complete-introduction-content-in-all-three-supported-languages-english-simplified-chinese-traditional-chinese-covering-core-mission-use-cases-daily-routines-health-exercise-social-activities-enterprise-promotion-bounty-mechanism-task-publishing-with-icp-deposit-crowdfunding-additions-warrior-acceptance-with-deposit-settlement-rules-success-payout-task-unclaimed-refund-default-forfeit-platform-fees-of-6-and-warrior-credit-system-50-initial-deposit-reducing-3-per-successful-quest-to-minimum-2-reset-to-50-on-default",
-      "title": "Add translation keys for the complete introduction content in all three supported languages (English, Simplified Chinese, Traditional Chinese) covering: Core Mission, Use Cases (daily routines, health, exercise, social activities, enterprise promotion), Bounty Mechanism (task publishing with ICP deposit, crowdfunding additions, warrior acceptance with deposit), Settlement Rules (success payout, task unclaimed refund, default forfeit, platform fees of 6%), and Warrior Credit System (50% initial deposit reducing 3% per successful quest to minimum 2%, reset to 50% on default)",
+      "id": "feature-allow-publishers-to-cancel-a-task-and-receive-a-full-refund-of-the-locked-bounty-amount-when-no-warrior-has-accepted-the-task-yet-without-charging-any-cancellation-fee",
+      "title": "Allow publishers to cancel a task and receive a full refund of the locked bounty amount when no warrior has accepted the task yet, without charging any cancellation fee",
       "reqIds": [
-        "REQ-3"
+        "REQ-4"
       ],
       "version": 1
     }
@@ -37,8 +38,40 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add 'How it works?' link below ENTER button that opens Grit Bounty introduction modal",
+      "summary": "Collect bounty amount immediately upon task publication confirmation",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Lock collected bounty funds in task contract until completion or cancellation",
+      "reqIds": [
+        "AR-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Block task publication if publisher has insufficient balance",
+      "reqIds": [
+        "AR-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Allow task cancellation with full refund when no warrior has accepted (no fees)",
+      "reqIds": [
+        "AR-2"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Upon confirming task publication in the dialog, immediately deduct the full bounty amount from the publisher's ICP balance and lock it in the task contract",
+      "reqIds": [
+        "REQ-2"
+      ],
       "status": "pending"
     }
   ],

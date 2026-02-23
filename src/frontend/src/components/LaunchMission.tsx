@@ -8,18 +8,27 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Rocket } from 'lucide-react';
+import { Rocket } from 'lucide-react';
 import { toast } from 'sonner';
+import PublishQuestConfirmationDialog from './PublishQuestConfirmationDialog';
 
 export default function LaunchMission() {
   const { t } = useLanguage();
-  const { mutateAsync: createQuest, isPending } = useCreateQuest();
+  const { mutateAsync: createQuest } = useCreateQuest();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [rewardPool, setRewardPool] = useState('');
   const [difficulty, setDifficulty] = useState<Difficulty>(Difficulty.easy);
   const [participantCount, setParticipantCount] = useState('1');
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingQuestData, setPendingQuestData] = useState<{
+    title: string;
+    description: string;
+    rewardPool: bigint;
+    difficulty: Difficulty;
+    participantCount: bigint;
+  } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,24 +62,39 @@ export default function LaunchMission() {
 
     const rewardPoolE8s = BigInt(Math.floor(rewardAmount * 100000000));
 
+    // Store quest data and show confirmation dialog
+    setPendingQuestData({
+      title,
+      description,
+      rewardPool: rewardPoolE8s,
+      difficulty,
+      participantCount: BigInt(participants),
+    });
+    setShowConfirmDialog(true);
+  };
+
+  const handleConfirmPublish = async () => {
+    if (!pendingQuestData) return;
+
     try {
-      // TODO: Implement ICP payment before quest creation
-      // For now, we'll proceed directly to quest creation
       const questId = await createQuest({
-        title,
-        description,
-        rewardPool: rewardPoolE8s,
-        difficulty,
-        participantCount: BigInt(participants),
+        title: pendingQuestData.title,
+        description: pendingQuestData.description,
+        rewardPool: pendingQuestData.rewardPool,
+        difficulty: pendingQuestData.difficulty,
+        participantCount: pendingQuestData.participantCount,
       });
       toast.success(t('launchMission.createSuccess') + ` (ID: ${questId})`);
+      
+      // Reset form
       setTitle('');
       setDescription('');
       setRewardPool('');
       setDifficulty(Difficulty.easy);
       setParticipantCount('1');
+      setPendingQuestData(null);
     } catch (error: any) {
-      toast.error(t('launchMission.createError') + ': ' + error.message);
+      throw error; // Let the dialog handle the error display
     }
   };
 
@@ -97,7 +121,6 @@ export default function LaunchMission() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder={t('launchMission.titlePlaceholder')}
-                disabled={isPending}
               />
             </div>
 
@@ -109,7 +132,6 @@ export default function LaunchMission() {
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder={t('launchMission.rulesPlaceholder')}
                 className="min-h-[150px] resize-none"
-                disabled={isPending}
               />
               <p className="text-xs text-muted-foreground">
                 {description.length} / 20 {t('launchMission.minCharacters')}
@@ -126,7 +148,6 @@ export default function LaunchMission() {
                 value={participantCount}
                 onChange={(e) => setParticipantCount(e.target.value)}
                 placeholder={t('launchMission.participantCountPlaceholder')}
-                disabled={isPending}
               />
               <p className="text-xs text-muted-foreground">
                 {t('launchMission.participantCountHint')}
@@ -142,7 +163,6 @@ export default function LaunchMission() {
                 value={rewardPool}
                 onChange={(e) => setRewardPool(e.target.value)}
                 placeholder={t('launchMission.rewardHint')}
-                disabled={isPending}
               />
             </div>
 
@@ -151,7 +171,6 @@ export default function LaunchMission() {
               <Select
                 value={difficulty}
                 onValueChange={(value) => setDifficulty(value as Difficulty)}
-                disabled={isPending}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -166,21 +185,26 @@ export default function LaunchMission() {
 
             <Button
               type="submit"
-              disabled={isPending}
               className="w-full bg-neon-magenta text-white hover:bg-neon-magenta/90 font-semibold"
             >
-              {isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t('launchMission.creating')}
-                </>
-              ) : (
-                t('launchMission.createQuest')
-              )}
+              {t('launchMission.createQuest')}
             </Button>
           </form>
         </CardContent>
       </Card>
+
+      {pendingQuestData && (
+        <PublishQuestConfirmationDialog
+          open={showConfirmDialog}
+          onOpenChange={setShowConfirmDialog}
+          title={pendingQuestData.title}
+          description={pendingQuestData.description}
+          rewardPool={pendingQuestData.rewardPool}
+          difficulty={pendingQuestData.difficulty}
+          participantCount={pendingQuestData.participantCount}
+          onConfirm={handleConfirmPublish}
+        />
+      )}
     </div>
   );
 }

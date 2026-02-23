@@ -2,11 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-semi-transparent-how-it-works-text-link-below-the-enter-button-on-the-splash-screen-that-opens-an-introduction-modal-when-clicked",
-      "featureTitle": "Add a semi-transparent 'How it works? (运作规则)' text link below the ENTER button on the splash screen that opens an introduction modal when clicked",
+      "featureId": "feature-when-user-clicks-the-publish-button-after-filling-task-information-title-description-reward-amount-difficulty-participant-count-show-a-confirmation-dialog-displaying-all-task-details-before-final-submission",
+      "featureTitle": "When user clicks the publish button after filling task information (title, description, reward amount, difficulty, participant count), show a confirmation dialog displaying all task details before final submission",
       "files": [
-        "frontend/src/components/IntroductionModal.tsx",
-        "frontend/src/components/SplashScreen.tsx"
+        "frontend/src/components/LaunchMission.tsx",
+        "frontend/src/components/PublishQuestConfirmationDialog.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -24,31 +24,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-create-an-introduction-modal-component-that-displays-the-complete-grit-bounty-concept-and-rules-in-a-scrollable-format-with-proper-typography-hierarchy-and-sections",
-      "featureTitle": "Create an introduction modal component that displays the complete Grit Bounty concept and rules in a scrollable format with proper typography hierarchy and sections",
+      "featureId": "feature-if-the-publisher-account-balance-is-insufficient-to-cover-the-bounty-amount-display-an-error-message-and-prevent-task-publication",
+      "featureTitle": "If the publisher account balance is insufficient to cover the bounty amount, display an error message and prevent task publication",
       "files": [
-        "frontend/src/components/IntroductionModal.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "http-outcalls@3.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-translation-keys-for-the-complete-introduction-content-in-all-three-supported-languages-english-simplified-chinese-traditional-chinese-covering-core-mission-use-cases-daily-routines-health-exercise-social-activities-enterprise-promotion-bounty-mechanism-task-publishing-with-icp-deposit-crowdfunding-additions-warrior-acceptance-with-deposit-settlement-rules-success-payout-task-unclaimed-refund-default-forfeit-platform-fees-of-6-and-warrior-credit-system-50-initial-deposit-reducing-3-per-successful-quest-to-minimum-2-reset-to-50-on-default",
-      "featureTitle": "Add translation keys for the complete introduction content in all three supported languages (English, Simplified Chinese, Traditional Chinese) covering: Core Mission, Use Cases (daily routines, health, exercise, social activities, enterprise promotion), Bounty Mechanism (task publishing with ICP deposit, crowdfunding additions, warrior acceptance with deposit), Settlement Rules (success payout, task unclaimed refund, default forfeit, platform fees of 6%), and Warrior Credit System (50% initial deposit reducing 3% per successful quest to minimum 2%, reset to 50% on default)",
-      "files": [
-        "frontend/src/i18n/translations.ts"
+        "frontend/src/components/PublishQuestConfirmationDialog.tsx",
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -62,6 +42,29 @@
       ],
       "testIds": [
         "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-allow-publishers-to-cancel-a-task-and-receive-a-full-refund-of-the-locked-bounty-amount-when-no-warrior-has-accepted-the-task-yet-without-charging-any-cancellation-fee",
+      "featureTitle": "Allow publishers to cancel a task and receive a full refund of the locked bounty amount when no warrior has accepted the task yet, without charging any cancellation fee",
+      "files": [
+        "frontend/src/components/CancelQuestDialog.tsx",
+        "frontend/src/components/PersonalCenter.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "http-outcalls@3.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
       ],
       "confidence": "high"
     }

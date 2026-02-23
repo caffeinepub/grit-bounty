@@ -8,8 +8,7 @@ import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 import MixinStorage "blob-storage/Mixin";
 import Runtime "mo:core/Runtime";
-
-
+import ICP "mo:core/Nat64";
 
 actor {
   let accessControlState = AccessControl.initState();
@@ -93,6 +92,7 @@ actor {
   let userProfiles = Map.empty<Principal, UserProfile>();
   let quests = Map.empty<Nat, Quest>();
   var nextQuestId = 0;
+  var systemBountyBalance : Nat64 = 0;
 
   include MixinStorage();
 
@@ -283,6 +283,12 @@ actor {
       Runtime.trap("Unauthorized: Only users can create quests");
     };
 
+    if (rewardPool == 0) {
+      Runtime.trap("Reward pool must be greater than zero");
+    };
+
+    systemBountyBalance += rewardPool;
+
     let questId = nextQuestId;
     nextQuestId += 1;
 
@@ -328,6 +334,13 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can create A/B quests");
     };
+
+    if (rewardPool == 0) {
+      Runtime.trap("Reward pool must be greater than zero");
+    };
+
+    let totalCost = rewardPool * 2;
+    systemBountyBalance += totalCost;
 
     let questIdA = nextQuestId;
     nextQuestId += 1;
@@ -528,6 +541,8 @@ actor {
         if (quest.publisherId != caller) {
           Runtime.trap("Unauthorized: Only the publisher can delete this quest");
         };
+
+        systemBountyBalance -= quest.rewardPool;
 
         quests.remove(questId);
         "";

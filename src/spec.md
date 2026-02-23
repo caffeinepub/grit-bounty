@@ -1,12 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Add an introduction page accessible from the splash screen that explains Grit Bounty's concept, rules, bounty mechanism, settlement process, and warrior credit system.
+**Goal:** Implement immediate bounty collection when publishers create tasks, with confirmation dialog and cancellation refund capability.
 
 **Planned changes:**
-- Add a semi-transparent "How it works? (运作规则)" link below the ENTER button on the splash screen
-- Create an introduction modal component with scrollable content displaying five main sections: Core Mission, Use Cases, Bounty Mechanism, Settlement Rules, and Warrior Credit System
-- Add complete translation keys for all introduction content in English, Simplified Chinese, and Traditional Chinese
-- Style the modal consistently with existing dark theme dialog patterns
+- Add confirmation dialog showing all task details before final publication
+- Deduct and lock full bounty amount from publisher's ICP balance immediately upon task creation
+- Validate publisher balance and display error if insufficient funds
+- Enable task cancellation with full refund when no warrior has accepted yet
 
-**User-visible outcome:** Users can click the "How it works?" link on the splash screen to read a comprehensive explanation of the Grit Bounty platform, including how tasks are published with ICP deposits, how warriors can accept quests, settlement rules with platform fees, and the credit reduction system for successful warriors.
+**User-visible outcome:** Publishers must have sufficient balance to create tasks, see a confirmation before publishing, have funds immediately locked, and can cancel unaccepted tasks for a full refund.

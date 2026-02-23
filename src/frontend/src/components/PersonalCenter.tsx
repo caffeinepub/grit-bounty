@@ -7,13 +7,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { Loader2, Trophy, Target, Camera, Eye, Trash2, LogOut, AlertTriangle } from 'lucide-react';
+import { Loader2, Trophy, Target, Camera, Eye, Trash2, LogOut, AlertTriangle, XCircle } from 'lucide-react';
 import CreditScoreDisplay from './CreditScoreDisplay';
 import DailyCheckIn from './DailyCheckIn';
 import VisualComparison from './VisualComparison';
 import DeleteQuestDialog from './DeleteQuestDialog';
 import ExitQuestDialog from './ExitQuestDialog';
 import AbandonQuestDialog from './AbandonQuestDialog';
+import CancelQuestDialog from './CancelQuestDialog';
 
 export default function PersonalCenter() {
   const { t } = useLanguage();
@@ -26,6 +27,7 @@ export default function PersonalCenter() {
   const [deleteQuestId, setDeleteQuestId] = useState<bigint | null>(null);
   const [exitQuestId, setExitQuestId] = useState<bigint | null>(null);
   const [abandonQuestId, setAbandonQuestId] = useState<bigint | null>(null);
+  const [cancelQuestId, setCancelQuestId] = useState<bigint | null>(null);
 
   const getStatusColor = (status: QuestStatus) => {
     switch (status) {
@@ -83,6 +85,7 @@ export default function PersonalCenter() {
   const deleteQuest = postedBounties.find((q) => q.questId === deleteQuestId);
   const exitQuest = postedBounties.find((q) => q.questId === exitQuestId);
   const abandonQuest = acceptedQuests.find((q) => q.questId === abandonQuestId);
+  const cancelQuest = postedBounties.find((q) => q.questId === cancelQuestId);
 
   const handleDeleteClick = (questId: bigint) => {
     console.log('[PersonalCenter] Delete button clicked for questId:', questId.toString());
@@ -97,6 +100,11 @@ export default function PersonalCenter() {
   const handleAbandonClick = (questId: bigint) => {
     console.log('[PersonalCenter] Abandon button clicked for questId:', questId.toString());
     setAbandonQuestId(questId);
+  };
+
+  const handleCancelClick = (questId: bigint) => {
+    console.log('[PersonalCenter] Cancel button clicked for questId:', questId.toString());
+    setCancelQuestId(questId);
   };
 
   return (
@@ -245,25 +253,15 @@ export default function PersonalCenter() {
         <TabsContent value="posted" className="mt-6">
           {postedLoading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-neon-blue" />
+              <Loader2 className="h-8 w-8 animate-spin text-neon-magenta" />
             </div>
           ) : postedBounties.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2">
               {postedBounties.map((quest) => {
                 const rewardPoolICP = Number(quest.rewardPool) / 100000000;
-                const hasWarrior = quest.warriorId !== undefined && quest.warriorId !== null;
+                const hasWarrior = quest.warriorId !== undefined;
                 const hasCrowdfunding = quest.crowdfundingContributions.length > 0;
-                const canDelete = quest.status === QuestStatus.active && !hasWarrior;
-                const canExit = quest.status === QuestStatus.active && !hasWarrior && hasCrowdfunding;
-
-                console.log('[PersonalCenter] Quest card rendered:', {
-                  questId: quest.questId.toString(),
-                  canDelete,
-                  canExit,
-                  status: quest.status,
-                  hasWarrior,
-                  hasCrowdfunding
-                });
+                const canCancel = quest.status === QuestStatus.active && !hasWarrior;
 
                 return (
                   <Card
@@ -278,7 +276,7 @@ export default function PersonalCenter() {
                         </Badge>
                       </div>
                     </CardHeader>
-                    <CardContent className="space-y-3">
+                    <CardContent className="space-y-4">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">{t('personalCenter.status')}</span>
                         <Badge className={getStatusColor(quest.status)}>
@@ -295,37 +293,46 @@ export default function PersonalCenter() {
 
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">{t('personalCenter.hypeCount')}</span>
-                        <span className="font-semibold text-neon-blue">{Number(quest.hypeCount)}</span>
+                        <span className="font-semibold">{Number(quest.hypeCount)}</span>
                       </div>
 
-                      {quest.warriorId && (
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">{t('personalCenter.warrior')}</span>
-                          <span className="font-mono text-xs truncate max-w-[200px]">
-                            {quest.warriorId.toString().slice(0, 8)}...
-                          </span>
-                        </div>
-                      )}
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">{t('personalCenter.warrior')}</span>
+                        <span className="font-semibold">
+                          {hasWarrior ? t('personalCenter.statusInProgress') : t('personalCenter.statusActive')}
+                        </span>
+                      </div>
 
-                      {(canDelete || canExit) && (
-                        <div className="flex gap-2 pt-2">
-                          {canDelete && (
+                      {quest.status === QuestStatus.active && (
+                        <div className="space-y-2 pt-2">
+                          {canCancel && (
+                            <Button
+                              onClick={() => handleCancelClick(quest.questId)}
+                              variant="outline"
+                              size="sm"
+                              className="w-full border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10"
+                            >
+                              <XCircle className="mr-2 h-4 w-4" />
+                              {t('personalCenter.cancelQuest')}
+                            </Button>
+                          )}
+                          {!hasWarrior && !hasCrowdfunding && (
                             <Button
                               onClick={() => handleDeleteClick(quest.questId)}
                               variant="destructive"
                               size="sm"
-                              className="flex-1"
+                              className="w-full"
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
                               {t('personalCenter.deleteQuest')}
                             </Button>
                           )}
-                          {canExit && (
+                          {!hasWarrior && hasCrowdfunding && (
                             <Button
                               onClick={() => handleExitClick(quest.questId)}
                               variant="outline"
                               size="sm"
-                              className="flex-1 border-orange-500/30 text-orange-400 hover:bg-orange-500/10"
+                              className="w-full border-orange-500/30 text-orange-400 hover:bg-orange-500/10"
                             >
                               <LogOut className="mr-2 h-4 w-4" />
                               {t('personalCenter.exitQuest')}
@@ -348,7 +355,7 @@ export default function PersonalCenter() {
 
       {checkInQuest && (
         <DailyCheckIn
-          open={!!checkInQuestId}
+          open={checkInQuestId !== null}
           onOpenChange={(open) => !open && setCheckInQuestId(null)}
           quest={checkInQuest}
         />
@@ -356,7 +363,7 @@ export default function PersonalCenter() {
 
       {viewProgressQuest && (
         <VisualComparison
-          open={!!viewProgressQuestId}
+          open={viewProgressQuestId !== null}
           onOpenChange={(open) => !open && setViewProgressQuestId(null)}
           quest={viewProgressQuest}
         />
@@ -364,18 +371,15 @@ export default function PersonalCenter() {
 
       {deleteQuest && (
         <DeleteQuestDialog
-          open={!!deleteQuestId}
-          onOpenChange={(open) => {
-            console.log('[PersonalCenter] DeleteQuestDialog onOpenChange:', open);
-            if (!open) setDeleteQuestId(null);
-          }}
+          open={deleteQuestId !== null}
+          onOpenChange={(open) => !open && setDeleteQuestId(null)}
           quest={deleteQuest}
         />
       )}
 
       {exitQuest && (
         <ExitQuestDialog
-          open={!!exitQuestId}
+          open={exitQuestId !== null}
           onOpenChange={(open) => !open && setExitQuestId(null)}
           quest={exitQuest}
         />
@@ -383,9 +387,17 @@ export default function PersonalCenter() {
 
       {abandonQuest && (
         <AbandonQuestDialog
-          open={!!abandonQuestId}
+          open={abandonQuestId !== null}
           onOpenChange={(open) => !open && setAbandonQuestId(null)}
           quest={abandonQuest}
+        />
+      )}
+
+      {cancelQuest && (
+        <CancelQuestDialog
+          open={cancelQuestId !== null}
+          onOpenChange={(open) => !open && setCancelQuestId(null)}
+          quest={cancelQuest}
         />
       )}
     </div>

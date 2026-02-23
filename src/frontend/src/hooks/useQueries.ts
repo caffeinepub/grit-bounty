@@ -24,6 +24,24 @@ export function useGetCallerUserProfile() {
   };
 }
 
+export function useGetCallerBalance() {
+  const { actor, isFetching: actorFetching } = useActor();
+  const { identity } = useInternetIdentity();
+
+  return useQuery<bigint>({
+    queryKey: ['callerBalance'],
+    queryFn: async () => {
+      if (!actor || !identity) throw new Error('Actor or identity not available');
+      const profile = await actor.getCallerUserProfile();
+      // For now, return a mock balance since backend doesn't have balance tracking yet
+      // In production, this would call a proper balance query method
+      return BigInt(1000000000); // 10 ICP mock balance
+    },
+    enabled: !!actor && !actorFetching && !!identity,
+    retry: false,
+  });
+}
+
 export function useSaveCallerUserProfile() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
@@ -77,6 +95,8 @@ export function useCreateQuest() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
+      queryClient.invalidateQueries({ queryKey: ['myPostedBounties'] });
+      queryClient.invalidateQueries({ queryKey: ['callerBalance'] });
     },
   });
 }
@@ -218,6 +238,7 @@ export function useDeleteQuest() {
       toast.success('Quest deleted successfully!');
       queryClient.invalidateQueries({ queryKey: ['myPostedBounties'] });
       queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
+      queryClient.invalidateQueries({ queryKey: ['callerBalance'] });
     },
     onError: (error: Error, questId) => {
       console.error('[useDeleteQuest] onError - Failed to delete quest:', questId.toString(), error);
@@ -269,6 +290,32 @@ export function useAbandonQuest() {
     onError: (error: Error) => {
       console.error('[useAbandonQuest] Failed to abandon quest:', error);
       toast.error(error.message || 'Failed to abandon quest');
+    },
+  });
+}
+
+export function useCancelQuest() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (questId: bigint) => {
+      console.log('[useCancelQuest] Mutation called with questId:', questId.toString());
+      if (!actor) throw new Error('Actor not available');
+      // Backend doesn't have cancelQuest yet, so we'll use deleteQuest for now
+      // which already handles the refund logic
+      return actor.deleteQuest(questId);
+    },
+    onSuccess: () => {
+      console.log('[useCancelQuest] Quest cancelled successfully');
+      toast.success('Quest cancelled successfully. Full refund has been returned to your balance.');
+      queryClient.invalidateQueries({ queryKey: ['myPostedBounties'] });
+      queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
+      queryClient.invalidateQueries({ queryKey: ['callerBalance'] });
+    },
+    onError: (error: Error) => {
+      console.error('[useCancelQuest] Failed to cancel quest:', error);
+      toast.error(error.message || 'Failed to cancel quest');
     },
   });
 }

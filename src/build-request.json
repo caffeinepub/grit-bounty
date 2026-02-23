@@ -1,83 +1,89 @@
 {
   "kind": "build_request",
-  "title": "Add introduction page with 'How it works?' link",
+  "title": "Implement immediate bounty collection on task publication",
   "projectName": "Grit Bounty",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Add a semi-transparent 'How it works? (运作规则)' text link below the ENTER button on the splash screen that opens an introduction modal when clicked",
+      "text": "When user clicks the publish button after filling task information (title, description, reward amount, difficulty, participant count), show a confirmation dialog displaying all task details before final submission",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "在那个\"ENTER\"按钮下方，加一行半透明的小字：\"How it works?（运作规则）\""
+          "msg-last"
         ]
       },
       "acceptanceCriteria": [
-        "Link appears below ENTER button with reduced opacity styling",
-        "Clicking the link opens the introduction modal",
-        "Link text displays 'How it works? (运作规则)' in the current language"
+        "Confirmation dialog appears after clicking publish button",
+        "Dialog displays quest title, description, reward pool amount, difficulty, and participant count",
+        "Dialog has a confirm button to proceed with publication",
+        "Dialog has a cancel button to return to the form"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Create an introduction modal component that displays the complete Grit Bounty concept and rules in a scrollable format with proper typography hierarchy and sections",
-      "target": "frontend",
+      "text": "Upon confirming task publication in the dialog, immediately deduct the full bounty amount from the publisher's ICP balance and lock it in the task contract",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "点击以后出现《Grit Bounty》软件介绍：将\"如果当初\"变为现实"
+          "msg-last"
         ]
       },
       "acceptanceCriteria": [
-        "Modal displays all five sections with clear visual hierarchy",
-        "Content is scrollable if it exceeds viewport height",
-        "Modal can be closed via close button or clicking outside",
-        "Sections are properly formatted with headings, bullet points, and emphasis"
+        "Bounty amount is deducted from publisher balance immediately upon confirmation",
+        "Funds are locked in the quest contract and not in publisher available balance",
+        "Quest creation only succeeds if funds are successfully locked",
+        "Transaction is atomic - either both deduction and quest creation succeed, or both fail"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Add translation keys for the complete introduction content in all three supported languages (English, Simplified Chinese, Traditional Chinese) covering: Core Mission, Use Cases (daily routines, health, exercise, social activities, enterprise promotion), Bounty Mechanism (task publishing with ICP deposit, crowdfunding additions, warrior acceptance with deposit), Settlement Rules (success payout, task unclaimed refund, default forfeit, platform fees of 6%), and Warrior Credit System (50% initial deposit reducing 3% per successful quest to minimum 2%, reset to 50% on default)",
-      "target": "frontend",
+      "text": "If the publisher account balance is insufficient to cover the bounty amount, display an error message and prevent task publication",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "一、 我们的核心使命",
-          "二、 无论你的想法多么奇特",
-          "三、 悬赏与运作机制",
-          "四、 结算与费用说明",
-          "五、 勇士信用减免系统"
+          "msg-last"
         ]
       },
       "acceptanceCriteria": [
-        "All introduction sections have translation keys in frontend/src/i18n/translations.ts",
-        "English translation accurately conveys the platform concept",
-        "Simplified Chinese matches the provided content exactly",
-        "Traditional Chinese is properly converted from Simplified Chinese",
-        "Examples include: waking at 5am, vegetarian diet, vitamin C intake, 10km running, making 3 friends daily, enterprise app promotion"
+        "Backend validates sufficient balance before creating quest",
+        "Frontend displays clear error message when balance is insufficient",
+        "Error message shows required amount and current balance",
+        "User remains on the form to adjust bounty amount or cancel",
+        "No quest is created when balance check fails"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Allow publishers to cancel a task and receive a full refund of the locked bounty amount when no warrior has accepted the task yet, without charging any cancellation fee",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-last"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Cancel button is available on publisher posted quests when acceptedBy array is empty",
+        "Clicking cancel returns the full locked bounty amount to publisher balance",
+        "No fees are deducted from the refund",
+        "Quest is removed from active quests list after cancellation",
+        "Cancel button is hidden or disabled once a warrior has accepted the quest"
       ]
     }
   ],
   "constraints": [
-    "Do not modify the authentication flow or backend functionality",
-    "Maintain the existing dark theme design system with OKLCH colors",
-    "Keep the modal component consistent with existing dialog patterns (similar to AddToPotDialog, DailyCheckIn dialogs)",
-    "Do not implement actual ICP payment functionality - this is display-only content"
+    "Do not modify any existing functionality beyond task publication and cancellation flow",
+    "Do not change the LaunchMission form fields or validation logic except for balance checking",
+    "Do not alter the quest acceptance mechanism for warriors",
+    "Do not modify the check-in, completion, or dispute resolution features",
+    "Do not change the credit score system or user profile functionality"
   ],
   "nonGoals": [
-    "Implementing ICP payment integration or Ledger Canister connections",
-    "Building dispute voting system",
-    "Creating task verification mechanisms",
-    "Adding new backend endpoints or data models",
-    "Modifying the main application navigation or layout structure"
+    "Modifying warrior deposit collection timing",
+    "Changing platform fee structure or collection points",
+    "Altering the crowdfunding contribution mechanism",
+    "Implementing partial refunds or cancellation fees",
+    "Adding cancellation functionality after warrior acceptance"
   ],
   "imageRequirements": {
     "required": [],

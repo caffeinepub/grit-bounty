@@ -1,61 +1,78 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add introduction page with 'How it works?' link",
+  "title": "Implement immediate bounty collection on task publication",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Add a semi-transparent 'How it works? (运作规则)' text link below the ENTER button on the splash screen that opens an introduction modal when clicked",
+      "summary": "Add confirmation dialog displaying all task details before final submission when publisher clicks publish button",
       "acceptanceCriteria": [
-        "Link appears below ENTER button with reduced opacity styling",
-        "Clicking the link opens the introduction modal",
-        "Link text displays 'How it works? (运作规则)' in the current language"
+        "Confirmation dialog appears after clicking publish button",
+        "Dialog displays quest title, description, reward pool amount, difficulty, and participant count",
+        "Dialog has a confirm button to proceed with publication",
+        "Dialog has a cancel button to return to the form"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/SplashScreen.tsx",
-          "operation": "modify",
-          "description": "Add a semi-transparent link below the ENTER button that displays 'How it works? (运作规则)' using translation keys. The link should have reduced opacity styling (e.g., opacity-60 hover:opacity-100) and trigger the introduction modal state when clicked. Position the link with proper spacing below the existing call-to-action button while maintaining the splash screen's visual hierarchy and dark theme styling."
+          "path": "frontend/src/components/PublishQuestConfirmationDialog.tsx",
+          "operation": "create",
+          "description": "Create a new dialog component that displays all quest details (title, description, reward pool, difficulty, participant count) with confirm and cancel buttons. Use shadcn/ui Dialog component for consistency with existing dialogs like DepositConfirmationDialog. Include loading state during quest creation and error handling."
         },
         {
-          "path": "frontend/src/components/IntroductionModal.tsx",
-          "operation": "create",
-          "description": "Create a modal component using shadcn/ui Dialog pattern (similar to AddToPotDialog and DailyCheckIn dialogs) that displays the complete Grit Bounty introduction content. Structure the modal with five main sections using proper typography hierarchy (headings, body text, bullet points, emphasis). Make the content scrollable when it exceeds viewport height. Support closing via close button and clicking outside. Use translation keys from i18n for all content. Apply consistent dark theme styling with OKLCH colors matching the existing design system."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Create an introduction modal component that displays the complete Grit Bounty concept and rules in a scrollable format with proper typography hierarchy and sections",
-      "acceptanceCriteria": [
-        "Modal displays all five sections with clear visual hierarchy",
-        "Content is scrollable if it exceeds viewport height",
-        "Modal can be closed via close button or clicking outside",
-        "Sections are properly formatted with headings, bullet points, and emphasis"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/IntroductionModal.tsx",
-          "operation": "create",
-          "description": "Create the IntroductionModal component that renders five distinct sections: Core Mission, Use Cases, Bounty Mechanism, Settlement Rules, and Warrior Credit System. Each section should have a clear heading (text-xl or text-2xl), properly formatted body content with paragraphs, bullet points for lists, and emphasis for important values (like percentages and ICP amounts). Use the ScrollArea component if needed for overflow content. Import and use translation keys from i18n/translations.ts for all text content. Follow the existing modal patterns in the codebase for consistent styling and behavior."
+          "path": "frontend/src/components/LaunchMission.tsx",
+          "operation": "modify",
+          "description": "Modify the form submission flow to open the PublishQuestConfirmationDialog instead of directly calling createQuest mutation. Pass form values (title, description, rewardPool, difficulty, participantCount) to the dialog. The dialog will handle the actual quest creation upon confirmation. Keep all existing form validation logic unchanged."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Add translation keys for the complete introduction content in all three supported languages (English, Simplified Chinese, Traditional Chinese) covering: Core Mission, Use Cases, Bounty Mechanism, Settlement Rules, and Warrior Credit System",
+      "summary": "Display error message and prevent task publication when publisher account balance is insufficient to cover the bounty amount",
       "acceptanceCriteria": [
-        "All introduction sections have translation keys in frontend/src/i18n/translations.ts",
-        "English translation accurately conveys the platform concept",
-        "Simplified Chinese matches the provided content exactly",
-        "Traditional Chinese is properly converted from Simplified Chinese",
-        "Examples include: waking at 5am, vegetarian diet, vitamin C intake, 10km running, making 3 friends daily, enterprise app promotion"
+        "Backend validates sufficient balance before creating quest",
+        "Frontend displays clear error message when balance is insufficient",
+        "Error message shows required amount and current balance",
+        "User remains on the form to adjust bounty amount or cancel",
+        "No quest is created when balance check fails"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/i18n/translations.ts",
+          "path": "frontend/src/components/PublishQuestConfirmationDialog.tsx",
           "operation": "modify",
-          "description": "Add a new top-level 'introduction' section to the translations structure containing nested keys for all five sections: coreMission (title, content), useCases (title, intro, examples array with items like '5am wake-up', 'vegetarian diet', 'vitamin C intake', '10km running', '3 new friends daily', 'enterprise app promotion'), bountyMechanism (title, taskPublishing, crowdfunding, acceptance), settlementRules (title, successPayout, unclaimedRefund, defaultForfeit, platformFees with '6%' emphasis), and warriorCreditSystem (title, initialDeposit '50%', reductionRate '3%', minimumRate '2%', resetCondition). Provide accurate translations for all three languages (en, zh-CN, zh-TW). Ensure Chinese content matches the user-provided text exactly. Include the modal link text 'How it works? (运作规则)' as a separate key."
+          "description": "Add balance checking before quest creation. Fetch current user balance and compare with the reward pool amount. If insufficient, display an error alert showing both the required amount and current balance. Use the existing error handling pattern from useQueries hooks. Prevent quest creation and keep the dialog open when balance is insufficient, allowing the user to cancel and return to the form."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a new query hook useGetCallerBalance() that fetches the current user's ICP balance from the backend. Use React Query's useQuery with appropriate cache settings. This hook will be used by PublishQuestConfirmationDialog to validate balance before quest creation."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Allow publishers to cancel a task and receive a full refund when no warrior has accepted the task yet, without charging any cancellation fee",
+      "acceptanceCriteria": [
+        "Cancel button is available on publisher posted quests when acceptedBy array is empty",
+        "Clicking cancel returns the full locked bounty amount to publisher balance",
+        "No fees are deducted from the refund",
+        "Quest is removed from active quests list after cancellation",
+        "Cancel button is hidden or disabled once a warrior has accepted the quest"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/CancelQuestDialog.tsx",
+          "operation": "create",
+          "description": "Create a new confirmation dialog for cancelling quests. Display quest details including the full refund amount (matching the reward pool). Show a clear message that the full bounty will be refunded with no fees deducted. Include confirm and cancel buttons. Add loading state during the cancellation mutation and error handling. Use shadcn/ui AlertDialog for consistency with DeleteQuestDialog."
+        },
+        {
+          "path": "frontend/src/components/PersonalCenter.tsx",
+          "operation": "modify",
+          "description": "Add a 'Cancel Quest' button to posted bounties in the My Bounties tab. Show this button only when the quest status is 'active' and warriorId is undefined (no warrior has accepted yet). Wire the button to open the CancelQuestDialog. Add state management for the selected quest and dialog visibility. Ensure the button is hidden or disabled once a warrior has accepted the quest."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a new mutation hook useCancelQuest() that calls the backend cancelQuest method. On success, invalidate the 'myPostedBounties', 'activeQuests', and 'currentUserProfile' query keys to refresh the UI. Handle error cases gracefully and display appropriate error messages to the user."
         }
       ]
     }
