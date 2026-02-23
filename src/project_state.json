@@ -1,40 +1,35 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
-  "architectural_notes": [],
+  "summary": "Grit Bounty - A task bounty platform on Internet Computer where users can post challenges/tasks with ICP rewards, and 'warriors' can accept and complete them for bounties. Currently building the introduction page to explain the platform concept.",
+  "architectural_notes": [
+    "Grit Bounty platform concept: Task bounty system where users post challenges with ICP stakes, warriors accept tasks with collateral deposits, and platform handles automated settlement with 6% fee",
+    "Warrior credit system: Initial 50% deposit requirement, reduces 3% per successful task completion down to minimum 2% (after 16 completions), resets to 50% on failure"
+  ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-remove-all-language-options-except-english-en-simplified-chinese-zh-cn-and-traditional-chinese-zh-tw-from-the-languageselection-component",
-      "title": "Remove all language options except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the LanguageSelection component",
+      "id": "feature-add-a-semi-transparent-how-it-works-text-link-below-the-enter-button-on-the-splash-screen-that-opens-an-introduction-modal-when-clicked",
+      "title": "Add a semi-transparent 'How it works? (运作规则)' text link below the ENTER button on the splash screen that opens an introduction modal when clicked",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-remove-all-language-options-except-english-en-simplified-chinese-zh-cn-and-traditional-chinese-zh-tw-from-the-languageswitcher-component",
-      "title": "Remove all language options except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the LanguageSwitcher component",
+      "id": "feature-create-an-introduction-modal-component-that-displays-the-complete-grit-bounty-concept-and-rules-in-a-scrollable-format-with-proper-typography-hierarchy-and-sections",
+      "title": "Create an introduction modal component that displays the complete Grit Bounty concept and rules in a scrollable format with proper typography hierarchy and sections",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-update-the-language-type-enum-in-frontend-src-types-ts-to-include-only-en-zh-cn-and-zh-tw-removing-all-other-language-codes",
-      "title": "Update the Language type enum in frontend/src/types.ts to include only 'en', 'zh-CN', and 'zh-TW', removing all other language codes",
+      "id": "feature-add-translation-keys-for-the-complete-introduction-content-in-all-three-supported-languages-english-simplified-chinese-traditional-chinese-covering-core-mission-use-cases-daily-routines-health-exercise-social-activities-enterprise-promotion-bounty-mechanism-task-publishing-with-icp-deposit-crowdfunding-additions-warrior-acceptance-with-deposit-settlement-rules-success-payout-task-unclaimed-refund-default-forfeit-platform-fees-of-6-and-warrior-credit-system-50-initial-deposit-reducing-3-per-successful-quest-to-minimum-2-reset-to-50-on-default",
+      "title": "Add translation keys for the complete introduction content in all three supported languages (English, Simplified Chinese, Traditional Chinese) covering: Core Mission, Use Cases (daily routines, health, exercise, social activities, enterprise promotion), Bounty Mechanism (task publishing with ICP deposit, crowdfunding additions, warrior acceptance with deposit), Settlement Rules (success payout, task unclaimed refund, default forfeit, platform fees of 6%), and Warrior Credit System (50% initial deposit reducing 3% per successful quest to minimum 2%, reset to 50% on default)",
       "reqIds": [
         "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-remove-translation-objects-for-all-languages-except-english-en-simplified-chinese-zh-cn-and-traditional-chinese-zh-tw-from-the-translations-file",
-      "title": "Remove translation objects for all languages except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the translations file",
-      "reqIds": [
-        "REQ-4"
       ],
       "version": 1
     }
@@ -42,12 +37,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Remove all languages except English, Simplified Chinese, and Traditional Chinese",
+      "summary": "Add 'How it works?' link below ENTER button that opens Grit Bounty introduction modal",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Remove all languages except English, Simplified Chinese, and Traditional Chinese",
+  "projectName": "Grit Bounty",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

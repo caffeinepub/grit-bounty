@@ -1,88 +1,83 @@
 {
   "kind": "build_request",
-  "title": "Remove all languages except English, Simplified Chinese, and Traditional Chinese",
+  "title": "Add introduction page with 'How it works?' link",
+  "projectName": "Grit Bounty",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Remove all language options except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the LanguageSelection component",
+      "text": "Add a semi-transparent 'How it works? (运作规则)' text link below the ENTER button on the splash screen that opens an introduction modal when clicked",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-final"
+          "msg-latest"
         ],
         "quotes": [
-          "现在只保留英语 简体中文跟繁体中文的语言  其他语言全部删除"
+          "在那个\"ENTER\"按钮下方，加一行半透明的小字：\"How it works?（运作规则）\""
         ]
       },
       "acceptanceCriteria": [
-        "LanguageSelection component displays exactly 3 language options: English, Simplified Chinese, Traditional Chinese",
-        "All other language options (Spanish, French, Japanese, Korean, German, Arabic, Portuguese, Russian, Italian, Dutch, Hindi, Turkish, Polish) are removed from the UI"
+        "Link appears below ENTER button with reduced opacity styling",
+        "Clicking the link opens the introduction modal",
+        "Link text displays 'How it works? (运作规则)' in the current language"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Remove all language options except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the LanguageSwitcher component",
+      "text": "Create an introduction modal component that displays the complete Grit Bounty concept and rules in a scrollable format with proper typography hierarchy and sections",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-final"
+          "msg-latest"
         ],
         "quotes": [
-          "现在只保留英语 简体中文跟繁体中文的语言  其他语言全部删除"
+          "点击以后出现《Grit Bounty》软件介绍：将\"如果当初\"变为现实"
         ]
       },
       "acceptanceCriteria": [
-        "LanguageSwitcher dropdown menu shows exactly 3 language options",
-        "Only English, Simplified Chinese, and Traditional Chinese are selectable"
+        "Modal displays all five sections with clear visual hierarchy",
+        "Content is scrollable if it exceeds viewport height",
+        "Modal can be closed via close button or clicking outside",
+        "Sections are properly formatted with headings, bullet points, and emphasis"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Update the Language type enum in frontend/src/types.ts to include only 'en', 'zh-CN', and 'zh-TW', removing all other language codes",
+      "text": "Add translation keys for the complete introduction content in all three supported languages (English, Simplified Chinese, Traditional Chinese) covering: Core Mission, Use Cases (daily routines, health, exercise, social activities, enterprise promotion), Bounty Mechanism (task publishing with ICP deposit, crowdfunding additions, warrior acceptance with deposit), Settlement Rules (success payout, task unclaimed refund, default forfeit, platform fees of 6%), and Warrior Credit System (50% initial deposit reducing 3% per successful quest to minimum 2%, reset to 50% on default)",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-final"
+          "msg-latest"
         ],
         "quotes": [
-          "现在只保留英语 简体中文跟繁体中文的语言  其他语言全部删除"
+          "一、 我们的核心使命",
+          "二、 无论你的想法多么奇特",
+          "三、 悬赏与运作机制",
+          "四、 结算与费用说明",
+          "五、 勇士信用减免系统"
         ]
       },
       "acceptanceCriteria": [
-        "Language enum contains exactly 3 values: en, zh-CN, zh-TW",
-        "All other language codes are removed from the type definition"
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Remove translation objects for all languages except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the translations file",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-final"
-        ],
-        "quotes": [
-          "现在只保留英语 简体中文跟繁体中文的语言  其他语言全部删除"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Translation data structure contains only 3 language objects: en, zh-CN, zh-TW",
-        "All translation objects for removed languages are deleted"
+        "All introduction sections have translation keys in frontend/src/i18n/translations.ts",
+        "English translation accurately conveys the platform concept",
+        "Simplified Chinese matches the provided content exactly",
+        "Traditional Chinese is properly converted from Simplified Chinese",
+        "Examples include: waking at 5am, vegetarian diet, vitamin C intake, 10km running, making 3 friends daily, enterprise app promotion"
       ]
     }
   ],
   "constraints": [
-    "Do not modify any code outside of language selection and translation systems",
-    "Preserve all existing functionality for the 3 retained languages",
-    "Do not change backend code",
-    "Do not modify any components other than LanguageSelection, LanguageSwitcher, types.ts, and translation files"
+    "Do not modify the authentication flow or backend functionality",
+    "Maintain the existing dark theme design system with OKLCH colors",
+    "Keep the modal component consistent with existing dialog patterns (similar to AddToPotDialog, DailyCheckIn dialogs)",
+    "Do not implement actual ICP payment functionality - this is display-only content"
   ],
   "nonGoals": [
-    "Adding new translations or improving existing translations",
-    "Changing language switching behavior or persistence logic",
-    "Modifying any quest management, authentication, or other application features",
-    "Changing UI styling or layout"
+    "Implementing ICP payment integration or Ledger Canister connections",
+    "Building dispute voting system",
+    "Creating task verification mechanisms",
+    "Adding new backend endpoints or data models",
+    "Modifying the main application navigation or layout structure"
   ],
   "imageRequirements": {
     "required": [],

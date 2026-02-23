@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
 import { Button } from '@/components/ui/button';
 import { Sparkles } from 'lucide-react';
+import IntroductionModal from './IntroductionModal';
 
 interface SplashScreenProps {
   onLoginClick: () => void;
@@ -8,6 +10,7 @@ interface SplashScreenProps {
 
 export default function SplashScreen({ onLoginClick }: SplashScreenProps) {
   const { t } = useLanguage();
+  const [showIntroModal, setShowIntroModal] = useState(false);
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -52,6 +55,16 @@ export default function SplashScreen({ onLoginClick }: SplashScreenProps) {
           {t('splash.enter')}
         </Button>
 
+        {/* How it works link */}
+        <div className="mt-4">
+          <button
+            onClick={() => setShowIntroModal(true)}
+            className="text-gray-400 hover:text-neon-cyan text-sm opacity-60 hover:opacity-100 transition-all duration-300 underline underline-offset-4"
+          >
+            {t('introduction.linkText')}
+          </button>
+        </div>
+
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
           <div className="bg-card/30 backdrop-blur-sm border border-neon-cyan/30 rounded-lg p-6">
             <h3 className="text-neon-cyan font-bold text-lg mb-2">{t('splash.feature1Title')}</h3>
@@ -67,6 +80,9 @@ export default function SplashScreen({ onLoginClick }: SplashScreenProps) {
           </div>
         </div>
       </div>
+
+      {/* Introduction Modal */}
+      <IntroductionModal open={showIntroModal} onOpenChange={setShowIntroModal} />
     </div>
   );
 }

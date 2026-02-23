@@ -1,65 +1,61 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Remove all languages except English, Simplified Chinese, and Traditional Chinese",
+  "title": "Add introduction page with 'How it works?' link",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Remove all language options except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the LanguageSelection component",
+      "summary": "Add a semi-transparent 'How it works? (运作规则)' text link below the ENTER button on the splash screen that opens an introduction modal when clicked",
       "acceptanceCriteria": [
-        "LanguageSelection component displays exactly 3 language options: English, Simplified Chinese, Traditional Chinese",
-        "All other language options (Spanish, French, Japanese, Korean, German, Arabic, Portuguese, Russian, Italian, Dutch, Hindi, Turkish, Polish) are removed from the UI"
+        "Link appears below ENTER button with reduced opacity styling",
+        "Clicking the link opens the introduction modal",
+        "Link text displays 'How it works? (运作规则)' in the current language"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/LanguageSelection.tsx",
+          "path": "frontend/src/components/SplashScreen.tsx",
           "operation": "modify",
-          "description": "Remove all language options except 'en', 'zh-CN', and 'zh-TW' from the language options array. Update the grid layout to display only 3 language options with appropriate styling. Remove flag icons and language data for Spanish, French, Japanese, Korean, German, Arabic, Portuguese, Russian, Italian, Dutch, Hindi, Turkish, and Polish."
+          "description": "Add a semi-transparent link below the ENTER button that displays 'How it works? (运作规则)' using translation keys. The link should have reduced opacity styling (e.g., opacity-60 hover:opacity-100) and trigger the introduction modal state when clicked. Position the link with proper spacing below the existing call-to-action button while maintaining the splash screen's visual hierarchy and dark theme styling."
+        },
+        {
+          "path": "frontend/src/components/IntroductionModal.tsx",
+          "operation": "create",
+          "description": "Create a modal component using shadcn/ui Dialog pattern (similar to AddToPotDialog and DailyCheckIn dialogs) that displays the complete Grit Bounty introduction content. Structure the modal with five main sections using proper typography hierarchy (headings, body text, bullet points, emphasis). Make the content scrollable when it exceeds viewport height. Support closing via close button and clicking outside. Use translation keys from i18n for all content. Apply consistent dark theme styling with OKLCH colors matching the existing design system."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Remove all language options except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the LanguageSwitcher component",
+      "summary": "Create an introduction modal component that displays the complete Grit Bounty concept and rules in a scrollable format with proper typography hierarchy and sections",
       "acceptanceCriteria": [
-        "LanguageSwitcher dropdown menu shows exactly 3 language options",
-        "Only English, Simplified Chinese, and Traditional Chinese are selectable"
+        "Modal displays all five sections with clear visual hierarchy",
+        "Content is scrollable if it exceeds viewport height",
+        "Modal can be closed via close button or clicking outside",
+        "Sections are properly formatted with headings, bullet points, and emphasis"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/LanguageSwitcher.tsx",
-          "operation": "modify",
-          "description": "Remove all language options except 'en', 'zh-CN', and 'zh-TW' from the dropdown menu items. Keep only the flag icons and native names for English, Simplified Chinese, and Traditional Chinese. Remove all other language entries from the switcher."
+          "path": "frontend/src/components/IntroductionModal.tsx",
+          "operation": "create",
+          "description": "Create the IntroductionModal component that renders five distinct sections: Core Mission, Use Cases, Bounty Mechanism, Settlement Rules, and Warrior Credit System. Each section should have a clear heading (text-xl or text-2xl), properly formatted body content with paragraphs, bullet points for lists, and emphasis for important values (like percentages and ICP amounts). Use the ScrollArea component if needed for overflow content. Import and use translation keys from i18n/translations.ts for all text content. Follow the existing modal patterns in the codebase for consistent styling and behavior."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Update the Language type enum in frontend/src/types.ts to include only 'en', 'zh-CN', and 'zh-TW', removing all other language codes",
+      "summary": "Add translation keys for the complete introduction content in all three supported languages (English, Simplified Chinese, Traditional Chinese) covering: Core Mission, Use Cases, Bounty Mechanism, Settlement Rules, and Warrior Credit System",
       "acceptanceCriteria": [
-        "Language enum contains exactly 3 values: en, zh-CN, zh-TW",
-        "All other language codes are removed from the type definition"
+        "All introduction sections have translation keys in frontend/src/i18n/translations.ts",
+        "English translation accurately conveys the platform concept",
+        "Simplified Chinese matches the provided content exactly",
+        "Traditional Chinese is properly converted from Simplified Chinese",
+        "Examples include: waking at 5am, vegetarian diet, vitamin C intake, 10km running, making 3 friends daily, enterprise app promotion"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/types.ts",
+          "path": "frontend/src/i18n/translations.ts",
           "operation": "modify",
-          "description": "Update the Language enum to contain only three values: 'en', 'zh-CN', and 'zh-TW'. Remove all other language codes including 'es', 'fr', 'ja', 'ko', 'de', 'ar', 'pt', 'ru', 'it', 'nl', 'hi', 'tr', and 'pl' from the type definition."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Remove translation objects for all languages except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the translations file",
-      "acceptanceCriteria": [
-        "Translation data structure contains only 3 language objects: en, zh-CN, zh-TW",
-        "All translation objects for removed languages are deleted"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useLanguage.ts",
-          "operation": "modify",
-          "description": "Remove all translation objects except 'en', 'zh-CN', and 'zh-TW' from the translations data structure embedded in the useLanguage hook. Delete translation entries for Spanish, French, Japanese, Korean, German, Arabic, Portuguese, Russian, Italian, Dutch, Hindi, Turkish, and Polish while preserving all translation keys and values for the three retained languages."
+          "description": "Add a new top-level 'introduction' section to the translations structure containing nested keys for all five sections: coreMission (title, content), useCases (title, intro, examples array with items like '5am wake-up', 'vegetarian diet', 'vitamin C intake', '10km running', '3 new friends daily', 'enterprise app promotion'), bountyMechanism (title, taskPublishing, crowdfunding, acceptance), settlementRules (title, successPayout, unclaimedRefund, defaultForfeit, platformFees with '6%' emphasis), and warriorCreditSystem (title, initialDeposit '50%', reductionRate '3%', minimumRate '2%', resetCondition). Provide accurate translations for all three languages (en, zh-CN, zh-TW). Ensure Chinese content matches the user-provided text exactly. Include the modal link text 'How it works? (运作规则)' as a separate key."
         }
       ]
     }

@@ -5,6 +5,14 @@ type TranslationStructure = {
     question: string;
     subtext: string;
     enter: string;
+    subtitle: string;
+    tagline: string;
+    feature1Title: string;
+    feature1Desc: string;
+    feature2Title: string;
+    feature2Desc: string;
+    feature3Title: string;
+    feature3Desc: string;
   };
   language: {
     select: string;
@@ -219,6 +227,68 @@ type TranslationStructure = {
     yourAppeal: string;
     noAppeal: string;
   };
+  introduction: {
+    linkText: string;
+    title: string;
+    subtitle: string;
+    coreMission: {
+      title: string;
+      content: string;
+    };
+    useCases: {
+      title: string;
+      intro: string;
+      lifestyle: string;
+      lifestyleExample: string;
+      health: string;
+      healthExample: string;
+      exercise: string;
+      exerciseExample: string;
+      social: string;
+      socialExample: string;
+      enterprise: string;
+      enterpriseExample: string;
+      more: string;
+      moreExample: string;
+    };
+    bountyMechanism: {
+      title: string;
+      publishTitle: string;
+      publishContent: string;
+      crowdfundTitle: string;
+      crowdfundContent: string;
+      acceptTitle: string;
+      acceptContent: string;
+      flexibleTitle: string;
+      flexibleContent: string;
+    };
+    settlementRules: {
+      title: string;
+      successTitle: string;
+      successContent: string;
+      unclaimedTitle: string;
+      unclaimedContent: string;
+      defaultTitle: string;
+      defaultContent: string;
+      feesTitle: string;
+      feesSuccessLabel: string;
+      feesSuccessContent: string;
+      feesDefaultLabel: string;
+      feesDefaultContent: string;
+    };
+    warriorCredit: {
+      title: string;
+      intro: string;
+      initialTitle: string;
+      initialContent: string;
+      rewardTitle: string;
+      rewardContent: string;
+      capTitle: string;
+      capContent: string;
+      penaltyTitle: string;
+      penaltyContent: string;
+    };
+  };
   footer: {
     builtWith: string;
     love: string;
@@ -232,6 +302,14 @@ const englishTranslations: TranslationStructure = {
     question: 'Will persistence make you stronger, or is it meaningless?',
     subtext: 'If "what if" became reality, would you truly be better?',
     enter: 'ENTER',
+    subtitle: 'Turn "What If" Into Reality',
+    tagline: 'Challenge yourself. Prove your grit. Earn rewards.',
+    feature1Title: 'Set Challenges',
+    feature1Desc: 'Create quests that test persistence and commitment',
+    feature2Title: 'Earn Rewards',
+    feature2Desc: 'Complete challenges and earn ICP tokens',
+    feature3Title: 'Build Trust',
+    feature3Desc: 'Lower your deposit rate with each successful quest',
   },
   language: {
     select: 'Select Your Language',
@@ -446,6 +524,81 @@ const englishTranslations: TranslationStructure = {
     yourAppeal: 'Your Appeal',
     noAppeal: 'No appeal submitted yet',
   },
+  introduction: {
+    linkText: 'How it works? (运作规则)',
+    title: 'Grit Bounty',
+    subtitle: 'Turn "What If" Into Reality',
+    coreMission: {
+      title: 'Our Core Mission',
+      content:
+        'If you once had a goal to persist but didn\'t follow through, yet still wonder what would have happened if you had—now is the time! We make it real!',
+    },
+    useCases: {
+      title: 'No Matter How Unique Your Idea',
+      intro:
+        'Most people have their own ideas and creativity, but often fail to persist for various reasons. Now, our warriors help you realize them:',
+      lifestyle: 'Lifestyle Routine',
+      lifestyleExample: 'Wake up at 5 AM every day.',
+      health: 'Healthy Diet',
+      healthExample: 'Eat only vegetables for a month, or consume 1-2 grams of vitamin C daily.',
+      exercise: 'Exercise Challenge',
+      exerciseExample: 'Run 10 kilometers daily, or hike to specific locations.',
+      social: 'Social Creativity',
+      socialExample: 'Make 3 new friends of the opposite gender daily.',
+      enterprise: 'Enterprise Use',
+      enterpriseExample: 'Promote new apps, collect user feedback, and incentivize participation.',
+      more: 'More Possibilities',
+      moreExample: 'And any other unusual challenges.',
+    },
+    bountyMechanism: {
+      title: 'Bounty & Operation Mechanism',
+      publishTitle: 'Publish Task',
+      publishContent:
+        'Simply publish your task and stake your credit currency (e.g., 100 ICP). Fill in the number of executors, total bounty for task completion, and pay the bounty to the platform immediately.',
+      crowdfundTitle: 'Crowdfunding',
+      crowdfundContent:
+        'Attract like-minded people who also want to see the results. They can enter and contribute tips. When the bounty accumulates to a level where warriors are willing to accept, they can choose to take on the task.',
+      acceptTitle: 'Warrior Acceptance',
+      acceptContent:
+        'Warriors who believe they can persist and accomplish this meaningful task can accept it and submit a portion of ICP as collateral.',
+      flexibleTitle: 'Flexible Settings',
+      flexibleContent:
+        'Publishers can freely increase the number of warriors—one, two, or more.',
+    },
+    settlementRules: {
+      title: 'Settlement & Fee Structure',
+      successTitle: 'Task Success',
+      successContent:
+        'Upon successful completion by the deadline, the task automatically unlocks, the bounty is sent to the warrior\'s wallet, and the deposit is automatically returned to the warrior\'s account.',
+      unclaimedTitle: 'Task Unclaimed',
+      unclaimedContent:
+        'If the task is not accepted, both the bounty and deposit are fully refunded to the publisher.',
+      defaultTitle: 'Default Penalty',
+      defaultContent:
+        'If the task is accepted but the warrior fails to complete it, all of the warrior\'s deposit is forfeited, and the bounty is returned to the publisher.',
+      feesTitle: 'Platform Fees',
+      feesSuccessLabel: 'Task Success',
+      feesSuccessContent: 'The platform takes 6% as operational fees.',
+      feesDefaultLabel: 'Task Default (Warrior Incomplete)',
+      feesDefaultContent:
+        'The platform takes 6% of the warrior\'s deposit, and the remaining 94% goes to the publisher.',
+    },
+    warriorCredit: {
+      title: 'Warrior Credit Reduction System',
+      intro: 'We encourage true warriors through a tiered deposit system:',
+      initialTitle: 'Initial Threshold',
+      initialContent: 'Start with a 50% deposit.',
+      rewardTitle: 'Success Reward',
+      rewardContent:
+        'Each successful task completion reduces the next deposit requirement by 3%.',
+      capTitle: 'Integrity Cap',
+      capContent:
+        'Continue the cycle until the deposit drops to 2% (achieved after 16 successful tasks).',
+      penaltyTitle: 'Penalty Mechanism',
+      penaltyContent:
+        'If you abandon a task midway or fail a dispute vote, your deposit immediately resets to 50% and the cycle restarts.',
+    },
+  },
   footer: {
     builtWith: 'Built with',
     love: 'love',
@@ -460,6 +613,14 @@ export const translations: Record<Language, TranslationStructure> = {
       question: '坚持会让你变得更强大,还是毫无意义?',
       subtext: '如果"当初"变为现实,你真的会更优秀吗?',
       enter: '进入',
+      subtitle: '将"如果当初"变为现实',
+      tagline: '挑战自我。证明毅力。赢取奖励。',
+      feature1Title: '设定挑战',
+      feature1Desc: '创建测试毅力和承诺的任务',
+      feature2Title: '赢取奖励',
+      feature2Desc: '完成挑战并赚取ICP代币',
+      feature3Title: '建立信任',
+      feature3Desc: '每次成功任务降低押金率',
     },
     language: {
       select: '选择您的语言',
@@ -674,10 +835,81 @@ export const translations: Record<Language, TranslationStructure> = {
       yourAppeal: '您的申诉',
       noAppeal: '尚未提交申诉',
     },
+    introduction: {
+      linkText: 'How it works? (运作规则)',
+      title: 'Grit Bounty',
+      subtitle: '将"如果当初"变为现实',
+      coreMission: {
+        title: '一、我们的核心使命',
+        content:
+          '如果你曾经有一个坚持的目标,但是没有坚持下来,却又想知道如果当时坚持下去会发生什么样的结果——就是现在,我们把它变成现实!',
+      },
+      useCases: {
+        title: '二、无论你的想法多么奇特',
+        intro:
+          '大多数人都有自己的想法跟创意,但往往因为各种原因没能长时间坚持。现在,我们的勇士帮你实现:',
+        lifestyle: '生活作息',
+        lifestyleExample: '坚持每天5点起床。',
+        health: '健康饮食',
+        healthExample: '坚持一个月每天只吃蔬菜,或每天坚持吃1-2克维生素C。',
+        exercise: '运动挑战',
+        exerciseExample: '每天跑步10公里,或徒步到某些地方。',
+        social: '社交创意',
+        socialExample: '每天坚持结交3个异性朋友。',
+        enterprise: '企业推广',
+        enterpriseExample: '企业可以推广新APP,收集用户反馈,激励用户参与。',
+        more: '更多可能',
+        moreExample: '以及任何其他奇怪的事情。',
+      },
+      bountyMechanism: {
+        title: '三、悬赏与运作机制',
+        publishTitle: '发布任务',
+        publishContent:
+          '你只需要发布任务,并押注自己的信用货币(如100 ICP)。发布时需填写执行人数、完成任务的总赏金,并立即向平台支付赏金。',
+        crowdfundTitle: '众人加码',
+        crowdfundContent:
+          '吸引同样想看到结果的同类人群,他们可以进入并进行打赏。当赏金积累到大家愿意接任务的水平时,勇士可根据情况选择接取。',
+        acceptTitle: '勇士领命',
+        acceptContent:
+          '认为自己能坚持并做到这件有意义事情的勇士,可以领取任务并提交部分ICP作为抵押。',
+        flexibleTitle: '自由设定',
+        flexibleContent: '悬赏者可以自由增加勇士数量,可以是一个、两个或更多。',
+      },
+      settlementRules: {
+        title: '四、结算与费用说明',
+        successTitle: '任务成功',
+        successContent:
+          '到期顺利坚持下来,任务自动解锁,赏金发放至勇士钱包,押金自动退回勇士账户。',
+        unclaimedTitle: '任务未完成',
+        unclaimedContent: '若任务未被领取,赏金与押金全部退回发布者。',
+        defaultTitle: '违约赔付',
+        defaultContent:
+          '若任务被领取但勇士未完成,扣除勇士所有押金,赏金退回发布者。',
+        feesTitle: '平台费用',
+        feesSuccessLabel: '任务成功',
+        feesSuccessContent: '平台抽取6%作为运营费用。',
+        feesDefaultLabel: '任务违约(勇士未完成)',
+        feesDefaultContent: '平台抽取勇士押金的6%,剩余94%的押金全部给发布者。',
+      },
+      warriorCredit: {
+        title: '五、勇士信用减免系统',
+        intro: '我们通过阶梯式押金制度鼓励真正的勇士:',
+        initialTitle: '初始门槛',
+        initialContent: '从50%押金开始起步。',
+        rewardTitle: '成功奖励',
+        rewardContent: '每成功完成一次任务,下次接单的押金比例减少3%。',
+        capTitle: '诚信封顶',
+        capContent:
+          '持续循环直到押金降至2%(即成功完成16次任务后达到最低2%押金)。',
+        penaltyTitle: '惩罚机制',
+        penaltyContent:
+          '如果中途放弃任务或争议投票失败,押金立即重置为50%并重新开始循环。',
+      },
+    },
     footer: {
-      builtWith: '构建于',
+      builtWith: '用',
       love: '爱',
-      using: '使用',
+      using: '构建,使用',
     },
   },
   [Language.TraditionalChinese]: {
@@ -685,6 +917,14 @@ export const translations: Record<Language, TranslationStructure> = {
       question: '堅持會讓你變得更強大,還是毫無意義?',
       subtext: '如果"當初"變為現實,你真的會更優秀嗎?',
       enter: '進入',
+      subtitle: '將"如果當初"變為現實',
+      tagline: '挑戰自我。證明毅力。贏取獎勵。',
+      feature1Title: '設定挑戰',
+      feature1Desc: '創建測試毅力和承諾的任務',
+      feature2Title: '贏取獎勵',
+      feature2Desc: '完成挑戰並賺取ICP代幣',
+      feature3Title: '建立信任',
+      feature3Desc: '每次成功任務降低押金率',
     },
     language: {
       select: '選擇您的語言',
@@ -704,8 +944,8 @@ export const translations: Record<Language, TranslationStructure> = {
       setupTitle: '歡迎,勇士',
       setupDescription: '輸入您的名字開始旅程',
       namePlaceholder: '您的名字',
-      save: '儲存',
-      saving: '儲存中...',
+      save: '保存',
+      saving: '保存中...',
     },
     nav: {
       bountyBoard: '懸賞大廳',
@@ -751,7 +991,7 @@ export const translations: Record<Language, TranslationStructure> = {
       cancel: '取消',
       confirmAndPay: '確認並支付',
       processing: '處理中...',
-      transferFailed: '轉帳失敗',
+      transferFailed: '轉賬失敗',
     },
     launchMission: {
       title: '發布任務',
@@ -765,7 +1005,7 @@ export const translations: Record<Language, TranslationStructure> = {
       difficulty: '難度等級',
       createQuest: '創建任務',
       creating: '創建中...',
-      fillAllFields: '請填寫所有欄位',
+      fillAllFields: '請填寫所有字段',
       invalidReward: '請輸入有效的獎勵金額',
       createSuccess: '任務創建成功!',
       createError: '創建任務失敗',
@@ -858,7 +1098,7 @@ export const translations: Record<Language, TranslationStructure> = {
       requireContent: '請添加狀態更新或照片',
       submitSuccess: '打卡提交成功!',
       submitError: '打卡提交失敗',
-      fileTooLarge: '檔案大小必須小於5MB',
+      fileTooLarge: '文件大小必須小於5MB',
     },
     visualComparison: {
       title: '視覺進度對比',
@@ -899,10 +1139,81 @@ export const translations: Record<Language, TranslationStructure> = {
       yourAppeal: '您的申訴',
       noAppeal: '尚未提交申訴',
     },
+    introduction: {
+      linkText: 'How it works? (運作規則)',
+      title: 'Grit Bounty',
+      subtitle: '將"如果當初"變為現實',
+      coreMission: {
+        title: '一、我們的核心使命',
+        content:
+          '如果你曾經有一個堅持的目標,但是沒有堅持下來,卻又想知道如果當時堅持下去會發生什麼樣的結果——就是現在,我們把它變成現實!',
+      },
+      useCases: {
+        title: '二、無論你的想法多麼奇特',
+        intro:
+          '大多數人都有自己的想法跟創意,但往往因為各種原因沒能長時間堅持。現在,我們的勇士幫你實現:',
+        lifestyle: '生活作息',
+        lifestyleExample: '堅持每天5點起床。',
+        health: '健康飲食',
+        healthExample: '堅持一個月每天只吃蔬菜,或每天堅持吃1-2克維生素C。',
+        exercise: '運動挑戰',
+        exerciseExample: '每天跑步10公里,或徒步到某些地方。',
+        social: '社交創意',
+        socialExample: '每天堅持結交3個異性朋友。',
+        enterprise: '企業推廣',
+        enterpriseExample: '企業可以推廣新APP,收集用戶反饋,激勵用戶參與。',
+        more: '更多可能',
+        moreExample: '以及任何其他奇怪的事情。',
+      },
+      bountyMechanism: {
+        title: '三、懸賞與運作機制',
+        publishTitle: '發布任務',
+        publishContent:
+          '你只需要發布任務,並押注自己的信用貨幣(如100 ICP)。發布時需填寫執行人數、完成任務的總賞金,並立即向平台支付賞金。',
+        crowdfundTitle: '眾人加碼',
+        crowdfundContent:
+          '吸引同樣想看到結果的同類人群,他們可以進入並進行打賞。當賞金積累到大家願意接任務的水平時,勇士可根據情況選擇接取。',
+        acceptTitle: '勇士領命',
+        acceptContent:
+          '認為自己能堅持並做到這件有意義事情的勇士,可以領取任務並提交部分ICP作為抵押。',
+        flexibleTitle: '自由設定',
+        flexibleContent: '懸賞者可以自由增加勇士數量,可以是一個、兩個或更多。',
+      },
+      settlementRules: {
+        title: '四、結算與費用說明',
+        successTitle: '任務成功',
+        successContent:
+          '到期順利堅持下來,任務自動解鎖,賞金發放至勇士錢包,押金自動退回勇士賬戶。',
+        unclaimedTitle: '任務未完成',
+        unclaimedContent: '若任務未被領取,賞金與押金全部退回發布者。',
+        defaultTitle: '違約賠付',
+        defaultContent:
+          '若任務被領取但勇士未完成,扣除勇士所有押金,賞金退回發布者。',
+        feesTitle: '平台費用',
+        feesSuccessLabel: '任務成功',
+        feesSuccessContent: '平台抽取6%作為運營費用。',
+        feesDefaultLabel: '任務違約(勇士未完成)',
+        feesDefaultContent: '平台抽取勇士押金的6%,剩餘94%的押金全部給發布者。',
+      },
+      warriorCredit: {
+        title: '五、勇士信用減免系統',
+        intro: '我們通過階梯式押金制度鼓勵真正的勇士:',
+        initialTitle: '初始門檻',
+        initialContent: '從50%押金開始起步。',
+        rewardTitle: '成功獎勵',
+        rewardContent: '每成功完成一次任務,下次接單的押金比例減少3%。',
+        capTitle: '誠信封頂',
+        capContent:
+          '持續循環直到押金降至2%(即成功完成16次任務後達到最低2%押金)。',
+        penaltyTitle: '懲罰機制',
+        penaltyContent:
+          '如果中途放棄任務或爭議投票失敗,押金立即重置為50%並重新開始循環。',
+      },
+    },
     footer: {
-      builtWith: '構建於',
+      builtWith: '用',
       love: '愛',
-      using: '使用',
+      using: '構建,使用',
     },
   },
 };

@@ -2,10 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-remove-all-language-options-except-english-en-simplified-chinese-zh-cn-and-traditional-chinese-zh-tw-from-the-languageselection-component",
-      "featureTitle": "Remove all language options except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the LanguageSelection component",
+      "featureId": "feature-add-a-semi-transparent-how-it-works-text-link-below-the-enter-button-on-the-splash-screen-that-opens-an-introduction-modal-when-clicked",
+      "featureTitle": "Add a semi-transparent 'How it works? (运作规则)' text link below the ENTER button on the splash screen that opens an introduction modal when clicked",
       "files": [
-        "frontend/src/components/LanguageSelection.tsx"
+        "frontend/src/components/IntroductionModal.tsx",
+        "frontend/src/components/SplashScreen.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -23,10 +24,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-remove-all-language-options-except-english-en-simplified-chinese-zh-cn-and-traditional-chinese-zh-tw-from-the-languageswitcher-component",
-      "featureTitle": "Remove all language options except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the LanguageSwitcher component",
+      "featureId": "feature-create-an-introduction-modal-component-that-displays-the-complete-grit-bounty-concept-and-rules-in-a-scrollable-format-with-proper-typography-hierarchy-and-sections",
+      "featureTitle": "Create an introduction modal component that displays the complete Grit Bounty concept and rules in a scrollable format with proper typography hierarchy and sections",
       "files": [
-        "frontend/src/components/LanguageSwitcher.tsx"
+        "frontend/src/components/IntroductionModal.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -44,10 +45,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-language-type-enum-in-frontend-src-types-ts-to-include-only-en-zh-cn-and-zh-tw-removing-all-other-language-codes",
-      "featureTitle": "Update the Language type enum in frontend/src/types.ts to include only 'en', 'zh-CN', and 'zh-TW', removing all other language codes",
+      "featureId": "feature-add-translation-keys-for-the-complete-introduction-content-in-all-three-supported-languages-english-simplified-chinese-traditional-chinese-covering-core-mission-use-cases-daily-routines-health-exercise-social-activities-enterprise-promotion-bounty-mechanism-task-publishing-with-icp-deposit-crowdfunding-additions-warrior-acceptance-with-deposit-settlement-rules-success-payout-task-unclaimed-refund-default-forfeit-platform-fees-of-6-and-warrior-credit-system-50-initial-deposit-reducing-3-per-successful-quest-to-minimum-2-reset-to-50-on-default",
+      "featureTitle": "Add translation keys for the complete introduction content in all three supported languages (English, Simplified Chinese, Traditional Chinese) covering: Core Mission, Use Cases (daily routines, health, exercise, social activities, enterprise promotion), Bounty Mechanism (task publishing with ICP deposit, crowdfunding additions, warrior acceptance with deposit), Settlement Rules (success payout, task unclaimed refund, default forfeit, platform fees of 6%), and Warrior Credit System (50% initial deposit reducing 3% per successful quest to minimum 2%, reset to 50% on default)",
       "files": [
-        "frontend/src/types.ts"
+        "frontend/src/i18n/translations.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -61,27 +62,6 @@
       ],
       "testIds": [
         "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-remove-translation-objects-for-all-languages-except-english-en-simplified-chinese-zh-cn-and-traditional-chinese-zh-tw-from-the-translations-file",
-      "featureTitle": "Remove translation objects for all languages except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the translations file",
-      "files": [
-        "frontend/src/hooks/useLanguage.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "http-outcalls@3.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
       ],
       "confidence": "high"
     }
