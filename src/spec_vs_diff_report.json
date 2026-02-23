@@ -1,24 +1,41 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-23T03:46:26.522Z",
-  "summary": "The implementation successfully addresses all four requirements with appropriate frontend confirmation dialogs, balance checking, and cancellation functionality. However, REQ-2's core backend fund locking mechanism is not fully implemented—the diff shows mock balance data and lacks actual ICP ledger integration for deducting/locking funds.",
+  "generatedAt": "2026-02-23T04:46:03.438Z",
+  "summary": "The diff implements a partial frontend UI for the ICP wallet feature with placeholder backend integration. Most frontend UI requirements are met (REQ-1, REQ-2, REQ-3, REQ-4), but critical backend integration with the real ICP Ledger canister (REQ-5, REQ-6) is missing. The backend contains migration code and transaction types but lacks actual ICP Ledger integration methods.",
   "missing_requirements": [
     {
-      "id": "REQ-2",
-      "requirement": "Upon confirming task publication in the dialog, immediately deduct the full bounty amount from the publisher's ICP balance and lock it in the task contract",
-      "reason": "Backend does not implement actual fund deduction or locking. The useGetCallerBalance hook returns a hardcoded mock balance (BigInt(1000000000)) with a comment stating 'For now, return a mock balance since backend doesn't have balance tracking yet'. The createQuest backend method does not perform any balance deduction or fund locking operations. While systemBountyBalance variable exists in backend/main.mo, it is never updated during quest creation.",
+      "id": "REQ-5",
+      "requirement": "Integrate Internet Computer ICP Ledger canister to handle real cryptocurrency deposits and track incoming transfers to user wallet addresses",
+      "reason": "Backend contains transaction types and migration code but no evidence of actual ICP Ledger canister integration. No code for generating unique ICP account identifiers, monitoring the Ledger for deposits, or crediting user balances from real blockchain transactions.",
+      "evidence": [
+        "backend/main.mo",
+        "frontend/src/hooks/useQueries.ts"
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "requirement": "Integrate ICP Ledger canister for outbound transfers to enable real cryptocurrency withdrawals to external addresses",
+      "reason": "Frontend useWithdrawICP mutation explicitly throws 'Withdrawal functionality requires backend ICP Ledger integration' error. Backend does not implement withdrawICP method or any Ledger canister transfer calls.",
       "evidence": [
         "frontend/src/hooks/useQueries.ts",
         "backend/main.mo"
       ]
     },
     {
-      "id": "REQ-2",
-      "requirement": "Transaction is atomic - either both deduction and quest creation succeed, or both fail",
-      "reason": "No atomic transaction implementation exists. The backend createQuest method does not wrap balance deduction and quest creation in any transactional block or rollback mechanism. Since actual fund deduction is not implemented, atomicity cannot be verified.",
+      "id": "REQ-1",
+      "requirement": "Display user's ICP wallet address in the Personal Center",
+      "reason": "Frontend getWalletAddress query returns a placeholder string with TODO comment indicating backend method is not implemented. No real ICP account identifier generation.",
       "evidence": [
-        "backend/main.mo"
+        "frontend/src/hooks/useQueries.ts"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "requirement": "Show current ICP balance fetched from backend",
+      "reason": "Frontend getWalletBalance query returns mock balance with TODO comment. Backend does not implement getWalletBalance method to fetch real Ledger balance.",
+      "evidence": [
+        "frontend/src/hooks/useQueries.ts"
       ]
     }
   ],
@@ -26,13 +43,16 @@
   "confidence": 0.92,
   "changed_files": [
     "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/CancelQuestDialog.tsx",
-    "frontend/src/components/LaunchMission.tsx",
     "frontend/src/components/PersonalCenter.tsx",
-    "frontend/src/components/PublishQuestConfirmationDialog.tsx",
+    "frontend/src/components/TransactionHistory.tsx",
+    "frontend/src/components/WalletSection.tsx",
+    "frontend/src/components/WithdrawalDialog.tsx",
     "frontend/src/hooks/useQueries.ts",
     "frontend/src/i18n/translations.ts",
+    "frontend/src/utils/formatters.ts",
+    "frontend/src/utils/validators.ts",
     "project_state.json"
   ]
 }

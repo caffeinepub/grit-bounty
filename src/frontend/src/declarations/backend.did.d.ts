@@ -46,6 +46,22 @@ export type QuestStatus = { 'pendingVerification' : null } |
   { 'disputed' : null } |
   { 'completed' : null } |
   { 'inProgress' : null };
+export interface Transaction {
+  'id' : bigint,
+  'to' : Principal,
+  'status' : TransactionStatus,
+  'transactionType' : TransactionType,
+  'from' : Principal,
+  'amountE8' : bigint,
+  'timestamp' : bigint,
+}
+export type TransactionStatus = { 'pending' : null } |
+  { 'success' : null } |
+  { 'failed' : null };
+export type TransactionType = { 'deposit' : null } |
+  { 'withdrawal' : null } |
+  { 'taskPayment' : null } |
+  { 'taskDeduction' : null };
 export interface UserProfile {
   'name' : string,
   'totalEarned' : bigint,
@@ -103,6 +119,7 @@ export interface _SERVICE {
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getMyAcceptedQuests' : ActorMethod<[], Array<QuestImmutable>>,
   'getMyPostedBounties' : ActorMethod<[], Array<QuestImmutable>>,
+  'getTransactionsView' : ActorMethod<[], Array<[bigint, Transaction]>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,

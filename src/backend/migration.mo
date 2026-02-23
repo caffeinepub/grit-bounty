@@ -1,77 +1,54 @@
 import Map "mo:core/Map";
 import Nat "mo:core/Nat";
 import Nat64 "mo:core/Nat64";
-import Principal "mo:core/Principal";
+import List "mo:core/List";
 
 module {
-  type OldUserProfile = {
-    name : Text;
-    preferredLanguage : {
-      #SimplifiedChinese;
-      #English;
-      #Spanish;
-      #French;
-      #Japanese;
-      #Korean;
-    };
+  type Difficulty = {
+    #easy;
+    #medium;
+    #hard;
   };
 
-  type OldActor = {
-    nextQuestId : Nat;
-    payments : Map.Map<Nat, {
-      questId : Nat;
-      user : Principal;
-      amount : Nat;
-      timestamp : Int;
-    }>;
-    platformFees : Map.Map<Nat, {
-      questId : Nat;
-      amount : Nat;
-      timestamp : Int;
-    }>;
-    quests : Map.Map<Nat, {
-      id : Nat;
-      title : Text;
-      description : Text;
-      creator : Principal;
-      rewardPool : Nat;
-      status : {
-        #active;
-        #accepted;
-        #completed;
-        #expired;
-      };
-      difficulty : {
-        #easy;
-        #medium;
-        #hard;
-        #extreme;
-        #impossible;
-      };
-      assignedWarrior : ?Principal;
-      language : {
-        #SimplifiedChinese;
-        #English;
-        #Spanish;
-        #French;
-        #Japanese;
-        #Korean;
-      };
-    }>;
-    supportedLanguages : [
-      {
-        #SimplifiedChinese;
-        #English;
-        #Spanish;
-        #French;
-        #Japanese;
-        #Korean;
-      }
-    ];
-    userProfiles : Map.Map<Principal, OldUserProfile>;
+  type QuestStatus = {
+    #active;
+    #inProgress;
+    #pendingVerification;
+    #completed;
+    #disputed;
+    #cancelled;
   };
 
-  type NewUserProfile = {
+  type CheckInRecord = {
+    dayNumber : Nat;
+    timestamp : Int;
+    statusText : Text;
+    photoUrl : ?Text;
+  };
+
+  type Quest = {
+    questId : Nat;
+    title : Text;
+    description : Text;
+    rewardPool : Nat64;
+    difficulty : Difficulty;
+    publisherId : Principal;
+    warriorId : ?Principal;
+    status : QuestStatus;
+    depositAmount : Nat64;
+    depositRate : Nat;
+    createdAt : Int;
+    acceptedAt : ?Int;
+    completedAt : ?Int;
+    hypeCount : Nat;
+    crowdfundingContributions : List.List<(Principal, Nat64)>;
+    dailyCheckIns : List.List<CheckInRecord>;
+    completionTarget : Nat;
+    currentStreak : Nat;
+    participantCount : Nat;
+  };
+
+  type UserProfile = {
     name : Text;
     successfulQuests : Nat;
     depositRate : Nat;
@@ -79,22 +56,47 @@ module {
     totalDeposited : Nat64;
   };
 
+  // New types for transactions
+  type TransactionType = {
+    #deposit;
+    #withdrawal;
+    #taskPayment;
+    #taskDeduction;
+  };
+
+  type TransactionStatus = {
+    #pending;
+    #success;
+    #failed;
+  };
+
+  type Transaction = {
+    id : Nat;
+    timestamp : Int;
+    transactionType : TransactionType;
+    amountE8 : Nat64;
+    from : Principal;
+    to : Principal;
+    status : TransactionStatus;
+  };
+
+  type OldActor = {
+    userProfiles : Map.Map<Principal, UserProfile>;
+    quests : Map.Map<Nat, Quest>;
+    nextQuestId : Nat;
+    systemBountyBalance : Nat64;
+  };
+
   type NewActor = {
-    userProfiles : Map.Map<Principal, NewUserProfile>;
+    userProfiles : Map.Map<Principal, UserProfile>;
+    quests : Map.Map<Nat, Quest>;
+    nextQuestId : Nat;
+    systemBountyBalance : Nat64;
+    nextTransactionId : Nat;
+    transactions : Map.Map<Nat, Transaction>;
   };
 
   public func run(old : OldActor) : NewActor {
-    let newUserProfiles = old.userProfiles.map<Principal, OldUserProfile, NewUserProfile>(
-      func(_principal, oldProfile) {
-        {
-          name = oldProfile.name;
-          successfulQuests = 0;
-          depositRate = 50;
-          totalEarned = 0;
-          totalDeposited = 0;
-        };
-      }
-    );
-    { userProfiles = newUserProfiles };
+    { old with nextTransactionId = 0; transactions = Map.empty<Nat, Transaction>() };
   };
 };

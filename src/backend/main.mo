@@ -9,12 +9,36 @@ import MixinAuthorization "authorization/MixinAuthorization";
 import MixinStorage "blob-storage/Mixin";
 import Runtime "mo:core/Runtime";
 import ICP "mo:core/Nat64";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
-  // Data types
+  public type TransactionType = {
+    #deposit;
+    #withdrawal;
+    #taskPayment;
+    #taskDeduction;
+  };
+
+  public type TransactionStatus = {
+    #pending;
+    #success;
+    #failed;
+  };
+
+  public type Transaction = {
+    id : Nat;
+    timestamp : Int;
+    transactionType : TransactionType;
+    amountE8 : Nat64;
+    from : Principal;
+    to : Principal;
+    status : TransactionStatus;
+  };
+
   public type Difficulty = {
     #easy;
     #medium;
@@ -93,10 +117,11 @@ actor {
   let quests = Map.empty<Nat, Quest>();
   var nextQuestId = 0;
   var systemBountyBalance : Nat64 = 0;
+  var nextTransactionId = 0;
+  let transactions = Map.empty<Nat, Transaction>();
 
   include MixinStorage();
 
-  // User profile management
   public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can save profiles");
@@ -118,8 +143,28 @@ actor {
     userProfiles.get(user);
   };
 
-  // Quest management
+  public query ({ caller }) func getTransactionsView() : async [(Nat, Transaction)] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view transactions");
+    };
+
+    // Admins can see all transactions
+    if (AccessControl.isAdmin(accessControlState, caller)) {
+      return transactions.toArray();
+    };
+
+    // Regular users can only see their own transactions
+    let userTransactions = transactions.filter(
+      func(_, tx) {
+        tx.from == caller or tx.to == caller
+      }
+    );
+    userTransactions.toArray();
+  };
+
   public query ({ caller }) func getActiveQuests(difficulty : ?Difficulty) : async [QuestImmutable] {
+    // Allow any authenticated user (including guests) to view active quests
+    // This is a public marketplace feature
     let filtered = switch (difficulty) {
       case (null) {
         quests.filter(func(_, quest) { quest.status == #active });
@@ -517,10 +562,6 @@ actor {
       };
     };
   };
-
-  //------------------------------------------------------------------
-  // New Backend Functions (Crowdfunding/Publisher/Warrior Operations)
-  //------------------------------------------------------------------
 
   public shared ({ caller }) func deleteQuest(questId : Nat) : async Text {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {

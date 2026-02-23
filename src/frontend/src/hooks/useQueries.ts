@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import { useInternetIdentity } from './useInternetIdentity';
-import { UserProfile, QuestImmutable, Difficulty } from '../backend';
+import { UserProfile, QuestImmutable, Difficulty, Transaction } from '../backend';
 import { toast } from 'sonner';
 
 export function useGetCallerUserProfile() {
@@ -22,6 +22,87 @@ export function useGetCallerUserProfile() {
     isLoading: actorFetching || query.isLoading,
     isFetched: !!actor && query.isFetched,
   };
+}
+
+export function useGetWalletAddress() {
+  const { actor, isFetching: actorFetching } = useActor();
+  const { identity } = useInternetIdentity();
+
+  return useQuery<string | null>({
+    queryKey: ['walletAddress'],
+    queryFn: async () => {
+      if (!actor || !identity) throw new Error('Actor or identity not available');
+      // TODO: Backend needs to implement getWalletAddress() method
+      // For now, return a placeholder that shows the principal
+      const principal = identity.getPrincipal().toString();
+      return `Wallet address for ${principal.slice(0, 10)}...`;
+    },
+    enabled: !!actor && !actorFetching && !!identity,
+    retry: false,
+  });
+}
+
+export function useGetWalletBalance() {
+  const { actor, isFetching: actorFetching } = useActor();
+  const { identity } = useInternetIdentity();
+
+  return useQuery<bigint>({
+    queryKey: ['walletBalance'],
+    queryFn: async () => {
+      if (!actor || !identity) throw new Error('Actor or identity not available');
+      // TODO: Backend needs to implement getWalletBalance() method
+      // For now, return a mock balance
+      return BigInt(1000000000); // 10 ICP mock balance
+    },
+    enabled: !!actor && !actorFetching && !!identity,
+    refetchInterval: 30000, // Refetch every 30 seconds
+    retry: false,
+  });
+}
+
+export function useGetTransactionHistory() {
+  const { actor, isFetching: actorFetching } = useActor();
+  const { identity } = useInternetIdentity();
+
+  return useQuery<Array<[bigint, Transaction]>>({
+    queryKey: ['transactionHistory'],
+    queryFn: async () => {
+      if (!actor || !identity) throw new Error('Actor or identity not available');
+      return actor.getTransactionsView();
+    },
+    enabled: !!actor && !actorFetching && !!identity,
+    refetchOnWindowFocus: true,
+    retry: false,
+  });
+}
+
+export function useWithdrawICP() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      destinationAddress,
+      amountE8,
+    }: {
+      destinationAddress: string;
+      amountE8: bigint;
+    }) => {
+      if (!actor) throw new Error('Actor not available');
+      // TODO: Backend needs to implement withdrawICP(destinationAddress, amountE8) method
+      // For now, throw an error indicating backend implementation is needed
+      throw new Error('Withdrawal functionality requires backend ICP Ledger integration');
+    },
+    onSuccess: () => {
+      toast.success('Withdrawal successful!');
+      queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
+      queryClient.invalidateQueries({ queryKey: ['transactionHistory'] });
+    },
+    onError: (error: Error) => {
+      console.error('Withdrawal failed:', error);
+      toast.error(error.message || 'Failed to process withdrawal');
+    },
+  });
 }
 
 export function useGetCallerBalance() {
@@ -97,6 +178,7 @@ export function useCreateQuest() {
       queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
       queryClient.invalidateQueries({ queryKey: ['myPostedBounties'] });
       queryClient.invalidateQueries({ queryKey: ['callerBalance'] });
+      queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
     },
   });
 }
@@ -114,6 +196,7 @@ export function useAcceptQuest() {
       queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
       queryClient.invalidateQueries({ queryKey: ['myAcceptedQuests'] });
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
     },
   });
 }
@@ -129,6 +212,7 @@ export function useAddToPot() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
+      queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
     },
   });
 }
@@ -239,6 +323,7 @@ export function useDeleteQuest() {
       queryClient.invalidateQueries({ queryKey: ['myPostedBounties'] });
       queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
       queryClient.invalidateQueries({ queryKey: ['callerBalance'] });
+      queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
     },
     onError: (error: Error, questId) => {
       console.error('[useDeleteQuest] onError - Failed to delete quest:', questId.toString(), error);
@@ -262,6 +347,7 @@ export function useExitQuest() {
       toast.success('Successfully exited quest. Your contribution has been refunded.');
       queryClient.invalidateQueries({ queryKey: ['myPostedBounties'] });
       queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
+      queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
     },
     onError: (error: Error) => {
       console.error('[useExitQuest] Failed to exit quest:', error);
@@ -286,6 +372,7 @@ export function useAbandonQuest() {
       queryClient.invalidateQueries({ queryKey: ['myAcceptedQuests'] });
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
       queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
+      queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
     },
     onError: (error: Error) => {
       console.error('[useAbandonQuest] Failed to abandon quest:', error);
@@ -312,6 +399,7 @@ export function useCancelQuest() {
       queryClient.invalidateQueries({ queryKey: ['myPostedBounties'] });
       queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
       queryClient.invalidateQueries({ queryKey: ['callerBalance'] });
+      queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
     },
     onError: (error: Error) => {
       console.error('[useCancelQuest] Failed to cancel quest:', error);

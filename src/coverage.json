@@ -1,77 +1,114 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-23T03:46:26.525Z",
+  "generatedAt": "2026-02-23T04:46:03.441Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 3,
+    "total": 6,
+    "implemented": 4,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "When user clicks the publish button after filling task information (title, description, reward amount, difficulty, participant count), show a confirmation dialog displaying all task details before final submission",
+        "summary": "Display user's ICP wallet address in the Personal Center to enable external deposits from exchanges or other wallets",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/PublishQuestConfirmationDialog.tsx",
-          "frontend/src/components/LaunchMission.tsx"
+          "frontend/src/components/PersonalCenter.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/PublishQuestConfirmationDialog.tsx",
-          "frontend/src/components/LaunchMission.tsx"
+          "frontend/src/components/PersonalCenter.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Upon confirming task publication in the dialog, immediately deduct the full bounty amount from the publisher's ICP balance and lock it in the task contract",
+        "summary": "Show current ICP balance in the wallet section of Personal Center",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/PersonalCenter.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/utils/formatters.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/PersonalCenter.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/utils/formatters.ts"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Implement ICP withdrawal feature allowing users to send ICP to any destination address with 0.01% transaction fee and no minimum amount restriction",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/WithdrawalDialog.tsx",
+          "frontend/src/components/PersonalCenter.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/utils/validators.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/WithdrawalDialog.tsx",
+          "frontend/src/components/PersonalCenter.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/utils/validators.ts"
+        ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Display transaction history in wallet section showing time, transaction type (deposit/withdrawal/task deduction/task payment), amount, and status for each transaction",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/TransactionHistory.tsx",
+          "frontend/src/components/PersonalCenter.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/utils/formatters.ts",
+          "frontend/src/i18n/translations.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/TransactionHistory.tsx",
+          "frontend/src/components/PersonalCenter.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/utils/formatters.ts",
+          "frontend/src/i18n/translations.ts"
+        ]
+      },
+      {
+        "id": "REQ-5",
+        "summary": "Integrate Internet Computer ICP Ledger canister to handle real cryptocurrency deposits and track incoming transfers to user wallet addresses",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
       },
       {
-        "id": "REQ-3",
-        "summary": "If the publisher account balance is insufficient to cover the bounty amount, display an error message and prevent task publication",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/PublishQuestConfirmationDialog.tsx",
-          "frontend/src/hooks/useQueries.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/PublishQuestConfirmationDialog.tsx",
-          "frontend/src/hooks/useQueries.ts"
-        ]
-      },
-      {
-        "id": "REQ-4",
-        "summary": "Allow publishers to cancel a task and receive a full refund of the locked bounty amount when no warrior has accepted the task yet, without charging any cancellation fee",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/CancelQuestDialog.tsx",
-          "frontend/src/components/PersonalCenter.tsx",
-          "frontend/src/hooks/useQueries.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/CancelQuestDialog.tsx",
-          "frontend/src/components/PersonalCenter.tsx",
-          "frontend/src/hooks/useQueries.ts"
-        ]
+        "id": "REQ-6",
+        "summary": "Integrate ICP Ledger canister for outbound transfers to enable real cryptocurrency withdrawals to external addresses",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
     "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/CancelQuestDialog.tsx",
-    "frontend/src/components/LaunchMission.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
     "frontend/src/components/PersonalCenter.tsx",
-    "frontend/src/components/PublishQuestConfirmationDialog.tsx",
+    "frontend/src/components/TransactionHistory.tsx",
+    "frontend/src/components/WalletSection.tsx",
+    "frontend/src/components/WithdrawalDialog.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
     "frontend/src/hooks/useQueries.ts",
     "frontend/src/i18n/translations.ts",
+    "frontend/src/utils/formatters.ts",
+    "frontend/src/utils/validators.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

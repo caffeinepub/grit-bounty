@@ -71,6 +71,26 @@ export const UserProfile = IDL.Record({
   'totalDeposited' : IDL.Nat64,
   'depositRate' : IDL.Nat,
 });
+export const TransactionStatus = IDL.Variant({
+  'pending' : IDL.Null,
+  'success' : IDL.Null,
+  'failed' : IDL.Null,
+});
+export const TransactionType = IDL.Variant({
+  'deposit' : IDL.Null,
+  'withdrawal' : IDL.Null,
+  'taskPayment' : IDL.Null,
+  'taskDeduction' : IDL.Null,
+});
+export const Transaction = IDL.Record({
+  'id' : IDL.Nat,
+  'to' : IDL.Principal,
+  'status' : TransactionStatus,
+  'transactionType' : TransactionType,
+  'from' : IDL.Principal,
+  'amountE8' : IDL.Nat64,
+  'timestamp' : IDL.Int,
+});
 
 export const idlService = IDL.Service({
   '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -133,6 +153,11 @@ export const idlService = IDL.Service({
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getMyAcceptedQuests' : IDL.Func([], [IDL.Vec(QuestImmutable)], ['query']),
   'getMyPostedBounties' : IDL.Func([], [IDL.Vec(QuestImmutable)], ['query']),
+  'getTransactionsView' : IDL.Func(
+      [],
+      [IDL.Vec(IDL.Tuple(IDL.Nat, Transaction))],
+      ['query'],
+    ),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
@@ -214,6 +239,26 @@ export const idlFactory = ({ IDL }) => {
     'totalDeposited' : IDL.Nat64,
     'depositRate' : IDL.Nat,
   });
+  const TransactionStatus = IDL.Variant({
+    'pending' : IDL.Null,
+    'success' : IDL.Null,
+    'failed' : IDL.Null,
+  });
+  const TransactionType = IDL.Variant({
+    'deposit' : IDL.Null,
+    'withdrawal' : IDL.Null,
+    'taskPayment' : IDL.Null,
+    'taskDeduction' : IDL.Null,
+  });
+  const Transaction = IDL.Record({
+    'id' : IDL.Nat,
+    'to' : IDL.Principal,
+    'status' : TransactionStatus,
+    'transactionType' : TransactionType,
+    'from' : IDL.Principal,
+    'amountE8' : IDL.Nat64,
+    'timestamp' : IDL.Int,
+  });
   
   return IDL.Service({
     '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -276,6 +321,11 @@ export const idlFactory = ({ IDL }) => {
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getMyAcceptedQuests' : IDL.Func([], [IDL.Vec(QuestImmutable)], ['query']),
     'getMyPostedBounties' : IDL.Func([], [IDL.Vec(QuestImmutable)], ['query']),
+    'getTransactionsView' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Tuple(IDL.Nat, Transaction))],
+        ['query'],
+      ),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],

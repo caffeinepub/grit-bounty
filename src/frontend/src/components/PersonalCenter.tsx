@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { Loader2, Trophy, Target, Camera, Eye, Trash2, LogOut, AlertTriangle, XCircle } from 'lucide-react';
+import { Loader2, Trophy, Target, Camera, Eye, Trash2, LogOut, AlertTriangle, XCircle, Wallet } from 'lucide-react';
 import CreditScoreDisplay from './CreditScoreDisplay';
 import DailyCheckIn from './DailyCheckIn';
 import VisualComparison from './VisualComparison';
@@ -15,6 +15,7 @@ import DeleteQuestDialog from './DeleteQuestDialog';
 import ExitQuestDialog from './ExitQuestDialog';
 import AbandonQuestDialog from './AbandonQuestDialog';
 import CancelQuestDialog from './CancelQuestDialog';
+import WalletSection from './WalletSection';
 
 export default function PersonalCenter() {
   const { t } = useLanguage();
@@ -115,6 +116,9 @@ export default function PersonalCenter() {
         <h2 className="text-3xl font-bold text-neon-blue">{t('personalCenter.title')}</h2>
         <p className="text-muted-foreground mt-2">{t('personalCenter.subtitle')}</p>
       </div>
+
+      {/* Wallet Section */}
+      <WalletSection />
 
       <Tabs defaultValue="accepted" className="w-full">
         <TabsList className="grid w-full max-w-md grid-cols-2 h-12 bg-card/50 border border-neon-blue/20">

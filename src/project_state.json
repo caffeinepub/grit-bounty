@@ -1,34 +1,42 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Grit Bounty - a habit-forming task bounty platform on Internet Computer where publishers set challenges and warriors compete to complete them",
+  "summary": "Task bounty platform with ICP wallet integration for real cryptocurrency payments",
   "architectural_notes": [
-    "Payment collection occurs after user confirms task details in confirmation dialog",
-    "Bounty funds are locked in task smart contract, not platform account",
-    "No modification to existing features outside task publication flow"
+    "Must integrate real ICP Ledger for cryptocurrency transactions",
+    "Wallet withdrawal fee: 0.01%, no minimum amount limit",
+    "Transaction types: deposit, withdrawal, task deduction, task payment"
   ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-when-user-clicks-the-publish-button-after-filling-task-information-title-description-reward-amount-difficulty-participant-count-show-a-confirmation-dialog-displaying-all-task-details-before-final-submission",
-      "title": "When user clicks the publish button after filling task information (title, description, reward amount, difficulty, participant count), show a confirmation dialog displaying all task details before final submission",
+      "id": "feature-display-user-s-icp-wallet-address-in-the-personal-center-to-enable-external-deposits-from-exchanges-or-other-wallets",
+      "title": "Display user's ICP wallet address in the Personal Center to enable external deposits from exchanges or other wallets",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-if-the-publisher-account-balance-is-insufficient-to-cover-the-bounty-amount-display-an-error-message-and-prevent-task-publication",
-      "title": "If the publisher account balance is insufficient to cover the bounty amount, display an error message and prevent task publication",
+      "id": "feature-show-current-icp-balance-in-the-wallet-section-of-personal-center",
+      "title": "Show current ICP balance in the wallet section of Personal Center",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-icp-withdrawal-feature-allowing-users-to-send-icp-to-any-destination-address-with-0-01-transaction-fee-and-no-minimum-amount-restriction",
+      "title": "Implement ICP withdrawal feature allowing users to send ICP to any destination address with 0.01% transaction fee and no minimum amount restriction",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
     },
     {
-      "id": "feature-allow-publishers-to-cancel-a-task-and-receive-a-full-refund-of-the-locked-bounty-amount-when-no-warrior-has-accepted-the-task-yet-without-charging-any-cancellation-fee",
-      "title": "Allow publishers to cancel a task and receive a full refund of the locked bounty amount when no warrior has accepted the task yet, without charging any cancellation fee",
+      "id": "feature-display-transaction-history-in-wallet-section-showing-time-transaction-type-deposit-withdrawal-task-deduction-task-payment-amount-and-status-for-each-transaction",
+      "title": "Display transaction history in wallet section showing time, transaction type (deposit/withdrawal/task deduction/task payment), amount, and status for each transaction",
       "reqIds": [
         "REQ-4"
       ],
@@ -38,39 +46,35 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Collect bounty amount immediately upon task publication confirmation",
+      "summary": "Add ICP wallet to profile center showing balance and ICP deposit address",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Lock collected bounty funds in task contract until completion or cancellation",
-      "reqIds": [
-        "AR-1"
-      ],
+      "summary": "Implement ICP withdrawal with 0.01% fee and user-provided destination address",
+      "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Block task publication if publisher has insufficient balance",
+      "summary": "Display transaction history with time, type (deposit/withdrawal/task deduction/task payment), amount, and status",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Integrate Internet Computer ICP Ledger canister to handle real cryptocurrency deposits and track incoming transfers to user wallet addresses",
       "reqIds": [
-        "AR-1"
+        "REQ-5"
       ],
       "status": "pending"
     },
     {
-      "id": "AR-4",
-      "summary": "Allow task cancellation with full refund when no warrior has accepted (no fees)",
+      "id": "AR-9",
+      "summary": "Integrate ICP Ledger canister for outbound transfers to enable real cryptocurrency withdrawals to external addresses",
       "reqIds": [
-        "AR-2"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-6",
-      "summary": "Upon confirming task publication in the dialog, immediately deduct the full bounty amount from the publisher's ICP balance and lock it in the task contract",
-      "reqIds": [
-        "REQ-2"
+        "REQ-6"
       ],
       "status": "pending"
     }

@@ -1,12 +1,14 @@
 # Specification
 
 ## Summary
-**Goal:** Implement immediate bounty collection when publishers create tasks, with confirmation dialog and cancellation refund capability.
+**Goal:** Integrate real ICP wallet functionality with deposits, withdrawals, and transaction history.
 
 **Planned changes:**
-- Add confirmation dialog showing all task details before final publication
-- Deduct and lock full bounty amount from publisher's ICP balance immediately upon task creation
-- Validate publisher balance and display error if insufficient funds
-- Enable task cancellation with full refund when no warrior has accepted yet
+- Display user's ICP wallet address in Personal Center for external deposits
+- Show current ICP balance in wallet section
+- Implement ICP withdrawal feature with 0.01% transaction fee and no minimum amount restriction
+- Display transaction history showing time, type (deposit/withdrawal/task deduction/task payment), amount, and status
+- Integrate Internet Computer ICP Ledger canister for real cryptocurrency deposits and withdrawals
+- Track incoming transfers to user wallet addresses and execute outbound transfers to external addresses
 
-**User-visible outcome:** Publishers must have sufficient balance to create tasks, see a confirmation before publishing, have funds immediately locked, and can cancel unaccepted tasks for a full refund.
+**User-visible outcome:** Users can view their ICP wallet address, check their balance, receive deposits from exchanges or other wallets, withdraw ICP to external addresses with a small fee, and view their complete transaction history including all deposits, withdrawals, and task-related transactions.

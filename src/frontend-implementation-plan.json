@@ -1,78 +1,125 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Implement immediate bounty collection on task publication",
+  "title": "Integrate ICP Wallet UI with Deposits, Withdrawals, and Transaction History",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Add confirmation dialog displaying all task details before final submission when publisher clicks publish button",
+      "summary": "Display user's ICP wallet address in Personal Center for external deposits",
       "acceptanceCriteria": [
-        "Confirmation dialog appears after clicking publish button",
-        "Dialog displays quest title, description, reward pool amount, difficulty, and participant count",
-        "Dialog has a confirm button to proceed with publication",
-        "Dialog has a cancel button to return to the form"
+        "Wallet section appears in Personal Center component",
+        "User's unique ICP deposit address is displayed prominently",
+        "Address is copyable for easy sharing"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/PublishQuestConfirmationDialog.tsx",
-          "operation": "create",
-          "description": "Create a new dialog component that displays all quest details (title, description, reward pool, difficulty, participant count) with confirm and cancel buttons. Use shadcn/ui Dialog component for consistency with existing dialogs like DepositConfirmationDialog. Include loading state during quest creation and error handling."
+          "path": "frontend/src/components/PersonalCenter.tsx",
+          "operation": "modify",
+          "description": "Add a Wallet section below the profile information that displays the user's ICP deposit address. Include a copy-to-clipboard button using the existing shadcn/ui components. The address should be fetched from a new backend method and displayed in a monospace font for readability. Verify the authorization component's usage instructions before implementing to ensure proper authentication guards."
         },
         {
-          "path": "frontend/src/components/LaunchMission.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Modify the form submission flow to open the PublishQuestConfirmationDialog instead of directly calling createQuest mutation. Pass form values (title, description, rewardPool, difficulty, participantCount) to the dialog. The dialog will handle the actual quest creation upon confirmation. Keep all existing form validation logic unchanged."
+          "description": "Add a new useQuery hook called useGetWalletAddress that fetches the user's ICP deposit address from the backend. Enable the query only when the actor is available and the user is authenticated. Follow the same pattern as useGetCallerUserProfile for proper loading state handling."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Show current ICP balance in the wallet section of Personal Center",
+      "acceptanceCriteria": [
+        "Current ICP balance is fetched from backend and displayed",
+        "Balance updates automatically after transactions",
+        "Balance is formatted clearly with ICP denomination"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/PersonalCenter.tsx",
+          "operation": "modify",
+          "description": "Add ICP balance display in the Wallet section showing the current balance with 'ICP' denomination. Format the balance with 8 decimal places (e8 format) and make it prominent using a larger font size and accent color. Position it above the deposit address."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a new useQuery hook called useGetWalletBalance that fetches the user's current ICP balance from the backend. Configure automatic refetching with a reasonable interval (e.g., 30 seconds) and invalidate this query after withdrawal and deposit mutations complete."
+        },
+        {
+          "path": "frontend/src/utils/formatters.ts",
+          "operation": "create",
+          "description": "Create utility functions for formatting ICP amounts. Include formatICPBalance that converts e8 bigint amounts to human-readable strings with 8 decimal places, and formatICPWithUnit that appends 'ICP' to the formatted amount. Handle edge cases like zero balances and very large numbers."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Display error message and prevent task publication when publisher account balance is insufficient to cover the bounty amount",
+      "summary": "Implement ICP withdrawal feature with 0.01% fee and destination address input",
       "acceptanceCriteria": [
-        "Backend validates sufficient balance before creating quest",
-        "Frontend displays clear error message when balance is insufficient",
-        "Error message shows required amount and current balance",
-        "User remains on the form to adjust bounty amount or cancel",
-        "No quest is created when balance check fails"
+        "Withdrawal form accepts destination ICP address input",
+        "Withdrawal form accepts amount to send",
+        "0.01% fee is calculated and displayed before confirmation",
+        "No minimum withdrawal amount validation",
+        "Withdrawal executes real ICP ledger transfer",
+        "Success/failure feedback is shown to user"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/PublishQuestConfirmationDialog.tsx",
+          "path": "frontend/src/components/WithdrawalDialog.tsx",
+          "operation": "create",
+          "description": "Create a Dialog component for ICP withdrawals with fields for destination ICP address (text input with validation) and amount (number input). Calculate and display the 0.01% transaction fee below the amount input, showing both the fee and net amount received. Include a confirmation step showing all details before executing. Use shadcn/ui Dialog, Input, and Button components. Show loading state during withdrawal execution and display success/error toast notifications. Verify the authorization component's usage instructions before implementing to ensure the user must be authenticated."
+        },
+        {
+          "path": "frontend/src/components/PersonalCenter.tsx",
           "operation": "modify",
-          "description": "Add balance checking before quest creation. Fetch current user balance and compare with the reward pool amount. If insufficient, display an error alert showing both the required amount and current balance. Use the existing error handling pattern from useQueries hooks. Prevent quest creation and keep the dialog open when balance is insufficient, allowing the user to cancel and return to the form."
+          "description": "Add a 'Withdraw ICP' button in the Wallet section that opens the WithdrawalDialog. Position it next to the balance display. Disable the button if the balance is zero or if the wallet data is still loading."
         },
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add a new query hook useGetCallerBalance() that fetches the current user's ICP balance from the backend. Use React Query's useQuery with appropriate cache settings. This hook will be used by PublishQuestConfirmationDialog to validate balance before quest creation."
+          "description": "Add a useMutation hook called useWithdrawICP that calls the backend withdrawal method with destination address and amount parameters. On success, invalidate the wallet balance query and transaction history query to refresh displayed data. Handle errors with appropriate error messages including validation failures from the backend."
+        },
+        {
+          "path": "frontend/src/utils/validators.ts",
+          "operation": "create",
+          "description": "Create validation utilities for ICP addresses and withdrawal amounts. Include validateICPAddress that checks address format, and validateWithdrawalAmount that ensures the amount plus fee doesn't exceed the user's balance. Return user-friendly error messages for each validation failure."
         }
       ]
     },
     {
       "id": "REQ-4",
-      "summary": "Allow publishers to cancel a task and receive a full refund when no warrior has accepted the task yet, without charging any cancellation fee",
+      "summary": "Display transaction history showing time, type, amount, and status",
       "acceptanceCriteria": [
-        "Cancel button is available on publisher posted quests when acceptedBy array is empty",
-        "Clicking cancel returns the full locked bounty amount to publisher balance",
-        "No fees are deducted from the refund",
-        "Quest is removed from active quests list after cancellation",
-        "Cancel button is hidden or disabled once a warrior has accepted the quest"
+        "Transaction history list displays all wallet transactions",
+        "Each entry shows timestamp in readable format",
+        "Transaction type is clearly labeled (Deposit, Withdrawal, Task Deduction, Task Payment)",
+        "Amount is displayed with ICP denomination",
+        "Transaction status is shown (Pending, Completed, Failed)",
+        "History is sorted by most recent first"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/CancelQuestDialog.tsx",
+          "path": "frontend/src/components/TransactionHistory.tsx",
           "operation": "create",
-          "description": "Create a new confirmation dialog for cancelling quests. Display quest details including the full refund amount (matching the reward pool). Show a clear message that the full bounty will be refunded with no fees deducted. Include confirm and cancel buttons. Add loading state during the cancellation mutation and error handling. Use shadcn/ui AlertDialog for consistency with DeleteQuestDialog."
+          "description": "Create a component displaying a scrollable list of transaction history entries. Each entry shows a formatted timestamp, transaction type badge with color coding (green for deposit/payment, red for withdrawal/deduction), amount with ICP denomination, and status badge (pending/completed/failed). Use shadcn/ui Table or Card components for layout. Show empty state when no transactions exist. Sort transactions by timestamp descending (most recent first)."
         },
         {
           "path": "frontend/src/components/PersonalCenter.tsx",
           "operation": "modify",
-          "description": "Add a 'Cancel Quest' button to posted bounties in the My Bounties tab. Show this button only when the quest status is 'active' and warriorId is undefined (no warrior has accepted yet). Wire the button to open the CancelQuestDialog. Add state management for the selected quest and dialog visibility. Ensure the button is hidden or disabled once a warrior has accepted the quest."
+          "description": "Add the TransactionHistory component below the Wallet section in PersonalCenter. Include a section header 'Transaction History' with appropriate spacing. The history should be collapsible or in a separate tab if space is limited."
         },
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add a new mutation hook useCancelQuest() that calls the backend cancelQuest method. On success, invalidate the 'myPostedBounties', 'activeQuests', and 'currentUserProfile' query keys to refresh the UI. Handle error cases gracefully and display appropriate error messages to the user."
+          "description": "Add a new useQuery hook called useGetTransactionHistory that fetches the transaction history from the backend using getTransactionsView. Enable the query only when the actor is available and the user is authenticated. Configure to refetch when the tab becomes visible and invalidate after withdrawal or deposit operations."
+        },
+        {
+          "path": "frontend/src/utils/formatters.ts",
+          "operation": "modify",
+          "description": "Add formatting functions for transaction data: formatTransactionType that converts backend transaction type enums to translated display strings, formatTransactionStatus for status badges, and formatTimestamp that converts bigint timestamps to human-readable date-time strings in the user's locale."
+        },
+        {
+          "path": "frontend/src/i18n/translations.ts",
+          "operation": "modify",
+          "description": "Add translation keys for the wallet section including wallet address label, balance label, withdraw button text, transaction history header, transaction type labels (deposit, withdrawal, taskPayment, taskDeduction), and transaction status labels (pending, success, failed). Include translations for all three supported languages (English, Simplified Chinese, Traditional Chinese)."
         }
       ]
     }

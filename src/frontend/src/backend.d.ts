@@ -7,6 +7,15 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
+export interface Transaction {
+    id: bigint;
+    to: Principal;
+    status: TransactionStatus;
+    transactionType: TransactionType;
+    from: Principal;
+    amountE8: bigint;
+    timestamp: bigint;
+}
 export interface CheckInRecord {
     photoUrl?: string;
     dayNumber: bigint;
@@ -54,6 +63,17 @@ export enum QuestStatus {
     completed = "completed",
     inProgress = "inProgress"
 }
+export enum TransactionStatus {
+    pending = "pending",
+    success = "success",
+    failed = "failed"
+}
+export enum TransactionType {
+    deposit = "deposit",
+    withdrawal = "withdrawal",
+    taskPayment = "taskPayment",
+    taskDeduction = "taskDeduction"
+}
 export enum UserRole {
     admin = "admin",
     user = "user",
@@ -73,6 +93,7 @@ export interface backendInterface {
     getCallerUserRole(): Promise<UserRole>;
     getMyAcceptedQuests(): Promise<Array<QuestImmutable>>;
     getMyPostedBounties(): Promise<Array<QuestImmutable>>;
+    getTransactionsView(): Promise<Array<[bigint, Transaction]>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
