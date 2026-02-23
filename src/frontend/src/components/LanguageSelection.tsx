@@ -1,62 +1,41 @@
+import React from 'react';
 import { useLanguage } from '../hooks/useLanguage';
 import { Language } from '../types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 
-interface LanguageSelectionProps {
-  onLanguageSelect: (language: Language) => void;
-}
+const languageOptions = [
+  { value: Language.English, flag: '🇬🇧', native: 'English', chinese: '英语' },
+  { value: Language.SimplifiedChinese, flag: '🇨🇳', native: '简体中文', chinese: '简体中文' },
+  { value: Language.TraditionalChinese, flag: '🇹🇼', native: '繁體中文', chinese: '繁体中文' },
+];
 
-export default function LanguageSelection({ onLanguageSelect }: LanguageSelectionProps) {
+export default function LanguageSelection() {
   const { setLanguage } = useLanguage();
 
-  const languages = [
-    { code: Language.SimplifiedChinese, name: '简体中文', flag: '🇨🇳' },
-    { code: Language.English, name: 'English', flag: '🇺🇸' },
-    { code: Language.Spanish, name: 'Español', flag: '🇪🇸' },
-    { code: Language.French, name: 'Français', flag: '🇫🇷' },
-    { code: Language.Japanese, name: '日本語', flag: '🇯🇵' },
-    { code: Language.Korean, name: '한국어', flag: '🇰🇷' },
-    { code: Language.German, name: 'Deutsch', flag: '🇩🇪' },
-    { code: Language.Arabic, name: 'العربية', flag: '🇸🇦' },
-    { code: Language.Portuguese, name: 'Português', flag: '🇵🇹' },
-    { code: Language.Russian, name: 'Русский', flag: '🇷🇺' },
-    { code: Language.Italian, name: 'Italiano', flag: '🇮🇹' },
-    { code: Language.Dutch, name: 'Nederlands', flag: '🇳🇱' },
-    { code: Language.Hindi, name: 'हिन्दी', flag: '🇮🇳' },
-    { code: Language.Turkish, name: 'Türkçe', flag: '🇹🇷' },
-    { code: Language.Polish, name: 'Polski', flag: '🇵🇱' },
-  ];
-
   const handleLanguageSelect = (lang: Language) => {
+    console.log('LanguageSelection: Setting language to', lang);
     setLanguage(lang);
-    onLanguageSelect(lang);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      <Card className="w-full max-w-4xl border-neon-cyan/30 bg-card/80 backdrop-blur">
-        <CardHeader>
-          <CardTitle className="text-3xl text-center text-neon-cyan font-bold">
-            Select Your Language / 选择您的语言
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {languages.map((lang) => (
-              <Button
-                key={lang.code}
-                onClick={() => handleLanguageSelect(lang.code)}
-                variant="outline"
-                className="h-24 flex flex-col items-center justify-center gap-2 border-neon-cyan/30 hover:border-neon-cyan hover:bg-neon-cyan/10 transition-all"
-              >
-                <span className="text-4xl">{lang.flag}</span>
-                <span className="font-semibold text-sm">{lang.name}</span>
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-4">
+      <div className="max-w-4xl w-full">
+        <h1 className="text-4xl font-bold text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+          Select Your Language / 选择语言
+        </h1>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
+          {languageOptions.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => handleLanguageSelect(option.value)}
+              className="bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 hover:border-cyan-500 rounded-lg p-6 transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/20"
+            >
+              <div className="text-5xl mb-3">{option.flag}</div>
+              <div className="text-lg font-semibold text-white mb-1">{option.native}</div>
+              <div className="text-sm text-gray-400">{option.chinese}</div>
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

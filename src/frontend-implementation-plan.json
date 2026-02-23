@@ -1,37 +1,65 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix language switching to update entire interface",
+  "title": "Remove all languages except English, Simplified Chinese, and Traditional Chinese",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Fix the language switching mechanism so that all text across the entire application interface updates immediately when a user selects a new language from the dropdown",
+      "summary": "Remove all language options except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the LanguageSelection component",
       "acceptanceCriteria": [
-        "After selecting a language from the dropdown, all visible text in the UI immediately updates to the selected language",
-        "The language change persists across page refreshes",
-        "All components (SplashScreen, MainApp, BountyBoard, LaunchMission, PersonalCenter, QuestCard, etc.) display text in the selected language",
-        "No manual page refresh is required for the language change to take effect"
+        "LanguageSelection component displays exactly 3 language options: English, Simplified Chinese, Traditional Chinese",
+        "All other language options (Spanish, French, Japanese, Korean, German, Arabic, Portuguese, Russian, Italian, Dutch, Hindi, Turkish, Polish) are removed from the UI"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/LanguageSelection.tsx",
+          "operation": "modify",
+          "description": "Remove all language options except 'en', 'zh-CN', and 'zh-TW' from the language options array. Update the grid layout to display only 3 language options with appropriate styling. Remove flag icons and language data for Spanish, French, Japanese, Korean, German, Arabic, Portuguese, Russian, Italian, Dutch, Hindi, Turkish, and Polish."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Remove all language options except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the LanguageSwitcher component",
+      "acceptanceCriteria": [
+        "LanguageSwitcher dropdown menu shows exactly 3 language options",
+        "Only English, Simplified Chinese, and Traditional Chinese are selectable"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/LanguageSwitcher.tsx",
+          "operation": "modify",
+          "description": "Remove all language options except 'en', 'zh-CN', and 'zh-TW' from the dropdown menu items. Keep only the flag icons and native names for English, Simplified Chinese, and Traditional Chinese. Remove all other language entries from the switcher."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Update the Language type enum in frontend/src/types.ts to include only 'en', 'zh-CN', and 'zh-TW', removing all other language codes",
+      "acceptanceCriteria": [
+        "Language enum contains exactly 3 values: en, zh-CN, zh-TW",
+        "All other language codes are removed from the type definition"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/types.ts",
+          "operation": "modify",
+          "description": "Update the Language enum to contain only three values: 'en', 'zh-CN', and 'zh-TW'. Remove all other language codes including 'es', 'fr', 'ja', 'ko', 'de', 'ar', 'pt', 'ru', 'it', 'nl', 'hi', 'tr', and 'pl' from the type definition."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Remove translation objects for all languages except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the translations file",
+      "acceptanceCriteria": [
+        "Translation data structure contains only 3 language objects: en, zh-CN, zh-TW",
+        "All translation objects for removed languages are deleted"
       ],
       "file_operations": [
         {
           "path": "frontend/src/hooks/useLanguage.ts",
           "operation": "modify",
-          "description": "Convert the useLanguage hook to use React Context with a provider that wraps the entire application. The context should store the current language state and provide a setLanguage function that updates both the state and localStorage. This ensures all components using the hook re-render when the language changes. The translation function (t) should reference the current language from context state rather than reading directly from localStorage."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Wrap the entire application with the LanguageProvider from the updated useLanguage hook. This should be placed at the top level, outside the InternetIdentityProvider, to ensure language context is available throughout the component tree. The provider wrapping ensures that when language changes, all child components using useLanguage will re-render with the new translations."
-        },
-        {
-          "path": "frontend/src/components/LanguageSwitcher.tsx",
-          "operation": "modify",
-          "description": "Update the LanguageSwitcher component to use the setLanguage function from the useLanguage context instead of directly manipulating localStorage. When a language is selected from the dropdown, call setLanguage which will trigger the context state update and cause all consuming components to re-render with the new language."
-        },
-        {
-          "path": "frontend/src/components/LanguageSelection.tsx",
-          "operation": "modify",
-          "description": "Update the LanguageSelection component to use the setLanguage function from the useLanguage context instead of directly manipulating localStorage. When a language is selected from the initial selection screen, call setLanguage to ensure the context state is updated and the application immediately reflects the chosen language."
+          "description": "Remove all translation objects except 'en', 'zh-CN', and 'zh-TW' from the translations data structure embedded in the useLanguage hook. Delete translation entries for Spanish, French, Japanese, Korean, German, Arabic, Portuguese, Russian, Italian, Dutch, Hindi, Turkish, and Polish while preserving all translation keys and values for the three retained languages."
         }
       ]
     }

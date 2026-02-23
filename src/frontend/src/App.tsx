@@ -19,7 +19,7 @@ export default function App() {
 
   const isAuthenticated = !!identity;
 
-  // Manage flow progression
+  // Manage flow progression with timeout fallback
   useEffect(() => {
     if (isInitializing) {
       return;
@@ -31,6 +31,20 @@ export default function App() {
       setFlowStep('authenticating');
     }
   }, [isAuthenticated, actor, actorFetching, loginStatus, isInitializing]);
+
+  // Safety timeout: if stuck in authenticating for too long, show error
+  useEffect(() => {
+    if (flowStep === 'authenticating' && loginStatus !== 'logging-in') {
+      const timeout = setTimeout(() => {
+        if (!isAuthenticated || !actor) {
+          console.error('[App] Initialization timeout - forcing retry');
+          setFlowStep('splash');
+        }
+      }, 10000); // 10 second timeout
+
+      return () => clearTimeout(timeout);
+    }
+  }, [flowStep, loginStatus, isAuthenticated, actor]);
 
   const handleLoginClick = async () => {
     try {

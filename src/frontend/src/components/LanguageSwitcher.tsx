@@ -1,3 +1,4 @@
+import React from 'react';
 import { useLanguage } from '../hooks/useLanguage';
 import { Language } from '../types';
 import {
@@ -5,80 +6,48 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+} from './ui/dropdown-menu';
+import { Button } from './ui/button';
 import { Globe } from 'lucide-react';
 
-const languageNames: Record<Language, string> = {
-  [Language.English]: 'English',
-  [Language.SimplifiedChinese]: '简体中文',
-  [Language.Spanish]: 'Español',
-  [Language.French]: 'Français',
-  [Language.Japanese]: '日本語',
-  [Language.Korean]: '한국어',
-  [Language.German]: 'Deutsch',
-  [Language.Arabic]: 'العربية',
-  [Language.Portuguese]: 'Português',
-  [Language.Russian]: 'Русский',
-  [Language.Italian]: 'Italiano',
-  [Language.Dutch]: 'Nederlands',
-  [Language.Hindi]: 'हिन्दी',
-  [Language.Turkish]: 'Türkçe',
-  [Language.Polish]: 'Polski',
-};
-
-const languageFlags: Record<Language, string> = {
-  [Language.English]: '🇬🇧',
-  [Language.SimplifiedChinese]: '🇨🇳',
-  [Language.Spanish]: '🇪🇸',
-  [Language.French]: '🇫🇷',
-  [Language.Japanese]: '🇯🇵',
-  [Language.Korean]: '🇰🇷',
-  [Language.German]: '🇩🇪',
-  [Language.Arabic]: '🇸🇦',
-  [Language.Portuguese]: '🇵🇹',
-  [Language.Russian]: '🇷🇺',
-  [Language.Italian]: '🇮🇹',
-  [Language.Dutch]: '🇳🇱',
-  [Language.Hindi]: '🇮🇳',
-  [Language.Turkish]: '🇹🇷',
-  [Language.Polish]: '🇵🇱',
-};
+const languageOptions = [
+  { value: Language.English, flag: '🇬🇧', native: 'English', chinese: '英语' },
+  { value: Language.SimplifiedChinese, flag: '🇨🇳', native: '简体中文', chinese: '简体中文' },
+  { value: Language.TraditionalChinese, flag: '🇹🇼', native: '繁體中文', chinese: '繁体中文' },
+];
 
 export default function LanguageSwitcher() {
-  const { currentLanguage, setLanguage } = useLanguage();
+  const { language, setLanguage } = useLanguage();
 
-  const handleLanguageChange = (lang: Language) => {
-    setLanguage(lang);
+  const currentLanguage = languageOptions.find((opt) => opt.value === language);
+
+  const handleLanguageChange = (newLanguage: Language) => {
+    console.log('LanguageSwitcher: Changing language from', language, 'to', newLanguage);
+    setLanguage(newLanguage);
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          className="border-neon-cyan/30 hover:bg-neon-cyan/10 hover:border-neon-cyan"
-        >
-          <Globe className="h-4 w-4 text-neon-cyan" />
+        <Button variant="ghost" size="sm" className="gap-2">
+          <Globe className="h-4 w-4" />
+          <span className="hidden sm:inline">{currentLanguage?.flag}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        className="w-48 max-h-[400px] overflow-y-auto border-neon-cyan/30 bg-card/95 backdrop-blur"
-      >
-        {Object.values(Language).map((lang) => (
+      <DropdownMenuContent align="end" className="w-64">
+        {languageOptions.map((option) => (
           <DropdownMenuItem
-            key={lang}
-            onClick={() => handleLanguageChange(lang)}
-            className={`cursor-pointer ${
-              currentLanguage === lang
-                ? 'bg-neon-cyan/20 text-neon-cyan font-semibold'
-                : 'hover:bg-neon-cyan/10'
+            key={option.value}
+            onClick={() => handleLanguageChange(option.value)}
+            className={`flex items-center gap-3 cursor-pointer ${
+              language === option.value ? 'bg-accent' : ''
             }`}
           >
-            <span className="mr-2">{languageFlags[lang]}</span>
-            {languageNames[lang]}
+            <span className="text-xl">{option.flag}</span>
+            <div className="flex-1">
+              <div className="font-medium">{option.native}</div>
+              <div className="text-xs text-muted-foreground">{option.chinese}</div>
+            </div>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

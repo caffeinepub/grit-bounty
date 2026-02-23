@@ -1,24 +1,53 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project with language switching functionality",
+  "summary": "New project",
   "architectural_notes": [],
-  "known_issues": [
-    "Language switching does not update the entire interface after language selection"
-  ],
-  "isFixRequest": true,
+  "known_issues": [],
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-fix-the-language-switching-mechanism-so-that-when-a-user-selects-a-new-language-from-the-dropdown-all-text-across-the-entire-application-interface-updates-immediately-to-reflect-the-chosen-language",
-      "title": "Fix the language switching mechanism so that when a user selects a new language from the dropdown, all text across the entire application interface updates immediately to reflect the chosen language",
+      "id": "feature-remove-all-language-options-except-english-en-simplified-chinese-zh-cn-and-traditional-chinese-zh-tw-from-the-languageselection-component",
+      "title": "Remove all language options except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the LanguageSelection component",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-remove-all-language-options-except-english-en-simplified-chinese-zh-cn-and-traditional-chinese-zh-tw-from-the-languageswitcher-component",
+      "title": "Remove all language options except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the LanguageSwitcher component",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-language-type-enum-in-frontend-src-types-ts-to-include-only-en-zh-cn-and-zh-tw-removing-all-other-language-codes",
+      "title": "Update the Language type enum in frontend/src/types.ts to include only 'en', 'zh-CN', and 'zh-TW', removing all other language codes",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-translation-objects-for-all-languages-except-english-en-simplified-chinese-zh-cn-and-traditional-chinese-zh-tw-from-the-translations-file",
+      "title": "Remove translation objects for all languages except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from the translations file",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
     }
   ],
-  "new_feature_requests": [],
-  "projectName": "Fix language switching to update entire interface",
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Remove all languages except English, Simplified Chinese, and Traditional Chinese",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Remove all languages except English, Simplified Chinese, and Traditional Chinese",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

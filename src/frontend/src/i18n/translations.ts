@@ -1,230 +1,461 @@
-export const translations = {
-  English: {
-    splash: {
-      question: 'Will persistence make you stronger, or is it meaningless?',
-      subtext: 'If "what if" became reality, would you truly be better?',
-      enter: 'ENTER',
-    },
-    language: {
-      select: 'Select Your Language',
-      english: 'English',
-      chinese: 'Chinese',
-      spanish: 'Spanish',
-      french: 'French',
-      japanese: 'Japanese',
-      korean: 'Korean',
-    },
-    auth: {
-      login: 'Login',
-      logout: 'Logout',
-      loggingIn: 'Logging in...',
-    },
-    profile: {
-      setupTitle: 'Welcome, Warrior',
-      setupDescription: 'Enter your name to begin your journey',
-      namePlaceholder: 'Your name',
-      save: 'Save',
-      saving: 'Saving...',
-    },
-    nav: {
-      bountyBoard: 'Bounty Board',
-      launchMission: 'Launch Mission',
-      disputeResolution: 'Dispute Resolution',
-      personalCenter: 'Personal Center',
-    },
-    bountyBoard: {
-      title: 'Bounty Board',
-      allQuests: 'All Quests',
-      noQuests: 'No quests available',
-      hype: 'Hype',
-      contributors: 'contributors',
-      acceptSuccess: 'Quest accepted successfully!',
-      acceptError: 'Failed to accept quest',
-      yourQuest: 'Your Quest',
-      addToPot: 'Add to Pot',
-      addToPotDescription: 'Increase the reward pool to attract more warriors',
-      currentPool: 'Current Pool',
-      yourContribution: 'Your Contribution',
-      newPool: 'New Pool',
-      contribute: 'Contribute',
-      contributionSuccess: 'Contribution added successfully!',
-      contributionError: 'Failed to add contribution',
-    },
-    difficulty: {
-      easy: 'Easy',
-      medium: 'Medium',
-      hard: 'Hard',
-      extreme: 'Extreme',
-      impossible: 'Impossible',
-    },
-    deposit: {
-      required: 'Deposit Required',
-      acceptAndPayDeposit: 'Accept & Pay Deposit',
-      confirmTitle: 'Confirm Deposit',
-      confirmDescription: 'Lock your deposit to accept this quest',
-      questTitle: 'Quest',
-      rewardPool: 'Reward Pool',
-      yourDepositRate: 'Your Deposit Rate',
-      depositRequired: 'Deposit Required',
-      depositInfo: 'Your deposit will be locked until quest completion. Complete successfully to earn rewards and reduce your deposit rate.',
-      cancel: 'Cancel',
-      confirmAndPay: 'Confirm & Pay',
-      processing: 'Processing...',
-      transferFailed: 'Transfer failed',
-    },
-    launchMission: {
-      title: 'Launch Mission',
-      subtitle: 'Create a new quest and set the challenge',
-      questTitle: 'Quest Title',
-      titlePlaceholder: 'e.g., Wake up at 5 AM for 100 days',
-      rules: 'Quest Rules & Description',
-      rulesPlaceholder: 'Describe the quest requirements and rules...',
-      rewardPool: 'Initial Reward Pool (ICP)',
-      rewardHint: 'Minimum 0.0001 ICP',
-      difficulty: 'Difficulty Level',
-      createQuest: 'Create Quest',
-      creating: 'Creating...',
-      fillAllFields: 'Please fill in all fields',
-      invalidReward: 'Please enter a valid reward amount',
-      createSuccess: 'Quest created successfully!',
-      createError: 'Failed to create quest',
-      titleRequired: 'Quest title is required',
-      descriptionTooShort: 'Description must be at least 20 characters',
-      minCharacters: 'characters minimum',
-    },
-    creditScore: {
-      title: 'Warrior Credit Score',
-      depositRate: 'Current Deposit Rate',
-      successfulQuests: 'Successful Quests',
-      totalEarned: 'Total Earned',
-      totalDeposited: 'Total Deposited',
-      questsToMinimum: 'quests to minimum rate (2%)',
-      rateDecrease: 'Each success: -3%',
-    },
-    personalCenter: {
-      title: 'Personal Center',
-      subtitle: 'Track your quests and progress',
-      acceptedQuests: 'Accepted Quests',
-      postedBounties: 'Posted Bounties',
-      noAcceptedQuests: 'No accepted quests yet',
-      noPostedBounties: 'No posted bounties yet',
-      progress: 'Progress',
-      status: 'Status',
-      reward: 'Reward',
-      lockedDeposit: 'Locked Deposit',
-      rewardPool: 'Reward Pool',
-      hypeCount: 'Hype Count',
-      warrior: 'Warrior',
-      checkIn: 'Check In',
-      viewProgress: 'View Progress',
-      deleteQuest: 'Delete',
-      exitQuest: 'Exit',
-      abandonQuest: 'Abandon Quest',
-      statusActive: 'Active',
-      statusInProgress: 'In Progress',
-      statusPending: 'Pending',
-      statusCompleted: 'Completed',
-      statusDisputed: 'Disputed',
-      statusCancelled: 'Cancelled',
-    },
-    deleteQuest: {
-      title: 'Delete Quest',
-      description: 'Are you sure you want to permanently delete this quest?',
-      warning: 'This action cannot be undone. The quest will be permanently removed.',
-      cancel: 'Cancel',
-      confirm: 'Delete Quest',
-      deleting: 'Deleting...',
-    },
-    exitQuest: {
-      title: 'Exit Quest',
-      description: 'You are about to exit this quest and receive a refund of your initial contribution.',
-      yourContribution: 'Your Contribution',
-      crowdfunding: 'Crowdfunding',
-      contributors: 'contributors',
-      refundInfo: 'You will receive a refund of your initial contribution. Crowdfunding contributions will remain in the quest.',
-      cancel: 'Cancel',
-      confirm: 'Exit & Refund',
-      exiting: 'Exiting...',
-    },
-    abandonQuest: {
-      title: 'Abandon Quest',
-      description: 'You are about to abandon this quest. This will have serious consequences:',
-      forfeitAmount: 'Forfeit Deposit',
-      depositRateReset: 'New Deposit Rate',
-      warning: 'Your deposit will be forfeited and your deposit rate will reset to 50% for future quests.',
-      typeConfirm: 'Type CONFIRM to proceed',
-      typeConfirmHint: 'Type "CONFIRM" in capital letters to enable the abandon button',
-      cancel: 'Cancel',
-      confirm: 'Abandon Quest',
-      abandoning: 'Abandoning...',
-    },
-    dailyCheckIn: {
-      title: 'Daily Check-In',
-      day: 'Day',
-      description: 'Record your progress for today',
-      firstDayNote: 'This is your Day 1 baseline. Future comparisons will reference this.',
-      progress: 'Progress',
-      target: 'Target',
-      days: 'days',
-      statusUpdate: 'Status Update',
-      statusPlaceholder: 'How did today go? Any challenges or wins?',
-      photo: 'Progress Photo',
-      uploadPhoto: 'Click to upload photo',
-      photoOptional: 'Optional but recommended',
-      uploading: 'Uploading',
-      submit: 'Submit Check-In',
-      submitting: 'Submitting...',
-      requireContent: 'Please add a status update or photo',
-      submitSuccess: 'Check-in submitted successfully!',
-      submitError: 'Failed to submit check-in',
-      fileTooLarge: 'File size must be less than 5MB',
-    },
-    visualComparison: {
-      title: 'Visual Progress Comparison',
-      day: 'Day',
-      totalCheckIns: 'Total Check-ins',
-      timeline: 'Full Timeline',
-      autoGenerated: 'Auto-generated baseline photo',
-    },
-    disputeResolution: {
-      title: 'Dispute Resolution',
-      subtitle: 'Community-powered justice system',
-      noDisputes: 'No active disputes',
-      questTitle: 'Quest',
-      publisher: 'Publisher',
-      warrior: 'Warrior',
-      publisherArgument: 'Publisher Argument',
-      warriorArgument: 'Warrior Argument',
-      voteDistribution: 'Vote Distribution',
-      publisherVotes: 'Publisher',
-      adminVotes: 'Admin',
-      communityVotes: 'Community',
-      voteForPublisher: 'Vote for Publisher',
-      voteForWarrior: 'Vote for Warrior',
-      votingClosed: 'Voting Closed',
-    },
-    appealSubmission: {
-      title: 'Submit Appeal',
-      description: 'Explain why you believe the dispute should be resolved in your favor',
-      yourArgument: 'Your Argument',
-      argumentPlaceholder: 'Provide detailed evidence and reasoning...',
-      minCharacters: 'Minimum 100 characters required',
-      submit: 'Submit Appeal',
-      submitting: 'Submitting...',
-      argumentTooShort: 'Argument must be at least 100 characters',
-      submitSuccess: 'Appeal submitted successfully!',
-      submitError: 'Failed to submit appeal',
-      viewAppeal: 'View Submitted Appeal',
-      yourAppeal: 'Your Appeal',
-      noAppeal: 'No appeal submitted yet',
-    },
-    footer: {
-      builtWith: 'Built with',
-      love: 'love',
-      using: 'using',
-    },
+import { Language } from '../types';
+
+type TranslationStructure = {
+  splash: {
+    question: string;
+    subtext: string;
+    enter: string;
+  };
+  language: {
+    select: string;
+    english: string;
+    chinese: string;
+    spanish: string;
+    french: string;
+    japanese: string;
+    korean: string;
+  };
+  auth: {
+    login: string;
+    logout: string;
+    loggingIn: string;
+  };
+  profile: {
+    setupTitle: string;
+    setupDescription: string;
+    namePlaceholder: string;
+    save: string;
+    saving: string;
+  };
+  nav: {
+    bountyBoard: string;
+    launchMission: string;
+    disputeResolution: string;
+    personalCenter: string;
+  };
+  bountyBoard: {
+    title: string;
+    allQuests: string;
+    noQuests: string;
+    hype: string;
+    contributors: string;
+    acceptSuccess: string;
+    acceptError: string;
+    yourQuest: string;
+    addToPot: string;
+    addToPotDescription: string;
+    currentPool: string;
+    yourContribution: string;
+    newPool: string;
+    contribute: string;
+    contributionSuccess: string;
+    contributionError: string;
+  };
+  difficulty: {
+    easy: string;
+    medium: string;
+    hard: string;
+    extreme: string;
+    impossible: string;
+  };
+  deposit: {
+    required: string;
+    acceptAndPayDeposit: string;
+    confirmTitle: string;
+    confirmDescription: string;
+    questTitle: string;
+    rewardPool: string;
+    yourDepositRate: string;
+    depositRequired: string;
+    depositInfo: string;
+    cancel: string;
+    confirmAndPay: string;
+    processing: string;
+    transferFailed: string;
+  };
+  launchMission: {
+    title: string;
+    subtitle: string;
+    questTitle: string;
+    titlePlaceholder: string;
+    rules: string;
+    rulesPlaceholder: string;
+    rewardPool: string;
+    rewardHint: string;
+    difficulty: string;
+    createQuest: string;
+    creating: string;
+    fillAllFields: string;
+    invalidReward: string;
+    createSuccess: string;
+    createError: string;
+    titleRequired: string;
+    descriptionTooShort: string;
+    minCharacters: string;
+  };
+  creditScore: {
+    title: string;
+    depositRate: string;
+    successfulQuests: string;
+    totalEarned: string;
+    totalDeposited: string;
+    questsToMinimum: string;
+    rateDecrease: string;
+  };
+  personalCenter: {
+    title: string;
+    subtitle: string;
+    acceptedQuests: string;
+    postedBounties: string;
+    noAcceptedQuests: string;
+    noPostedBounties: string;
+    progress: string;
+    status: string;
+    reward: string;
+    lockedDeposit: string;
+    rewardPool: string;
+    hypeCount: string;
+    warrior: string;
+    checkIn: string;
+    viewProgress: string;
+    deleteQuest: string;
+    exitQuest: string;
+    abandonQuest: string;
+    statusActive: string;
+    statusInProgress: string;
+    statusPending: string;
+    statusCompleted: string;
+    statusDisputed: string;
+    statusCancelled: string;
+  };
+  deleteQuest: {
+    title: string;
+    description: string;
+    warning: string;
+    cancel: string;
+    confirm: string;
+    deleting: string;
+  };
+  exitQuest: {
+    title: string;
+    description: string;
+    yourContribution: string;
+    crowdfunding: string;
+    contributors: string;
+    refundInfo: string;
+    cancel: string;
+    confirm: string;
+    exiting: string;
+  };
+  abandonQuest: {
+    title: string;
+    description: string;
+    forfeitAmount: string;
+    depositRateReset: string;
+    warning: string;
+    typeConfirm: string;
+    typeConfirmHint: string;
+    cancel: string;
+    confirm: string;
+    abandoning: string;
+  };
+  dailyCheckIn: {
+    title: string;
+    day: string;
+    description: string;
+    firstDayNote: string;
+    progress: string;
+    target: string;
+    days: string;
+    statusUpdate: string;
+    statusPlaceholder: string;
+    photo: string;
+    uploadPhoto: string;
+    photoOptional: string;
+    uploading: string;
+    submit: string;
+    submitting: string;
+    requireContent: string;
+    submitSuccess: string;
+    submitError: string;
+    fileTooLarge: string;
+  };
+  visualComparison: {
+    title: string;
+    day: string;
+    totalCheckIns: string;
+    timeline: string;
+    autoGenerated: string;
+  };
+  disputeResolution: {
+    title: string;
+    subtitle: string;
+    noDisputes: string;
+    questTitle: string;
+    publisher: string;
+    warrior: string;
+    publisherArgument: string;
+    warriorArgument: string;
+    voteDistribution: string;
+    publisherVotes: string;
+    adminVotes: string;
+    communityVotes: string;
+    voteForPublisher: string;
+    voteForWarrior: string;
+    votingClosed: string;
+  };
+  appealSubmission: {
+    title: string;
+    description: string;
+    yourArgument: string;
+    argumentPlaceholder: string;
+    minCharacters: string;
+    submit: string;
+    submitting: string;
+    argumentTooShort: string;
+    submitSuccess: string;
+    submitError: string;
+    viewAppeal: string;
+    yourAppeal: string;
+    noAppeal: string;
+  };
+  footer: {
+    builtWith: string;
+    love: string;
+    using: string;
+  };
+};
+
+// Base English translations
+const englishTranslations: TranslationStructure = {
+  splash: {
+    question: 'Will persistence make you stronger, or is it meaningless?',
+    subtext: 'If "what if" became reality, would you truly be better?',
+    enter: 'ENTER',
   },
-  SimplifiedChinese: {
+  language: {
+    select: 'Select Your Language',
+    english: 'English',
+    chinese: 'Chinese',
+    spanish: 'Spanish',
+    french: 'French',
+    japanese: 'Japanese',
+    korean: 'Korean',
+  },
+  auth: {
+    login: 'Login',
+    logout: 'Logout',
+    loggingIn: 'Logging in...',
+  },
+  profile: {
+    setupTitle: 'Welcome, Warrior',
+    setupDescription: 'Enter your name to begin your journey',
+    namePlaceholder: 'Your name',
+    save: 'Save',
+    saving: 'Saving...',
+  },
+  nav: {
+    bountyBoard: 'Bounty Board',
+    launchMission: 'Launch Mission',
+    disputeResolution: 'Dispute Resolution',
+    personalCenter: 'Personal Center',
+  },
+  bountyBoard: {
+    title: 'Bounty Board',
+    allQuests: 'All Quests',
+    noQuests: 'No quests available',
+    hype: 'Hype',
+    contributors: 'contributors',
+    acceptSuccess: 'Quest accepted successfully!',
+    acceptError: 'Failed to accept quest',
+    yourQuest: 'Your Quest',
+    addToPot: 'Add to Pot',
+    addToPotDescription: 'Increase the reward pool to attract more warriors',
+    currentPool: 'Current Pool',
+    yourContribution: 'Your Contribution',
+    newPool: 'New Pool',
+    contribute: 'Contribute',
+    contributionSuccess: 'Contribution added successfully!',
+    contributionError: 'Failed to add contribution',
+  },
+  difficulty: {
+    easy: 'Easy',
+    medium: 'Medium',
+    hard: 'Hard',
+    extreme: 'Extreme',
+    impossible: 'Impossible',
+  },
+  deposit: {
+    required: 'Deposit Required',
+    acceptAndPayDeposit: 'Accept & Pay Deposit',
+    confirmTitle: 'Confirm Deposit',
+    confirmDescription: 'Lock your deposit to accept this quest',
+    questTitle: 'Quest',
+    rewardPool: 'Reward Pool',
+    yourDepositRate: 'Your Deposit Rate',
+    depositRequired: 'Deposit Required',
+    depositInfo: 'Your deposit will be locked until quest completion. Complete successfully to earn rewards and reduce your deposit rate.',
+    cancel: 'Cancel',
+    confirmAndPay: 'Confirm & Pay',
+    processing: 'Processing...',
+    transferFailed: 'Transfer failed',
+  },
+  launchMission: {
+    title: 'Launch Mission',
+    subtitle: 'Create a new quest and set the challenge',
+    questTitle: 'Quest Title',
+    titlePlaceholder: 'e.g., Wake up at 5 AM for 100 days',
+    rules: 'Quest Rules & Description',
+    rulesPlaceholder: 'Describe the quest requirements and rules...',
+    rewardPool: 'Initial Reward Pool (ICP)',
+    rewardHint: 'Minimum 0.0001 ICP',
+    difficulty: 'Difficulty Level',
+    createQuest: 'Create Quest',
+    creating: 'Creating...',
+    fillAllFields: 'Please fill in all fields',
+    invalidReward: 'Please enter a valid reward amount',
+    createSuccess: 'Quest created successfully!',
+    createError: 'Failed to create quest',
+    titleRequired: 'Quest title is required',
+    descriptionTooShort: 'Description must be at least 20 characters',
+    minCharacters: 'characters minimum',
+  },
+  creditScore: {
+    title: 'Warrior Credit Score',
+    depositRate: 'Current Deposit Rate',
+    successfulQuests: 'Successful Quests',
+    totalEarned: 'Total Earned',
+    totalDeposited: 'Total Deposited',
+    questsToMinimum: 'quests to minimum rate (2%)',
+    rateDecrease: 'Each success: -3%',
+  },
+  personalCenter: {
+    title: 'Personal Center',
+    subtitle: 'Track your quests and progress',
+    acceptedQuests: 'Accepted Quests',
+    postedBounties: 'Posted Bounties',
+    noAcceptedQuests: 'No accepted quests yet',
+    noPostedBounties: 'No posted bounties yet',
+    progress: 'Progress',
+    status: 'Status',
+    reward: 'Reward',
+    lockedDeposit: 'Locked Deposit',
+    rewardPool: 'Reward Pool',
+    hypeCount: 'Hype Count',
+    warrior: 'Warrior',
+    checkIn: 'Check In',
+    viewProgress: 'View Progress',
+    deleteQuest: 'Delete',
+    exitQuest: 'Exit',
+    abandonQuest: 'Abandon Quest',
+    statusActive: 'Active',
+    statusInProgress: 'In Progress',
+    statusPending: 'Pending',
+    statusCompleted: 'Completed',
+    statusDisputed: 'Disputed',
+    statusCancelled: 'Cancelled',
+  },
+  deleteQuest: {
+    title: 'Delete Quest',
+    description: 'Are you sure you want to permanently delete this quest?',
+    warning: 'This action cannot be undone. The quest will be permanently removed.',
+    cancel: 'Cancel',
+    confirm: 'Delete Quest',
+    deleting: 'Deleting...',
+  },
+  exitQuest: {
+    title: 'Exit Quest',
+    description: 'You are about to exit this quest and receive a refund of your initial contribution.',
+    yourContribution: 'Your Contribution',
+    crowdfunding: 'Crowdfunding',
+    contributors: 'contributors',
+    refundInfo: 'You will receive a refund of your initial contribution. Crowdfunding contributions will remain in the quest.',
+    cancel: 'Cancel',
+    confirm: 'Exit & Refund',
+    exiting: 'Exiting...',
+  },
+  abandonQuest: {
+    title: 'Abandon Quest',
+    description: 'You are about to abandon this quest. This will have serious consequences:',
+    forfeitAmount: 'Forfeit Deposit',
+    depositRateReset: 'New Deposit Rate',
+    warning: 'Your deposit will be forfeited and your deposit rate will reset to 50% for future quests.',
+    typeConfirm: 'Type CONFIRM to proceed',
+    typeConfirmHint: 'Type "CONFIRM" in capital letters to enable the abandon button',
+    cancel: 'Cancel',
+    confirm: 'Abandon Quest',
+    abandoning: 'Abandoning...',
+  },
+  dailyCheckIn: {
+    title: 'Daily Check-In',
+    day: 'Day',
+    description: 'Record your progress for today',
+    firstDayNote: 'This is your Day 1 baseline. Future comparisons will reference this.',
+    progress: 'Progress',
+    target: 'Target',
+    days: 'days',
+    statusUpdate: 'Status Update',
+    statusPlaceholder: 'How did today go? Any challenges or wins?',
+    photo: 'Progress Photo',
+    uploadPhoto: 'Click to upload photo',
+    photoOptional: 'Optional but recommended',
+    uploading: 'Uploading',
+    submit: 'Submit Check-In',
+    submitting: 'Submitting...',
+    requireContent: 'Please add a status update or photo',
+    submitSuccess: 'Check-in submitted successfully!',
+    submitError: 'Failed to submit check-in',
+    fileTooLarge: 'File size must be less than 5MB',
+  },
+  visualComparison: {
+    title: 'Visual Progress Comparison',
+    day: 'Day',
+    totalCheckIns: 'Total Check-ins',
+    timeline: 'Full Timeline',
+    autoGenerated: 'Auto-generated baseline photo',
+  },
+  disputeResolution: {
+    title: 'Dispute Resolution',
+    subtitle: 'Community-powered justice system',
+    noDisputes: 'No active disputes',
+    questTitle: 'Quest',
+    publisher: 'Publisher',
+    warrior: 'Warrior',
+    publisherArgument: 'Publisher Argument',
+    warriorArgument: 'Warrior Argument',
+    voteDistribution: 'Vote Distribution',
+    publisherVotes: 'Publisher',
+    adminVotes: 'Admin',
+    communityVotes: 'Community',
+    voteForPublisher: 'Vote for Publisher',
+    voteForWarrior: 'Vote for Warrior',
+    votingClosed: 'Voting Closed',
+  },
+  appealSubmission: {
+    title: 'Submit Appeal',
+    description: 'Explain why you believe the dispute should be resolved in your favor',
+    yourArgument: 'Your Argument',
+    argumentPlaceholder: 'Provide detailed evidence and reasoning...',
+    minCharacters: 'Minimum 100 characters required',
+    submit: 'Submit Appeal',
+    submitting: 'Submitting...',
+    argumentTooShort: 'Argument must be at least 100 characters',
+    submitSuccess: 'Appeal submitted successfully!',
+    submitError: 'Failed to submit appeal',
+    viewAppeal: 'View Submitted Appeal',
+    yourAppeal: 'Your Appeal',
+    noAppeal: 'No appeal submitted yet',
+  },
+  footer: {
+    builtWith: 'Built with',
+    love: 'love',
+    using: 'using',
+  },
+};
+
+export const translations: Record<Language, TranslationStructure> = {
+  [Language.English]: englishTranslations,
+  [Language.SimplifiedChinese]: {
     splash: {
       question: '坚持会让你变得更强大,还是毫无意义?',
       subtext: '如果"当初"变为现实,你真的会更优秀吗?',
@@ -401,7 +632,7 @@ export const translations = {
       submitting: '提交中...',
       requireContent: '请添加状态更新或照片',
       submitSuccess: '打卡提交成功!',
-      submitError: '提交打卡失败',
+      submitError: '打卡提交失败',
       fileTooLarge: '文件大小必须小于5MB',
     },
     visualComparison: {
@@ -438,242 +669,240 @@ export const translations = {
       submitting: '提交中...',
       argumentTooShort: '论据至少需要100个字符',
       submitSuccess: '申诉提交成功!',
-      submitError: '提交申诉失败',
-      viewAppeal: '查看已提交申诉',
+      submitError: '申诉提交失败',
+      viewAppeal: '查看已提交的申诉',
       yourAppeal: '您的申诉',
       noAppeal: '尚未提交申诉',
     },
     footer: {
-      builtWith: '用',
+      builtWith: '构建于',
       love: '爱',
-      using: '构建于',
+      using: '使用',
     },
   },
-  Spanish: {
+  [Language.TraditionalChinese]: {
     splash: {
-      question: '¿La persistencia te hará más fuerte o no tiene sentido?',
-      subtext: 'Si "qué pasaría si" se hiciera realidad, ¿realmente serías mejor?',
-      enter: 'ENTRAR',
+      question: '堅持會讓你變得更強大,還是毫無意義?',
+      subtext: '如果"當初"變為現實,你真的會更優秀嗎?',
+      enter: '進入',
     },
     language: {
-      select: 'Selecciona tu idioma',
+      select: '選擇您的語言',
       english: 'English',
-      chinese: '简体中文',
+      chinese: '繁體中文',
       spanish: 'Español',
       french: 'Français',
       japanese: '日本語',
       korean: '한국어',
     },
     auth: {
-      login: 'Iniciar sesión',
-      logout: 'Cerrar sesión',
-      loggingIn: 'Iniciando sesión...',
+      login: '登入',
+      logout: '登出',
+      loggingIn: '登入中...',
     },
     profile: {
-      setupTitle: 'Bienvenido, Guerrero',
-      setupDescription: 'Ingresa tu nombre para comenzar tu viaje',
-      namePlaceholder: 'Tu nombre',
-      save: 'Guardar',
-      saving: 'Guardando...',
+      setupTitle: '歡迎,勇士',
+      setupDescription: '輸入您的名字開始旅程',
+      namePlaceholder: '您的名字',
+      save: '儲存',
+      saving: '儲存中...',
     },
     nav: {
-      bountyBoard: 'Tablero de Recompensas',
-      launchMission: 'Lanzar Misión',
-      disputeResolution: 'Resolución de Disputas',
-      personalCenter: 'Centro Personal',
+      bountyBoard: '懸賞大廳',
+      launchMission: '發布任務',
+      disputeResolution: '爭議解決',
+      personalCenter: '個人中心',
     },
     bountyBoard: {
-      title: 'Tablero de Recompensas',
-      allQuests: 'Todas las Misiones',
-      noQuests: 'No hay misiones disponibles',
-      hype: 'Interés',
-      contributors: 'contribuyentes',
-      acceptSuccess: '¡Misión aceptada con éxito!',
-      acceptError: 'Error al aceptar la misión',
-      yourQuest: 'Tu Misión',
-      addToPot: 'Añadir al Bote',
-      addToPotDescription: 'Aumenta el bote de recompensas para atraer más guerreros',
-      currentPool: 'Bote Actual',
-      yourContribution: 'Tu Contribución',
-      newPool: 'Nuevo Bote',
-      contribute: 'Contribuir',
-      contributionSuccess: '¡Contribución añadida con éxito!',
-      contributionError: 'Error al añadir contribución',
+      title: '懸賞大廳',
+      allQuests: '全部任務',
+      noQuests: '暫無任務',
+      hype: '熱度',
+      contributors: '貢獻者',
+      acceptSuccess: '成功接受任務!',
+      acceptError: '接受任務失敗',
+      yourQuest: '您的任務',
+      addToPot: '加入獎池',
+      addToPotDescription: '增加獎池以吸引更多勇士',
+      currentPool: '當前獎池',
+      yourContribution: '您的貢獻',
+      newPool: '新獎池',
+      contribute: '貢獻',
+      contributionSuccess: '貢獻成功!',
+      contributionError: '貢獻失敗',
     },
     difficulty: {
-      easy: 'Fácil',
-      medium: 'Medio',
-      hard: 'Difícil',
-      extreme: 'Extremo',
-      impossible: 'Imposible',
+      easy: '簡單',
+      medium: '中等',
+      hard: '困難',
+      extreme: '極難',
+      impossible: '幾乎不可能',
     },
     deposit: {
-      required: 'Depósito Requerido',
-      acceptAndPayDeposit: 'Aceptar y Pagar Depósito',
-      confirmTitle: 'Confirmar Depósito',
-      confirmDescription: 'Bloquea tu depósito para aceptar esta misión',
-      questTitle: 'Misión',
-      rewardPool: 'Bote de Recompensas',
-      yourDepositRate: 'Tu Tasa de Depósito',
-      depositRequired: 'Depósito Requerido',
-      depositInfo: 'Tu depósito estará bloqueado hasta completar la misión. Completa con éxito para ganar recompensas y reducir tu tasa de depósito.',
-      cancel: 'Cancelar',
-      confirmAndPay: 'Confirmar y Pagar',
-      processing: 'Procesando...',
-      transferFailed: 'Transferencia fallida',
+      required: '需要押金',
+      acceptAndPayDeposit: '接受並支付押金',
+      confirmTitle: '確認押金',
+      confirmDescription: '鎖定押金以接受此任務',
+      questTitle: '任務',
+      rewardPool: '獎池',
+      yourDepositRate: '您的押金率',
+      depositRequired: '需要押金',
+      depositInfo: '您的押金將被鎖定直到任務完成。成功完成可獲得獎勵並降低押金率。',
+      cancel: '取消',
+      confirmAndPay: '確認並支付',
+      processing: '處理中...',
+      transferFailed: '轉帳失敗',
     },
     launchMission: {
-      title: 'Lanzar Misión',
-      subtitle: 'Crea una nueva misión y establece el desafío',
-      questTitle: 'Título de la Misión',
-      titlePlaceholder: 'ej., Despertar a las 5 AM durante 100 días',
-      rules: 'Reglas y Descripción de la Misión',
-      rulesPlaceholder: 'Describe los requisitos y reglas de la misión...',
-      rewardPool: 'Bote de Recompensas Inicial (ICP)',
-      rewardHint: 'Mínimo 0.0001 ICP',
-      difficulty: 'Nivel de Dificultad',
-      createQuest: 'Crear Misión',
-      creating: 'Creando...',
-      fillAllFields: 'Por favor completa todos los campos',
-      invalidReward: 'Por favor ingresa una cantidad de recompensa válida',
-      createSuccess: '¡Misión creada con éxito!',
-      createError: 'Error al crear la misión',
-      titleRequired: 'El título de la misión es obligatorio',
-      descriptionTooShort: 'La descripción debe tener al menos 20 caracteres',
-      minCharacters: 'caracteres mínimo',
+      title: '發布任務',
+      subtitle: '創建新任務並設定挑戰',
+      questTitle: '任務標題',
+      titlePlaceholder: '例如:連續100天早上5點起床',
+      rules: '任務規則與描述',
+      rulesPlaceholder: '描述任務要求和規則...',
+      rewardPool: '初始獎池 (ICP)',
+      rewardHint: '最少 0.0001 ICP',
+      difficulty: '難度等級',
+      createQuest: '創建任務',
+      creating: '創建中...',
+      fillAllFields: '請填寫所有欄位',
+      invalidReward: '請輸入有效的獎勵金額',
+      createSuccess: '任務創建成功!',
+      createError: '創建任務失敗',
+      titleRequired: '任務標題必填',
+      descriptionTooShort: '描述至少需要20個字符',
+      minCharacters: '最少字符數',
     },
     creditScore: {
-      title: 'Puntuación de Crédito del Guerrero',
-      depositRate: 'Tasa de Depósito Actual',
-      successfulQuests: 'Misiones Exitosas',
-      totalEarned: 'Total Ganado',
-      totalDeposited: 'Total Depositado',
-      questsToMinimum: 'misiones para tasa mínima (2%)',
-      rateDecrease: 'Cada éxito: -3%',
+      title: '勇士信用評分',
+      depositRate: '當前押金率',
+      successfulQuests: '成功任務',
+      totalEarned: '總收入',
+      totalDeposited: '總押金',
+      questsToMinimum: '次任務達到最低率 (2%)',
+      rateDecrease: '每次成功: -3%',
     },
     personalCenter: {
-      title: 'Centro Personal',
-      subtitle: 'Rastrea tus misiones y progreso',
-      acceptedQuests: 'Misiones Aceptadas',
-      postedBounties: 'Recompensas Publicadas',
-      noAcceptedQuests: 'Aún no hay misiones aceptadas',
-      noPostedBounties: 'Aún no hay recompensas publicadas',
-      progress: 'Progreso',
-      status: 'Estado',
-      reward: 'Recompensa',
-      lockedDeposit: 'Depósito Bloqueado',
-      rewardPool: 'Bote de Recompensas',
-      hypeCount: 'Interés',
-      warrior: 'Guerrero',
-      checkIn: 'Registrarse',
-      viewProgress: 'Ver Progreso',
-      deleteQuest: 'Eliminar',
-      exitQuest: 'Salir',
-      abandonQuest: 'Abandonar Misión',
-      statusActive: 'Activo',
-      statusInProgress: 'En Progreso',
-      statusPending: 'Pendiente',
-      statusCompleted: 'Completado',
-      statusDisputed: 'En Disputa',
-      statusCancelled: 'Cancelado',
+      title: '個人中心',
+      subtitle: '追蹤您的任務和進度',
+      acceptedQuests: '已接受任務',
+      postedBounties: '已發布懸賞',
+      noAcceptedQuests: '暫無已接受任務',
+      noPostedBounties: '暫無已發布懸賞',
+      progress: '進度',
+      status: '狀態',
+      reward: '獎勵',
+      lockedDeposit: '鎖定押金',
+      rewardPool: '獎池',
+      hypeCount: '熱度',
+      warrior: '勇士',
+      checkIn: '打卡',
+      viewProgress: '查看進度',
+      deleteQuest: '刪除',
+      exitQuest: '退出',
+      abandonQuest: '放棄任務',
+      statusActive: '活躍',
+      statusInProgress: '進行中',
+      statusPending: '待驗證',
+      statusCompleted: '已完成',
+      statusDisputed: '爭議中',
+      statusCancelled: '已取消',
     },
     deleteQuest: {
-      title: 'Eliminar Misión',
-      description: '¿Estás seguro de que quieres eliminar permanentemente esta misión?',
-      warning: 'Esta acción no se puede deshacer. La misión será eliminada permanentemente.',
-      cancel: 'Cancelar',
-      confirm: 'Eliminar Misión',
-      deleting: 'Eliminando...',
+      title: '刪除任務',
+      description: '您確定要永久刪除此任務嗎?',
+      warning: '此操作無法撤銷。任務將被永久刪除。',
+      cancel: '取消',
+      confirm: '刪除任務',
+      deleting: '刪除中...',
     },
     exitQuest: {
-      title: 'Salir de la Misión',
-      description: 'Estás a punto de salir de esta misión y recibir un reembolso de tu contribución inicial.',
-      yourContribution: 'Tu Contribución',
-      crowdfunding: 'Financiación Colectiva',
-      contributors: 'contribuyentes',
-      refundInfo: 'Recibirás un reembolso de tu contribución inicial. Las contribuciones de financiación colectiva permanecerán en la misión.',
-      cancel: 'Cancelar',
-      confirm: 'Salir y Reembolsar',
-      exiting: 'Saliendo...',
+      title: '退出任務',
+      description: '您即將退出此任務並獲得初始貢獻的退款。',
+      yourContribution: '您的貢獻',
+      crowdfunding: '眾籌',
+      contributors: '貢獻者',
+      refundInfo: '您將獲得初始貢獻的退款。眾籌貢獻將保留在任務中。',
+      cancel: '取消',
+      confirm: '退出並退款',
+      exiting: '退出中...',
     },
     abandonQuest: {
-      title: 'Abandonar Misión',
-      description: 'Estás a punto de abandonar esta misión. Esto tendrá consecuencias graves:',
-      forfeitAmount: 'Perder Depósito',
-      depositRateReset: 'Nueva Tasa de Depósito',
-      warning: 'Tu depósito será confiscado y tu tasa de depósito se restablecerá al 50%.',
-      typeConfirm: 'Escribe CONFIRM para continuar',
-      typeConfirmHint: 'Escribe "CONFIRM" en mayúsculas para habilitar el botón de abandonar',
-      cancel: 'Cancelar',
-      confirm: 'Abandonar Misión',
-      abandoning: 'Abandonando...',
+      title: '放棄任務',
+      description: '您即將放棄此任務。這將產生嚴重後果:',
+      forfeitAmount: '沒收押金',
+      depositRateReset: '新押金率',
+      warning: '您的押金將被沒收,押金率將重置為50%。',
+      typeConfirm: '輸入 CONFIRM 繼續',
+      typeConfirmHint: '輸入大寫字母"CONFIRM"以啟用放棄按鈕',
+      cancel: '取消',
+      confirm: '放棄任務',
+      abandoning: '放棄中...',
     },
     dailyCheckIn: {
-      title: 'Registro Diario',
-      day: 'Día',
-      description: 'Registra tu progreso de hoy',
-      firstDayNote: 'Este es tu Día 1 de referencia. Las comparaciones futuras se basarán en esto.',
-      progress: 'Progreso',
-      target: 'Objetivo',
-      days: 'días',
-      statusUpdate: 'Actualización de Estado',
-      statusPlaceholder: '¿Cómo fue hoy? ¿Algún desafío o logro?',
-      photo: 'Foto de Progreso',
-      uploadPhoto: 'Haz clic para subir foto',
-      photoOptional: 'Opcional pero recomendado',
-      uploading: 'Subiendo',
-      submit: 'Enviar Registro',
-      submitting: 'Enviando...',
-      requireContent: 'Por favor añade una actualización de estado o foto',
-      submitSuccess: '¡Registro enviado con éxito!',
-      submitError: 'Error al enviar el registro',
-      fileTooLarge: 'El tamaño del archivo debe ser menor a 5MB',
+      title: '每日打卡',
+      day: '第',
+      description: '記錄今天的進度',
+      firstDayNote: '這是您的第1天基準。未來的對比將參考此記錄。',
+      progress: '進度',
+      target: '目標',
+      days: '天',
+      statusUpdate: '狀態更新',
+      statusPlaceholder: '今天怎麼樣?有什麼挑戰或收穫?',
+      photo: '進度照片',
+      uploadPhoto: '點擊上傳照片',
+      photoOptional: '可選但推薦',
+      uploading: '上傳中',
+      submit: '提交打卡',
+      submitting: '提交中...',
+      requireContent: '請添加狀態更新或照片',
+      submitSuccess: '打卡提交成功!',
+      submitError: '打卡提交失敗',
+      fileTooLarge: '檔案大小必須小於5MB',
     },
     visualComparison: {
-      title: 'Comparación Visual de Progreso',
-      day: 'Día',
-      totalCheckIns: 'Registros Totales',
-      timeline: 'Línea de Tiempo Completa',
-      autoGenerated: 'Foto de referencia generada automáticamente',
+      title: '視覺進度對比',
+      day: '第',
+      totalCheckIns: '總打卡次數',
+      timeline: '完整時間線',
+      autoGenerated: '自動生成的基準照片',
     },
     disputeResolution: {
-      title: 'Resolución de Disputas',
-      subtitle: 'Sistema de justicia impulsado por la comunidad',
-      noDisputes: 'No hay disputas activas',
-      questTitle: 'Misión',
-      publisher: 'Publicador',
-      warrior: 'Guerrero',
-      publisherArgument: 'Argumento del Publicador',
-      warriorArgument: 'Argumento del Guerrero',
-      voteDistribution: 'Distribución de Votos',
-      publisherVotes: 'Publicador',
-      adminVotes: 'Administrador',
-      communityVotes: 'Comunidad',
-      voteForPublisher: 'Votar por Publicador',
-      voteForWarrior: 'Votar por Guerrero',
-      votingClosed: 'Votación Cerrada',
+      title: '爭議解決',
+      subtitle: '社區驅動的公正系統',
+      noDisputes: '暫無活躍爭議',
+      questTitle: '任務',
+      publisher: '發布者',
+      warrior: '勇士',
+      publisherArgument: '發布者論據',
+      warriorArgument: '勇士論據',
+      voteDistribution: '投票分佈',
+      publisherVotes: '發布者',
+      adminVotes: '管理員',
+      communityVotes: '社區',
+      voteForPublisher: '支持發布者',
+      voteForWarrior: '支持勇士',
+      votingClosed: '投票已關閉',
     },
     appealSubmission: {
-      title: 'Enviar Apelación',
-      description: 'Explica por qué crees que la disputa debe resolverse a tu favor',
-      yourArgument: 'Tu Argumento',
-      argumentPlaceholder: 'Proporciona evidencia detallada y razonamiento...',
-      minCharacters: 'Se requieren mínimo 100 caracteres',
-      submit: 'Enviar Apelación',
-      submitting: 'Enviando...',
-      argumentTooShort: 'El argumento debe tener al menos 100 caracteres',
-      submitSuccess: '¡Apelación enviada con éxito!',
-      submitError: 'Error al enviar la apelación',
-      viewAppeal: 'Ver Apelación Enviada',
-      yourAppeal: 'Tu Apelación',
-      noAppeal: 'Aún no se ha enviado ninguna apelación',
+      title: '提交申訴',
+      description: '解釋為什麼您認為爭議應該以您的方式解決',
+      yourArgument: '您的論據',
+      argumentPlaceholder: '提供詳細的證據和理由...',
+      minCharacters: '至少需要100個字符',
+      submit: '提交申訴',
+      submitting: '提交中...',
+      argumentTooShort: '論據至少需要100個字符',
+      submitSuccess: '申訴提交成功!',
+      submitError: '申訴提交失敗',
+      viewAppeal: '查看已提交的申訴',
+      yourAppeal: '您的申訴',
+      noAppeal: '尚未提交申訴',
     },
     footer: {
-      builtWith: 'Construido con',
-      love: 'amor',
-      using: 'usando',
+      builtWith: '構建於',
+      love: '愛',
+      using: '使用',
     },
   },
-  // French, Japanese, and Korean translations follow the same pattern...
-  // Truncated for brevity, but would include all the same keys
 };

@@ -1,11 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Fix language switching so the entire application interface updates immediately when a user selects a new language.
+**Goal:** Simplify the language support by removing all languages except English, Simplified Chinese, and Traditional Chinese.
 
 **Planned changes:**
-- Fix the language switching mechanism to trigger immediate UI updates across all components when a language is selected from the dropdown
-- Ensure language changes persist across page refreshes
-- Verify all components (SplashScreen, MainApp, BountyBoard, LaunchMission, PersonalCenter, QuestCard, etc.) properly respond to language changes
+- Remove all language options except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from LanguageSelection component
+- Remove all language options except English (en), Simplified Chinese (zh-CN), and Traditional Chinese (zh-TW) from LanguageSwitcher component
+- Update Language type enum to include only 'en', 'zh-CN', and 'zh-TW'
+- Remove translation objects for all languages except English, Simplified Chinese, and Traditional Chinese
 
-**User-visible outcome:** When users select a language from the dropdown, all text throughout the application immediately updates to the chosen language without requiring a manual page refresh.
+**User-visible outcome:** Users will see only three language options (English, Simplified Chinese, Traditional Chinese) in the language selection dropdown and language switcher.
