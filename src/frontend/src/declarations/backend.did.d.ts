@@ -12,14 +12,23 @@ import type { Principal } from '@icp-sdk/core/principal';
 
 export interface BountyContribution {
   'contributorId' : Principal,
-  'amountE8' : bigint,
+  'amountCents' : bigint,
   'timestamp' : bigint,
 }
+export type Cents = bigint;
 export interface CheckInRecord {
   'photoUrl' : [] | [string],
   'dayNumber' : bigint,
   'timestamp' : bigint,
   'statusText' : string,
+}
+export interface CreateQuestRequest {
+  'title' : string,
+  'difficulty' : Difficulty,
+  'rewardCents' : Cents,
+  'description' : string,
+  'rewardUSD' : USD,
+  'participantCount' : [] | [bigint],
 }
 export type Difficulty = { 'easy' : null } |
   { 'hard' : null } |
@@ -37,12 +46,12 @@ export interface QuestImmutable {
   'publisherId' : Principal,
   'dailyCheckIns' : Array<CheckInRecord>,
   'description' : string,
+  'originalBountyAmountCents' : bigint,
   'warriorId' : [] | [Principal],
   'questId' : bigint,
   'participantCount' : bigint,
   'completionTarget' : bigint,
   'acceptedAt' : [] | [bigint],
-  'originalBountyAmountE8' : bigint,
   'currentStreak' : bigint,
   'depositRate' : bigint,
 }
@@ -52,23 +61,53 @@ export type QuestStatus = { 'pendingVerification' : null } |
   { 'disputed' : null } |
   { 'completed' : null } |
   { 'inProgress' : null };
+export interface RechargeDialogRequest {
+  'amountCents' : Cents,
+  'amountUSD' : USD,
+}
+export interface ShoppingItem {
+  'productName' : string,
+  'currency' : string,
+  'quantity' : bigint,
+  'priceInCents' : bigint,
+  'productDescription' : string,
+}
+export interface StripeConfiguration {
+  'allowedCountries' : Array<string>,
+  'secretKey' : string,
+}
+export type StripeSessionStatus = {
+    'completed' : { 'userPrincipal' : [] | [string], 'response' : string }
+  } |
+  { 'failed' : { 'error' : string } };
 export interface Transaction {
   'id' : bigint,
   'to' : Principal,
   'status' : TransactionStatus,
   'transactionType' : TransactionType,
   'from' : Principal,
-  'amountE8' : bigint,
+  'amountCents' : bigint,
   'timestamp' : bigint,
 }
 export type TransactionStatus = { 'pending' : null } |
   { 'success' : null } |
   { 'failed' : null };
 export type TransactionType = { 'deposit' : null } |
+  { 'serviceFee' : null } |
   { 'withdrawal' : null } |
   { 'taskPayment' : null } |
   { 'taskDeduction' : null } |
   { 'bountyContribution' : null };
+export interface TransformationInput {
+  'context' : Uint8Array,
+  'response' : http_request_result,
+}
+export interface TransformationOutput {
+  'status' : bigint,
+  'body' : Uint8Array,
+  'headers' : Array<http_header>,
+}
+export type USD = bigint;
 export interface UserProfile {
   'name' : string,
   'totalEarned' : bigint,
@@ -89,6 +128,12 @@ export interface _CaffeineStorageRefillInformation {
 export interface _CaffeineStorageRefillResult {
   'success' : [] | [boolean],
   'topped_up_amount' : [] | [bigint],
+}
+export interface http_header { 'value' : string, 'name' : string }
+export interface http_request_result {
+  'status' : bigint,
+  'body' : Uint8Array,
+  'headers' : Array<http_header>,
 }
 export interface _SERVICE {
   '_caffeineStorageBlobIsLive' : ActorMethod<[Uint8Array], boolean>,
@@ -115,9 +160,14 @@ export interface _SERVICE {
     [string, string, string, string, bigint, Difficulty, [] | [bigint]],
     [bigint, bigint]
   >,
-  'createQuest' : ActorMethod<
-    [string, string, bigint, Difficulty, [] | [bigint]],
-    bigint
+  'createCheckoutSession' : ActorMethod<
+    [Array<ShoppingItem>, string, string],
+    string
+  >,
+  'createQuest' : ActorMethod<[CreateQuestRequest], bigint>,
+  'createStripeCheckoutSession' : ActorMethod<
+    [RechargeDialogRequest, string, string],
+    string
   >,
   'deleteQuest' : ActorMethod<[bigint], string>,
   'exitQuest' : ActorMethod<[bigint], undefined>,
@@ -126,15 +176,24 @@ export interface _SERVICE {
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getMyAcceptedQuests' : ActorMethod<[], Array<QuestImmutable>>,
   'getMyPostedBounties' : ActorMethod<[], Array<QuestImmutable>>,
+  'getStripeSessionStatus' : ActorMethod<[string], StripeSessionStatus>,
   'getTransactionsView' : ActorMethod<[], Array<[bigint, Transaction]>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
+  'getUserWalletBalance' : ActorMethod<[], bigint>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'isStripeConfigured' : ActorMethod<[], boolean>,
+  'recordSuccessfulRecharge' : ActorMethod<
+    [bigint, Cents, Principal],
+    undefined
+  >,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'setStripeConfiguration' : ActorMethod<[StripeConfiguration], undefined>,
   'submitCompletion' : ActorMethod<[bigint], undefined>,
   'submitDailyCheckIn' : ActorMethod<
     [bigint, string, [] | [string]],
     undefined
   >,
+  'transform' : ActorMethod<[TransformationInput], TransformationOutput>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

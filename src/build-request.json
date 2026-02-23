@@ -1,71 +1,67 @@
 {
   "kind": "build_request",
-  "title": "Fix non-responsive Cancel and Delete buttons in Personal Center",
-  "priority": "high",
+  "title": "Set English as default language for all UI content",
+  "projectName": "Grit Bounty",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Fix the Cancel Quest button (取消任务) in PersonalCenter to trigger the CancelQuestDialog when clicked. Ensure the button properly opens the dialog and handles the cancellation flow.",
+      "text": "Change the default language selection to English for all application interfaces, replacing any current default that may be set to Chinese",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-last"
         ],
         "quotes": [
-          "我点击取消任务或者删除没有任何反应"
+          "让这款应用默认为英文显示全部内容 包括登陆界面默认为英文登陆界面"
         ]
       },
       "acceptanceCriteria": [
-        "Clicking the Cancel Quest button opens the CancelQuestDialog",
-        "Dialog displays quest details and refund amount",
-        "User can confirm or cancel the operation",
-        "Success/error feedback is shown after action"
+        "Application loads with English as the default language on first visit",
+        "Login interface displays in English by default",
+        "All UI text including splash screen, authentication dialogs, and navigation appears in English by default",
+        "Language switcher still allows users to manually change to Chinese if desired"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Fix the Delete button (删除) in PersonalCenter to trigger the DeleteQuestDialog when clicked. Ensure the button properly opens the dialog and handles the deletion flow.",
+      "text": "Update the language detection logic in useLanguage hook to prioritize English over browser language preferences",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "我点击取消任务或者删除没有任何反应"
+          "msg-last"
         ]
       },
       "acceptanceCriteria": [
-        "Clicking the Delete button opens the DeleteQuestDialog",
-        "Dialog displays confirmation warning with quest title",
-        "User can confirm or cancel the deletion",
-        "Success/error feedback is shown after action"
+        "Language hook initializes with 'en' as the default value",
+        "Browser language detection is overridden to default to English",
+        "localStorage language preference respects user's explicit choice if previously set"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Add visual feedback (loading states, disabled states, or click animations) to both Cancel and Delete buttons during processing to improve user experience and prevent double-clicks.",
+      "text": "Ensure the language selection screen (if shown on first visit) defaults to English as the pre-selected option",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-last"
         ]
       },
       "acceptanceCriteria": [
-        "Buttons show loading state during mutation processing",
-        "Buttons are disabled during processing to prevent duplicate submissions",
-        "Clear visual indication when action is in progress"
+        "Language selection modal highlights English as the default choice",
+        "If LanguageSelection component is rendered, English option appears selected or emphasized"
       ]
     }
   ],
   "constraints": [
-    "Do not modify the CancelQuestDialog or DeleteQuestDialog components themselves",
-    "Maintain existing quest state management logic",
-    "Preserve all existing styling and layout"
+    "Do not modify the translation files themselves - only change the default language logic",
+    "Preserve the existing language switcher functionality allowing users to change languages",
+    "Do not remove support for Chinese languages"
   ],
   "nonGoals": [
-    "Changing the dialog designs or content",
-    "Adding new quest management features",
-    "Modifying backend quest cancellation or deletion logic"
+    "Adding new translations or modifying existing translation content",
+    "Changing the visual design of language selection components",
+    "Removing the language switcher from the header"
   ],
   "imageRequirements": {
     "required": [],

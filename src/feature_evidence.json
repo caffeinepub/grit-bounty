@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-fix-the-cancel-quest-button-in-personalcenter-to-trigger-the-cancelquestdialog-when-clicked-ensure-the-button-properly-opens-the-dialog-and-handles-the-cancellation-flow",
-      "featureTitle": "Fix the Cancel Quest button (取消任务) in PersonalCenter to trigger the CancelQuestDialog when clicked. Ensure the button properly opens the dialog and handles the cancellation flow.",
+      "featureId": "feature-change-the-default-language-selection-to-english-for-all-application-interfaces-replacing-any-current-default-that-may-be-set-to-chinese",
+      "featureTitle": "Change the default language selection to English for all application interfaces, replacing any current default that may be set to Chinese",
       "files": [
-        "frontend/src/components/PersonalCenter.tsx"
+        "frontend/src/hooks/useLanguage.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -15,7 +15,8 @@
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
         "github-export-icp-cli@1.0.0",
-        "http-outcalls@3.0.0"
+        "http-outcalls@3.0.0",
+        "stripe@3.0.0"
       ],
       "testIds": [
         "REQ-1"
@@ -23,10 +24,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-fix-the-delete-button-in-personalcenter-to-trigger-the-deletequestdialog-when-clicked-ensure-the-button-properly-opens-the-dialog-and-handles-the-deletion-flow",
-      "featureTitle": "Fix the Delete button (删除) in PersonalCenter to trigger the DeleteQuestDialog when clicked. Ensure the button properly opens the dialog and handles the deletion flow.",
+      "featureId": "feature-update-the-language-detection-logic-in-uselanguage-hook-to-prioritize-english-over-browser-language-preferences",
+      "featureTitle": "Update the language detection logic in useLanguage hook to prioritize English over browser language preferences",
       "files": [
-        "frontend/src/components/PersonalCenter.tsx"
+        "frontend/src/hooks/useLanguage.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -36,7 +37,8 @@
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
         "github-export-icp-cli@1.0.0",
-        "http-outcalls@3.0.0"
+        "http-outcalls@3.0.0",
+        "stripe@3.0.0"
       ],
       "testIds": [
         "REQ-2"
@@ -44,12 +46,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-visual-feedback-loading-states-disabled-states-or-click-animations-to-both-cancel-and-delete-buttons-during-processing-to-improve-user-experience-and-prevent-double-clicks",
-      "featureTitle": "Add visual feedback (loading states, disabled states, or click animations) to both Cancel and Delete buttons during processing to improve user experience and prevent double-clicks.",
+      "featureId": "feature-ensure-the-language-selection-screen-if-shown-on-first-visit-defaults-to-english-as-the-pre-selected-option",
+      "featureTitle": "Ensure the language selection screen (if shown on first visit) defaults to English as the pre-selected option",
       "files": [
-        "frontend/src/components/CancelQuestDialog.tsx",
-        "frontend/src/components/DeleteQuestDialog.tsx",
-        "frontend/src/components/PersonalCenter.tsx"
+        "frontend/src/components/LanguageSelection.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -59,7 +59,8 @@
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
         "github-export-icp-cli@1.0.0",
-        "http-outcalls@3.0.0"
+        "http-outcalls@3.0.0",
+        "stripe@3.0.0"
       ],
       "testIds": [
         "REQ-3"

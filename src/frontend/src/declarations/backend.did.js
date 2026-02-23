@@ -29,6 +29,27 @@ export const Difficulty = IDL.Variant({
   'hard' : IDL.Null,
   'medium' : IDL.Null,
 });
+export const ShoppingItem = IDL.Record({
+  'productName' : IDL.Text,
+  'currency' : IDL.Text,
+  'quantity' : IDL.Nat,
+  'priceInCents' : IDL.Nat,
+  'productDescription' : IDL.Text,
+});
+export const Cents = IDL.Nat;
+export const USD = IDL.Nat;
+export const CreateQuestRequest = IDL.Record({
+  'title' : IDL.Text,
+  'difficulty' : Difficulty,
+  'rewardCents' : Cents,
+  'description' : IDL.Text,
+  'rewardUSD' : USD,
+  'participantCount' : IDL.Opt(IDL.Nat),
+});
+export const RechargeDialogRequest = IDL.Record({
+  'amountCents' : Cents,
+  'amountUSD' : USD,
+});
 export const QuestStatus = IDL.Variant({
   'pendingVerification' : IDL.Null,
   'active' : IDL.Null,
@@ -39,7 +60,7 @@ export const QuestStatus = IDL.Variant({
 });
 export const BountyContribution = IDL.Record({
   'contributorId' : IDL.Principal,
-  'amountE8' : IDL.Nat64,
+  'amountCents' : IDL.Nat,
   'timestamp' : IDL.Int,
 });
 export const CheckInRecord = IDL.Record({
@@ -51,8 +72,8 @@ export const CheckInRecord = IDL.Record({
 export const QuestImmutable = IDL.Record({
   'status' : QuestStatus,
   'completedAt' : IDL.Opt(IDL.Int),
-  'depositAmount' : IDL.Nat64,
-  'reward' : IDL.Nat64,
+  'depositAmount' : IDL.Nat,
+  'reward' : IDL.Nat,
   'title' : IDL.Text,
   'hypeCount' : IDL.Nat,
   'difficulty' : Difficulty,
@@ -61,21 +82,28 @@ export const QuestImmutable = IDL.Record({
   'publisherId' : IDL.Principal,
   'dailyCheckIns' : IDL.Vec(CheckInRecord),
   'description' : IDL.Text,
+  'originalBountyAmountCents' : IDL.Nat,
   'warriorId' : IDL.Opt(IDL.Principal),
   'questId' : IDL.Nat,
   'participantCount' : IDL.Nat,
   'completionTarget' : IDL.Nat,
   'acceptedAt' : IDL.Opt(IDL.Int),
-  'originalBountyAmountE8' : IDL.Nat64,
   'currentStreak' : IDL.Nat,
   'depositRate' : IDL.Nat,
 });
 export const UserProfile = IDL.Record({
   'name' : IDL.Text,
-  'totalEarned' : IDL.Nat64,
+  'totalEarned' : IDL.Nat,
   'successfulQuests' : IDL.Nat,
-  'totalDeposited' : IDL.Nat64,
+  'totalDeposited' : IDL.Nat,
   'depositRate' : IDL.Nat,
+});
+export const StripeSessionStatus = IDL.Variant({
+  'completed' : IDL.Record({
+    'userPrincipal' : IDL.Opt(IDL.Text),
+    'response' : IDL.Text,
+  }),
+  'failed' : IDL.Record({ 'error' : IDL.Text }),
 });
 export const TransactionStatus = IDL.Variant({
   'pending' : IDL.Null,
@@ -84,6 +112,7 @@ export const TransactionStatus = IDL.Variant({
 });
 export const TransactionType = IDL.Variant({
   'deposit' : IDL.Null,
+  'serviceFee' : IDL.Null,
   'withdrawal' : IDL.Null,
   'taskPayment' : IDL.Null,
   'taskDeduction' : IDL.Null,
@@ -95,8 +124,30 @@ export const Transaction = IDL.Record({
   'status' : TransactionStatus,
   'transactionType' : TransactionType,
   'from' : IDL.Principal,
-  'amountE8' : IDL.Nat64,
+  'amountCents' : IDL.Nat,
   'timestamp' : IDL.Int,
+});
+export const StripeConfiguration = IDL.Record({
+  'allowedCountries' : IDL.Vec(IDL.Text),
+  'secretKey' : IDL.Text,
+});
+export const http_header = IDL.Record({
+  'value' : IDL.Text,
+  'name' : IDL.Text,
+});
+export const http_request_result = IDL.Record({
+  'status' : IDL.Nat,
+  'body' : IDL.Vec(IDL.Nat8),
+  'headers' : IDL.Vec(http_header),
+});
+export const TransformationInput = IDL.Record({
+  'context' : IDL.Vec(IDL.Nat8),
+  'response' : http_request_result,
+});
+export const TransformationOutput = IDL.Record({
+  'status' : IDL.Nat,
+  'body' : IDL.Vec(IDL.Nat8),
+  'headers' : IDL.Vec(http_header),
 });
 
 export const idlService = IDL.Service({
@@ -129,7 +180,7 @@ export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'abandonQuest' : IDL.Func([IDL.Nat], [], []),
   'acceptQuest' : IDL.Func([IDL.Nat], [], []),
-  'addToBounty' : IDL.Func([IDL.Nat, IDL.Nat64], [], []),
+  'addToBounty' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'createABQuest' : IDL.Func(
       [
@@ -137,16 +188,22 @@ export const idlService = IDL.Service({
         IDL.Text,
         IDL.Text,
         IDL.Text,
-        IDL.Nat64,
+        IDL.Nat,
         Difficulty,
         IDL.Opt(IDL.Nat),
       ],
       [IDL.Nat, IDL.Nat],
       [],
     ),
-  'createQuest' : IDL.Func(
-      [IDL.Text, IDL.Text, IDL.Nat64, Difficulty, IDL.Opt(IDL.Nat)],
-      [IDL.Nat],
+  'createCheckoutSession' : IDL.Func(
+      [IDL.Vec(ShoppingItem), IDL.Text, IDL.Text],
+      [IDL.Text],
+      [],
+    ),
+  'createQuest' : IDL.Func([CreateQuestRequest], [IDL.Nat], []),
+  'createStripeCheckoutSession' : IDL.Func(
+      [RechargeDialogRequest, IDL.Text, IDL.Text],
+      [IDL.Text],
       [],
     ),
   'deleteQuest' : IDL.Func([IDL.Nat], [IDL.Text], []),
@@ -160,6 +217,7 @@ export const idlService = IDL.Service({
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getMyAcceptedQuests' : IDL.Func([], [IDL.Vec(QuestImmutable)], ['query']),
   'getMyPostedBounties' : IDL.Func([], [IDL.Vec(QuestImmutable)], ['query']),
+  'getStripeSessionStatus' : IDL.Func([IDL.Text], [StripeSessionStatus], []),
   'getTransactionsView' : IDL.Func(
       [],
       [IDL.Vec(IDL.Tuple(IDL.Nat, Transaction))],
@@ -170,13 +228,26 @@ export const idlService = IDL.Service({
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
+  'getUserWalletBalance' : IDL.Func([], [IDL.Nat], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'isStripeConfigured' : IDL.Func([], [IDL.Bool], ['query']),
+  'recordSuccessfulRecharge' : IDL.Func(
+      [IDL.Nat, Cents, IDL.Principal],
+      [],
+      [],
+    ),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'setStripeConfiguration' : IDL.Func([StripeConfiguration], [], []),
   'submitCompletion' : IDL.Func([IDL.Nat], [], []),
   'submitDailyCheckIn' : IDL.Func(
       [IDL.Nat, IDL.Text, IDL.Opt(IDL.Text)],
       [],
       [],
+    ),
+  'transform' : IDL.Func(
+      [TransformationInput],
+      [TransformationOutput],
+      ['query'],
     ),
 });
 
@@ -204,6 +275,27 @@ export const idlFactory = ({ IDL }) => {
     'hard' : IDL.Null,
     'medium' : IDL.Null,
   });
+  const ShoppingItem = IDL.Record({
+    'productName' : IDL.Text,
+    'currency' : IDL.Text,
+    'quantity' : IDL.Nat,
+    'priceInCents' : IDL.Nat,
+    'productDescription' : IDL.Text,
+  });
+  const Cents = IDL.Nat;
+  const USD = IDL.Nat;
+  const CreateQuestRequest = IDL.Record({
+    'title' : IDL.Text,
+    'difficulty' : Difficulty,
+    'rewardCents' : Cents,
+    'description' : IDL.Text,
+    'rewardUSD' : USD,
+    'participantCount' : IDL.Opt(IDL.Nat),
+  });
+  const RechargeDialogRequest = IDL.Record({
+    'amountCents' : Cents,
+    'amountUSD' : USD,
+  });
   const QuestStatus = IDL.Variant({
     'pendingVerification' : IDL.Null,
     'active' : IDL.Null,
@@ -214,7 +306,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const BountyContribution = IDL.Record({
     'contributorId' : IDL.Principal,
-    'amountE8' : IDL.Nat64,
+    'amountCents' : IDL.Nat,
     'timestamp' : IDL.Int,
   });
   const CheckInRecord = IDL.Record({
@@ -226,8 +318,8 @@ export const idlFactory = ({ IDL }) => {
   const QuestImmutable = IDL.Record({
     'status' : QuestStatus,
     'completedAt' : IDL.Opt(IDL.Int),
-    'depositAmount' : IDL.Nat64,
-    'reward' : IDL.Nat64,
+    'depositAmount' : IDL.Nat,
+    'reward' : IDL.Nat,
     'title' : IDL.Text,
     'hypeCount' : IDL.Nat,
     'difficulty' : Difficulty,
@@ -236,21 +328,28 @@ export const idlFactory = ({ IDL }) => {
     'publisherId' : IDL.Principal,
     'dailyCheckIns' : IDL.Vec(CheckInRecord),
     'description' : IDL.Text,
+    'originalBountyAmountCents' : IDL.Nat,
     'warriorId' : IDL.Opt(IDL.Principal),
     'questId' : IDL.Nat,
     'participantCount' : IDL.Nat,
     'completionTarget' : IDL.Nat,
     'acceptedAt' : IDL.Opt(IDL.Int),
-    'originalBountyAmountE8' : IDL.Nat64,
     'currentStreak' : IDL.Nat,
     'depositRate' : IDL.Nat,
   });
   const UserProfile = IDL.Record({
     'name' : IDL.Text,
-    'totalEarned' : IDL.Nat64,
+    'totalEarned' : IDL.Nat,
     'successfulQuests' : IDL.Nat,
-    'totalDeposited' : IDL.Nat64,
+    'totalDeposited' : IDL.Nat,
     'depositRate' : IDL.Nat,
+  });
+  const StripeSessionStatus = IDL.Variant({
+    'completed' : IDL.Record({
+      'userPrincipal' : IDL.Opt(IDL.Text),
+      'response' : IDL.Text,
+    }),
+    'failed' : IDL.Record({ 'error' : IDL.Text }),
   });
   const TransactionStatus = IDL.Variant({
     'pending' : IDL.Null,
@@ -259,6 +358,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const TransactionType = IDL.Variant({
     'deposit' : IDL.Null,
+    'serviceFee' : IDL.Null,
     'withdrawal' : IDL.Null,
     'taskPayment' : IDL.Null,
     'taskDeduction' : IDL.Null,
@@ -270,8 +370,27 @@ export const idlFactory = ({ IDL }) => {
     'status' : TransactionStatus,
     'transactionType' : TransactionType,
     'from' : IDL.Principal,
-    'amountE8' : IDL.Nat64,
+    'amountCents' : IDL.Nat,
     'timestamp' : IDL.Int,
+  });
+  const StripeConfiguration = IDL.Record({
+    'allowedCountries' : IDL.Vec(IDL.Text),
+    'secretKey' : IDL.Text,
+  });
+  const http_header = IDL.Record({ 'value' : IDL.Text, 'name' : IDL.Text });
+  const http_request_result = IDL.Record({
+    'status' : IDL.Nat,
+    'body' : IDL.Vec(IDL.Nat8),
+    'headers' : IDL.Vec(http_header),
+  });
+  const TransformationInput = IDL.Record({
+    'context' : IDL.Vec(IDL.Nat8),
+    'response' : http_request_result,
+  });
+  const TransformationOutput = IDL.Record({
+    'status' : IDL.Nat,
+    'body' : IDL.Vec(IDL.Nat8),
+    'headers' : IDL.Vec(http_header),
   });
   
   return IDL.Service({
@@ -304,7 +423,7 @@ export const idlFactory = ({ IDL }) => {
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'abandonQuest' : IDL.Func([IDL.Nat], [], []),
     'acceptQuest' : IDL.Func([IDL.Nat], [], []),
-    'addToBounty' : IDL.Func([IDL.Nat, IDL.Nat64], [], []),
+    'addToBounty' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'createABQuest' : IDL.Func(
         [
@@ -312,16 +431,22 @@ export const idlFactory = ({ IDL }) => {
           IDL.Text,
           IDL.Text,
           IDL.Text,
-          IDL.Nat64,
+          IDL.Nat,
           Difficulty,
           IDL.Opt(IDL.Nat),
         ],
         [IDL.Nat, IDL.Nat],
         [],
       ),
-    'createQuest' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Nat64, Difficulty, IDL.Opt(IDL.Nat)],
-        [IDL.Nat],
+    'createCheckoutSession' : IDL.Func(
+        [IDL.Vec(ShoppingItem), IDL.Text, IDL.Text],
+        [IDL.Text],
+        [],
+      ),
+    'createQuest' : IDL.Func([CreateQuestRequest], [IDL.Nat], []),
+    'createStripeCheckoutSession' : IDL.Func(
+        [RechargeDialogRequest, IDL.Text, IDL.Text],
+        [IDL.Text],
         [],
       ),
     'deleteQuest' : IDL.Func([IDL.Nat], [IDL.Text], []),
@@ -335,6 +460,7 @@ export const idlFactory = ({ IDL }) => {
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getMyAcceptedQuests' : IDL.Func([], [IDL.Vec(QuestImmutable)], ['query']),
     'getMyPostedBounties' : IDL.Func([], [IDL.Vec(QuestImmutable)], ['query']),
+    'getStripeSessionStatus' : IDL.Func([IDL.Text], [StripeSessionStatus], []),
     'getTransactionsView' : IDL.Func(
         [],
         [IDL.Vec(IDL.Tuple(IDL.Nat, Transaction))],
@@ -345,13 +471,26 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
+    'getUserWalletBalance' : IDL.Func([], [IDL.Nat], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'isStripeConfigured' : IDL.Func([], [IDL.Bool], ['query']),
+    'recordSuccessfulRecharge' : IDL.Func(
+        [IDL.Nat, Cents, IDL.Principal],
+        [],
+        [],
+      ),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'setStripeConfiguration' : IDL.Func([StripeConfiguration], [], []),
     'submitCompletion' : IDL.Func([IDL.Nat], [], []),
     'submitDailyCheckIn' : IDL.Func(
         [IDL.Nat, IDL.Text, IDL.Opt(IDL.Text)],
         [],
         [],
+      ),
+    'transform' : IDL.Func(
+        [TransformationInput],
+        [TransformationOutput],
+        ['query'],
       ),
   });
 };

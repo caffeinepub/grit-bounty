@@ -10,6 +10,7 @@ import { Eye, Coins, Shield, Plus, Users, ChevronDown, TrendingUp } from 'lucide
 import { toast } from 'sonner';
 import DepositConfirmationDialog from './DepositConfirmationDialog';
 import AddBountyDialog from './AddBountyDialog';
+import { formatUSD, centsToUSD } from '../utils/formatters';
 import type { Identity } from '@dfinity/agent';
 
 interface QuestCardProps {
@@ -26,18 +27,17 @@ export default function QuestCard({ quest, userIdentity }: QuestCardProps) {
   const [showContributors, setShowContributors] = useState(false);
 
   const depositRate = userProfile ? Number(userProfile.depositRate) : 50;
-  const rewardPoolICP = Number(quest.reward) / 100000000;
+  const rewardPoolUSD = centsToUSD(quest.reward);
   const participantCount = Number(quest.participantCount);
-  const perWarriorReward = rewardPoolICP / participantCount;
+  const perWarriorReward = rewardPoolUSD / participantCount;
   const depositAmount = (perWarriorReward * depositRate) / 100;
 
   const isOwnQuest = userIdentity && quest.publisherId.toString() === userIdentity.getPrincipal().toString();
 
-  // Calculate original bounty and additional contributions
-  const originalBountyICP = Number(quest.originalBountyAmountE8) / 100000000;
+  const originalBountyUSD = centsToUSD(quest.originalBountyAmountCents);
   const additionalContributions = quest.bountyContributions || [];
-  const totalAdditionalICP = additionalContributions.reduce(
-    (sum, contrib) => sum + Number(contrib.amountE8) / 100000000,
+  const totalAdditionalUSD = additionalContributions.reduce(
+    (sum, contrib) => sum + centsToUSD(contrib.amountCents),
     0
   );
 
@@ -93,8 +93,8 @@ export default function QuestCard({ quest, userIdentity }: QuestCardProps) {
             </div>
             <div className="flex items-center gap-1 text-neon-magenta">
               <Coins className="h-4 w-4" />
-              <span className="font-semibold">{rewardPoolICP.toFixed(4)}</span>
-              <span className="text-muted-foreground">ICP</span>
+              <span className="font-semibold">${rewardPoolUSD.toFixed(2)}</span>
+              <span className="text-muted-foreground">USD</span>
             </div>
             <div className="flex items-center gap-1 text-neon-cyan">
               <Users className="h-4 w-4" />
@@ -103,17 +103,16 @@ export default function QuestCard({ quest, userIdentity }: QuestCardProps) {
             </div>
           </div>
 
-          {/* Bounty Breakdown */}
           <div className="space-y-2 p-3 rounded-lg bg-muted/30 border border-border/50">
             <div className="flex justify-between text-xs">
               <span className="text-muted-foreground">{t('bountyBoard.originalBounty')}</span>
-              <span className="font-medium">{originalBountyICP.toFixed(4)} ICP</span>
+              <span className="font-medium">${originalBountyUSD.toFixed(2)} USD</span>
             </div>
-            {totalAdditionalICP > 0 && (
+            {totalAdditionalUSD > 0 && (
               <>
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">{t('bountyBoard.additionalBounties')}</span>
-                  <span className="font-medium text-neon-cyan">+{totalAdditionalICP.toFixed(4)} ICP</span>
+                  <span className="font-medium text-neon-cyan">+${totalAdditionalUSD.toFixed(2)} USD</span>
                 </div>
                 {additionalContributions.length > 0 && (
                   <Collapsible open={showContributors} onOpenChange={setShowContributors}>
@@ -145,7 +144,7 @@ export default function QuestCard({ quest, userIdentity }: QuestCardProps) {
             <Shield className="h-4 w-4 text-neon-cyan shrink-0" />
             <div className="flex-1 text-xs">
               <span className="text-muted-foreground">{t('deposit.required')}: </span>
-              <span className="font-bold text-neon-cyan">{depositAmount.toFixed(4)} ICP</span>
+              <span className="font-bold text-neon-cyan">${depositAmount.toFixed(2)} USD</span>
               <span className="text-muted-foreground"> ({depositRate}%)</span>
             </div>
           </div>
@@ -201,16 +200,15 @@ export default function QuestCard({ quest, userIdentity }: QuestCardProps) {
   );
 }
 
-// Contributor item component with profile name fetching
-function ContributorItem({ contribution }: { contribution: { contributorId: any; amountE8: bigint; timestamp: bigint } }) {
+function ContributorItem({ contribution }: { contribution: { contributorId: any; amountCents: bigint; timestamp: bigint } }) {
   const { data: profile } = useGetUserProfile(contribution.contributorId);
-  const amountICP = Number(contribution.amountE8) / 100000000;
+  const amountUSD = centsToUSD(contribution.amountCents);
   const contributorName = profile?.name || contribution.contributorId.toString().slice(0, 10) + '...';
 
   return (
     <div className="flex justify-between items-center text-xs p-2 rounded bg-muted/50">
       <span className="text-muted-foreground truncate flex-1">{contributorName}</span>
-      <span className="font-medium text-neon-cyan ml-2">{amountICP.toFixed(4)} ICP</span>
+      <span className="font-medium text-neon-cyan ml-2">${amountUSD.toFixed(2)} USD</span>
     </div>
   );
 }

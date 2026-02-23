@@ -12,30 +12,19 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-const detectBrowserLanguage = (): Language => {
-  const browserLang = navigator.language.toLowerCase();
-  
-  if (browserLang.startsWith('zh')) {
-    if (browserLang.includes('tw') || browserLang.includes('hk') || browserLang.includes('hant')) {
-      return Language.TraditionalChinese;
-    }
-    return Language.SimplifiedChinese;
-  }
-  
-  return Language.English;
-};
-
 interface LanguageProviderProps {
   children: ReactNode;
 }
 
 export function LanguageProvider(props: LanguageProviderProps): React.ReactElement {
   const [language, setLanguageState] = useState<Language>(() => {
+    // Check localStorage first to respect user's explicit choice
     const stored = localStorage.getItem('language');
     if (stored && Object.values(Language).includes(stored as Language)) {
       return stored as Language;
     }
-    return detectBrowserLanguage();
+    // Default to English for new users
+    return Language.English;
   });
 
   useEffect(() => {

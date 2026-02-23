@@ -1,7 +1,29 @@
 import { TransactionType, TransactionStatus } from '../backend';
 
 /**
- * Format ICP amount from e8 (100000000 = 1 ICP) to human-readable string
+ * Format USD amount from cents to human-readable string with 2 decimal places
+ */
+export function formatUSD(amountCents: bigint): string {
+  const dollars = Number(amountCents) / 100;
+  return `$${dollars.toFixed(2)} USD`;
+}
+
+/**
+ * Format USD amount from cents to dollars (number)
+ */
+export function centsToUSD(amountCents: bigint): number {
+  return Number(amountCents) / 100;
+}
+
+/**
+ * Convert USD dollars to cents
+ */
+export function usdToCents(dollars: number): bigint {
+  return BigInt(Math.floor(dollars * 100));
+}
+
+/**
+ * @deprecated Use formatUSD instead - ICP currency has been replaced with USD
  */
 export function formatICPBalance(amountE8: bigint): string {
   const icp = Number(amountE8) / 100000000;
@@ -9,7 +31,7 @@ export function formatICPBalance(amountE8: bigint): string {
 }
 
 /**
- * Format ICP amount with unit
+ * @deprecated Use formatUSD instead - ICP currency has been replaced with USD
  */
 export function formatICPWithUnit(amountE8: bigint): string {
   return `${formatICPBalance(amountE8)} ICP`;
@@ -28,6 +50,10 @@ export function formatTransactionType(type: TransactionType, t: (key: string) =>
       return t('wallet.typeTaskPayment');
     case TransactionType.taskDeduction:
       return t('wallet.typeTaskDeduction');
+    case TransactionType.bountyContribution:
+      return t('wallet.typeBountyContribution');
+    case TransactionType.serviceFee:
+      return t('wallet.typeServiceFee');
     default:
       return String(type);
   }

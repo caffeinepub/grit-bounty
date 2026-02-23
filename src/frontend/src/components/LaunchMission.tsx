@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Rocket } from 'lucide-react';
 import { toast } from 'sonner';
 import PublishQuestConfirmationDialog from './PublishQuestConfirmationDialog';
+import { usdToCents } from '../utils/formatters';
 
 export default function LaunchMission() {
   const { t } = useLanguage();
@@ -60,13 +61,12 @@ export default function LaunchMission() {
       return;
     }
 
-    const rewardPoolE8s = BigInt(Math.floor(rewardAmount * 100000000));
+    const rewardPoolCents = usdToCents(rewardAmount);
 
-    // Store quest data and show confirmation dialog
     setPendingQuestData({
       title,
       description,
-      rewardPool: rewardPoolE8s,
+      rewardPool: rewardPoolCents,
       difficulty,
       participantCount: BigInt(participants),
     });
@@ -86,7 +86,6 @@ export default function LaunchMission() {
       });
       toast.success(t('launchMission.createSuccess') + ` (ID: ${questId})`);
       
-      // Reset form
       setTitle('');
       setDescription('');
       setRewardPool('');
@@ -94,7 +93,7 @@ export default function LaunchMission() {
       setParticipantCount('1');
       setPendingQuestData(null);
     } catch (error: any) {
-      throw error; // Let the dialog handle the error display
+      throw error;
     }
   };
 
@@ -156,14 +155,19 @@ export default function LaunchMission() {
 
             <div className="space-y-2">
               <Label htmlFor="rewardPool">{t('launchMission.rewardPool')}</Label>
-              <Input
-                id="rewardPool"
-                type="number"
-                step="0.0001"
-                value={rewardPool}
-                onChange={(e) => setRewardPool(e.target.value)}
-                placeholder={t('launchMission.rewardHint')}
-              />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                <Input
+                  id="rewardPool"
+                  type="number"
+                  step="0.01"
+                  value={rewardPool}
+                  onChange={(e) => setRewardPool(e.target.value)}
+                  placeholder={t('launchMission.rewardHint')}
+                  className="pl-7"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">USD</p>
             </div>
 
             <div className="space-y-2">

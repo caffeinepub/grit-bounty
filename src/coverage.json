@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-23T05:35:27.554Z",
+  "generatedAt": "2026-02-23T08:00:49.670Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -12,39 +12,35 @@
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Fix the Cancel Quest button (取消任务) in PersonalCenter to trigger the CancelQuestDialog when clicked. Ensure the button properly opens the dialog and handles the cancellation flow.",
+        "summary": "Change the default language selection to English for all application interfaces, replacing any current default that may be set to Chinese",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/PersonalCenter.tsx"
+          "frontend/src/hooks/useLanguage.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/PersonalCenter.tsx"
+          "frontend/src/hooks/useLanguage.ts"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Fix the Delete button (删除) in PersonalCenter to trigger the DeleteQuestDialog when clicked. Ensure the button properly opens the dialog and handles the deletion flow.",
+        "summary": "Update the language detection logic in useLanguage hook to prioritize English over browser language preferences",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/PersonalCenter.tsx"
+          "frontend/src/hooks/useLanguage.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/PersonalCenter.tsx"
+          "frontend/src/hooks/useLanguage.ts"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "Add visual feedback (loading states, disabled states, or click animations) to both Cancel and Delete buttons during processing to improve user experience and prevent double-clicks.",
+        "summary": "Ensure the language selection screen (if shown on first visit) defaults to English as the pre-selected option",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/PersonalCenter.tsx",
-          "frontend/src/components/CancelQuestDialog.tsx",
-          "frontend/src/components/DeleteQuestDialog.tsx"
+          "frontend/src/components/LanguageSelection.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/PersonalCenter.tsx",
-          "frontend/src/components/CancelQuestDialog.tsx",
-          "frontend/src/components/DeleteQuestDialog.tsx"
+          "frontend/src/components/LanguageSelection.tsx"
         ]
       }
     ]
@@ -54,11 +50,8 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/AbandonQuestDialog.tsx",
-    "frontend/src/components/CancelQuestDialog.tsx",
-    "frontend/src/components/DeleteQuestDialog.tsx",
-    "frontend/src/components/ExitQuestDialog.tsx",
-    "frontend/src/components/PersonalCenter.tsx",
+    "frontend/src/components/LanguageSelection.tsx",
+    "frontend/src/hooks/useLanguage.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

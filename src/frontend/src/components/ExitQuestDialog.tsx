@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Loader2, AlertCircle, Coins, LogOut, Users } from 'lucide-react';
 import { useExitQuest, useGetUserProfile } from '../hooks/useQueries';
+import { centsToUSD } from '../utils/formatters';
 
 interface ExitQuestDialogProps {
   open: boolean;
@@ -27,10 +28,12 @@ export default function ExitQuestDialog({ open, onOpenChange, quest }: ExitQuest
 
   if (!quest) return null;
 
-  const originalBountyICP = Number(quest.originalBountyAmountE8) / 100000000;
-  const totalContributionsICP =
-    quest.bountyContributions.reduce((sum, contrib) => sum + Number(contrib.amountE8), 0) / 100000000;
-  const refundAmountICP = originalBountyICP;
+  const originalBountyUSD = centsToUSD(quest.originalBountyAmountCents);
+  const totalContributionsUSD = quest.bountyContributions.reduce(
+    (sum, contrib) => sum + centsToUSD(contrib.amountCents),
+    0
+  );
+  const refundAmountUSD = originalBountyUSD;
 
   const handleConfirm = async () => {
     setError(null);
@@ -66,11 +69,11 @@ export default function ExitQuestDialog({ open, onOpenChange, quest }: ExitQuest
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">{t('exitQuest.originalBounty')}</span>
-              <span className="font-semibold">{originalBountyICP.toFixed(4)} ICP</span>
+              <span className="font-semibold">${originalBountyUSD.toFixed(2)} USD</span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">{t('exitQuest.contributions')}</span>
-              <span className="font-semibold text-neon-magenta">{totalContributionsICP.toFixed(4)} ICP</span>
+              <span className="font-semibold text-neon-magenta">${totalContributionsUSD.toFixed(2)} USD</span>
             </div>
           </div>
 
@@ -86,9 +89,9 @@ export default function ExitQuestDialog({ open, onOpenChange, quest }: ExitQuest
               <div className="space-y-1 max-h-32 overflow-y-auto">
                 {quest.bountyContributions.map((contrib, idx) => {
                   const contributorId = contrib.contributorId.toString();
-                  const amountICP = Number(contrib.amountE8) / 100000000;
+                  const amountUSD = centsToUSD(contrib.amountCents);
                   return (
-                    <ContributorRow key={idx} contributorId={contributorId} amountICP={amountICP} />
+                    <ContributorRow key={idx} contributorId={contributorId} amountUSD={amountUSD} />
                   );
                 })}
               </div>
@@ -102,7 +105,7 @@ export default function ExitQuestDialog({ open, onOpenChange, quest }: ExitQuest
             <span className="font-semibold text-green-400">{t('exitQuest.refundAmount')}</span>
             <span className="text-xl font-bold text-green-400 flex items-center gap-1">
               <Coins className="h-5 w-5" />
-              {refundAmountICP.toFixed(4)} ICP
+              ${refundAmountUSD.toFixed(2)} USD
             </span>
           </div>
 
@@ -150,7 +153,7 @@ export default function ExitQuestDialog({ open, onOpenChange, quest }: ExitQuest
   );
 }
 
-function ContributorRow({ contributorId, amountICP }: { contributorId: string; amountICP: number }) {
+function ContributorRow({ contributorId, amountUSD }: { contributorId: string; amountUSD: number }) {
   const { data: profile } = useGetUserProfile(contributorId as any);
 
   return (
@@ -158,7 +161,7 @@ function ContributorRow({ contributorId, amountICP }: { contributorId: string; a
       <span className="font-mono truncate max-w-[150px]">
         {profile?.name || `${contributorId.slice(0, 10)}...`}
       </span>
-      <span className="font-semibold text-neon-cyan">{amountICP.toFixed(4)} ICP</span>
+      <span className="font-semibold text-neon-cyan">${amountUSD.toFixed(2)} USD</span>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import { useInternetIdentity } from './useInternetIdentity';
-import { UserProfile, QuestImmutable, Difficulty, Transaction } from '../backend';
+import { UserProfile, QuestImmutable, Difficulty, Transaction, RechargeDialogRequest, CreateQuestRequest } from '../backend';
 import { Principal } from '@dfinity/principal';
 import { toast } from 'sonner';
 
@@ -36,25 +36,7 @@ export function useGetUserProfile(principal: Principal) {
     },
     enabled: !!actor && !actorFetching && !!principal,
     retry: false,
-    staleTime: 60000, // Cache for 1 minute
-  });
-}
-
-export function useGetWalletAddress() {
-  const { actor, isFetching: actorFetching } = useActor();
-  const { identity } = useInternetIdentity();
-
-  return useQuery<string | null>({
-    queryKey: ['walletAddress'],
-    queryFn: async () => {
-      if (!actor || !identity) throw new Error('Actor or identity not available');
-      // TODO: Backend needs to implement getWalletAddress() method
-      // For now, return a placeholder that shows the principal
-      const principal = identity.getPrincipal().toString();
-      return `Wallet address for ${principal.slice(0, 10)}...`;
-    },
-    enabled: !!actor && !actorFetching && !!identity,
-    retry: false,
+    staleTime: 60000,
   });
 }
 
@@ -66,12 +48,10 @@ export function useGetWalletBalance() {
     queryKey: ['walletBalance'],
     queryFn: async () => {
       if (!actor || !identity) throw new Error('Actor or identity not available');
-      // TODO: Backend needs to implement getWalletBalance() method
-      // For now, return a mock balance
-      return BigInt(1000000000); // 10 ICP mock balance
+      return actor.getUserWalletBalance();
     },
     enabled: !!actor && !actorFetching && !!identity,
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 30000,
     retry: false,
   });
 }
@@ -92,35 +72,6 @@ export function useGetTransactionHistory() {
   });
 }
 
-export function useWithdrawICP() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      destinationAddress,
-      amountE8,
-    }: {
-      destinationAddress: string;
-      amountE8: bigint;
-    }) => {
-      if (!actor) throw new Error('Actor not available');
-      // TODO: Backend needs to implement withdrawICP(destinationAddress, amountE8) method
-      // For now, throw an error indicating backend implementation is needed
-      throw new Error('Withdrawal functionality requires backend ICP Ledger integration');
-    },
-    onSuccess: () => {
-      toast.success('Withdrawal successful!');
-      queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
-      queryClient.invalidateQueries({ queryKey: ['transactionHistory'] });
-    },
-    onError: (error: Error) => {
-      console.error('Withdrawal failed:', error);
-      toast.error(error.message || 'Failed to process withdrawal');
-    },
-  });
-}
-
 export function useGetCallerBalance() {
   const { actor, isFetching: actorFetching } = useActor();
   const { identity } = useInternetIdentity();
@@ -129,10 +80,7 @@ export function useGetCallerBalance() {
     queryKey: ['callerBalance'],
     queryFn: async () => {
       if (!actor || !identity) throw new Error('Actor or identity not available');
-      const profile = await actor.getCallerUserProfile();
-      // For now, return a mock balance since backend doesn't have balance tracking yet
-      // In production, this would call a proper balance query method
-      return BigInt(1000000000); // 10 ICP mock balance
+      return actor.getUserWalletBalance();
     },
     enabled: !!actor && !actorFetching && !!identity,
     retry: false,
@@ -188,7 +136,18 @@ export function useCreateQuest() {
       participantCount?: bigint;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.createQuest(title, description, rewardPool, difficulty, participantCount || null);
+      
+      const rewardUSD = rewardPool / 100n;
+      const request: CreateQuestRequest = {
+        title,
+        description,
+        rewardUSD,
+        rewardCents: rewardPool,
+        difficulty,
+        participantCount: participantCount || undefined,
+      };
+      
+      return actor.createQuest(request);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
@@ -238,9 +197,9 @@ export function useAddBounty() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ questId, amountE8 }: { questId: bigint; amountE8: bigint }) => {
+    mutationFn: async ({ questId, amountCents }: { questId: bigint; amountCents: bigint }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.addToBounty(questId, amountE8);
+      return actor.addToBounty(questId, amountCents);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
@@ -302,7 +261,6 @@ export function useSubmitDailyCheckIn() {
       let photoUrl: string | null = null;
 
       if (photoFile) {
-        // Simulate upload progress
         if (onProgress) {
           onProgress(30);
           await new Promise(resolve => setTimeout(resolve, 100));
@@ -311,7 +269,6 @@ export function useSubmitDailyCheckIn() {
           onProgress(90);
         }
 
-        // Convert file to data URL for storage
         const reader = new FileReader();
         photoUrl = await new Promise<string>((resolve, reject) => {
           reader.onload = () => resolve(reader.result as string);
@@ -338,55 +295,13 @@ export function useDeleteQuest() {
 
   return useMutation({
     mutationFn: async (questId: bigint) => {
-      console.log('[useDeleteQuest] Mutation called with questId:', questId.toString());
-      if (!actor) {
-        console.error('[useDeleteQuest] Actor not available');
-        throw new Error('Actor not available');
-      }
-      console.log('[useDeleteQuest] Calling actor.deleteQuest...');
-      const result = await actor.deleteQuest(questId);
-      console.log('[useDeleteQuest] Backend returned:', result);
-      return result;
-    },
-    onMutate: (questId) => {
-      console.log('[useDeleteQuest] onMutate - Starting deletion for questId:', questId.toString());
-    },
-    onSuccess: (data, questId) => {
-      console.log('[useDeleteQuest] onSuccess - Quest deleted successfully:', questId.toString());
-      toast.success('Quest deleted successfully!');
-      queryClient.invalidateQueries({ queryKey: ['myPostedBounties'] });
-      queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
-      queryClient.invalidateQueries({ queryKey: ['callerBalance'] });
-      queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
-    },
-    onError: (error: Error, questId) => {
-      console.error('[useDeleteQuest] onError - Failed to delete quest:', questId.toString(), error);
-      toast.error(error.message || 'Failed to delete quest');
-    },
-  });
-}
-
-export function useCancelQuest() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (questId: bigint) => {
-      console.log('[useCancelQuest] Mutation called with questId:', questId.toString());
       if (!actor) throw new Error('Actor not available');
       return actor.deleteQuest(questId);
     },
     onSuccess: () => {
-      console.log('[useCancelQuest] Quest cancelled successfully');
-      toast.success('Quest cancelled successfully!');
       queryClient.invalidateQueries({ queryKey: ['myPostedBounties'] });
       queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
-      queryClient.invalidateQueries({ queryKey: ['callerBalance'] });
       queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
-    },
-    onError: (error: Error) => {
-      console.error('[useCancelQuest] Failed to cancel quest:', error);
-      toast.error(error.message || 'Failed to cancel quest');
     },
   });
 }
@@ -397,19 +312,12 @@ export function useExitQuest() {
 
   return useMutation({
     mutationFn: async (questId: bigint) => {
-      console.log('[useExitQuest] Mutation called with questId:', questId.toString());
       if (!actor) throw new Error('Actor not available');
       return actor.exitQuest(questId);
     },
     onSuccess: () => {
-      console.log('[useExitQuest] Quest exited successfully');
-      toast.success('Successfully exited quest');
       queryClient.invalidateQueries({ queryKey: ['myPostedBounties'] });
       queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
-    },
-    onError: (error: Error) => {
-      console.error('[useExitQuest] Failed to exit quest:', error);
-      toast.error(error.message || 'Failed to exit quest');
     },
   });
 }
@@ -420,39 +328,63 @@ export function useAbandonQuest() {
 
   return useMutation({
     mutationFn: async (questId: bigint) => {
-      console.log('[useAbandonQuest] Mutation called with questId:', questId.toString());
       if (!actor) throw new Error('Actor not available');
       return actor.abandonQuest(questId);
     },
     onSuccess: () => {
-      console.log('[useAbandonQuest] Quest abandoned successfully');
-      toast.success('Quest abandoned');
       queryClient.invalidateQueries({ queryKey: ['myAcceptedQuests'] });
       queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
     },
-    onError: (error: Error) => {
-      console.error('[useAbandonQuest] Failed to abandon quest:', error);
-      toast.error(error.message || 'Failed to abandon quest');
-    },
   });
 }
 
-export function useSubmitCompletion() {
+export function useCancelQuest() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (questId: bigint) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.submitCompletion(questId);
+      return actor.deleteQuest(questId);
     },
     onSuccess: () => {
-      toast.success('Quest completion submitted!');
-      queryClient.invalidateQueries({ queryKey: ['myAcceptedQuests'] });
+      queryClient.invalidateQueries({ queryKey: ['myPostedBounties'] });
+      queryClient.invalidateQueries({ queryKey: ['activeQuests'] });
+      queryClient.invalidateQueries({ queryKey: ['walletBalance'] });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Failed to submit completion');
+  });
+}
+
+export function useCreateStripeCheckoutSession() {
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async ({
+      request,
+      successUrl,
+      cancelUrl,
+    }: {
+      request: RechargeDialogRequest;
+      successUrl: string;
+      cancelUrl: string;
+    }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.createStripeCheckoutSession(request, successUrl, cancelUrl);
     },
+  });
+}
+
+export function useGetStripeSessionStatus(sessionId: string | null) {
+  const { actor, isFetching: actorFetching } = useActor();
+
+  return useQuery({
+    queryKey: ['stripeSessionStatus', sessionId],
+    queryFn: async () => {
+      if (!actor || !sessionId) throw new Error('Actor or session ID not available');
+      return actor.getStripeSessionStatus(sessionId);
+    },
+    enabled: !!actor && !actorFetching && !!sessionId,
+    retry: false,
   });
 }

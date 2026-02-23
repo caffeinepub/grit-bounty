@@ -1,12 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Fix non-responsive Cancel Quest (取消任务) and Delete (删除) buttons in the Personal Center so they properly trigger their respective confirmation dialogs.
+**Goal:** Set English as the default language for all UI content throughout the application.
 
 **Planned changes:**
-- Wire up the Cancel Quest button to open CancelQuestDialog when clicked
-- Wire up the Delete button to open DeleteQuestDialog when clicked
-- Add loading states and disable buttons during processing to prevent double-clicks
-- Ensure proper success/error feedback after actions complete
+- Change default language initialization to English in the language management logic
+- Update language detection to prioritize English over browser language preferences
+- Ensure language selection screen defaults to English as pre-selected option
+- Keep language switcher functionality intact for manual language changes
 
-**User-visible outcome:** Users can successfully cancel or delete quests from their Personal Center. Clicking the buttons opens confirmation dialogs, and visual feedback shows when actions are processing.
+**User-visible outcome:** Users will see all application interfaces in English by default on first visit, including the login screen, splash screen, and all navigation elements. The language can still be manually switched to Chinese if desired.

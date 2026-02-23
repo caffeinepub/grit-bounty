@@ -1,32 +1,36 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
-  "architectural_notes": [],
-  "known_issues": [
-    "Cancel task and delete buttons are not responding to clicks"
+  "summary": "Web application with English as default language for all UI content including login interface",
+  "architectural_notes": [
+    "Application uses English as default language",
+    "Wallet system displays USD currency",
+    "Stripe payment integration prepared (requires paid subscription to activate)"
   ],
-  "isFixRequest": true,
+  "known_issues": [
+    "Stripe functionality requires paid Caffeine subscription to activate"
+  ],
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-fix-the-cancel-quest-button-in-personalcenter-to-trigger-the-cancelquestdialog-when-clicked-ensure-the-button-properly-opens-the-dialog-and-handles-the-cancellation-flow",
-      "title": "Fix the Cancel Quest button (取消任务) in PersonalCenter to trigger the CancelQuestDialog when clicked. Ensure the button properly opens the dialog and handles the cancellation flow.",
+      "id": "feature-change-the-default-language-selection-to-english-for-all-application-interfaces-replacing-any-current-default-that-may-be-set-to-chinese",
+      "title": "Change the default language selection to English for all application interfaces, replacing any current default that may be set to Chinese",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-fix-the-delete-button-in-personalcenter-to-trigger-the-deletequestdialog-when-clicked-ensure-the-button-properly-opens-the-dialog-and-handles-the-deletion-flow",
-      "title": "Fix the Delete button (删除) in PersonalCenter to trigger the DeleteQuestDialog when clicked. Ensure the button properly opens the dialog and handles the deletion flow.",
+      "id": "feature-update-the-language-detection-logic-in-uselanguage-hook-to-prioritize-english-over-browser-language-preferences",
+      "title": "Update the language detection logic in useLanguage hook to prioritize English over browser language preferences",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-visual-feedback-loading-states-disabled-states-or-click-animations-to-both-cancel-and-delete-buttons-during-processing-to-improve-user-experience-and-prevent-double-clicks",
-      "title": "Add visual feedback (loading states, disabled states, or click animations) to both Cancel and Delete buttons during processing to improve user experience and prevent double-clicks.",
+      "id": "feature-ensure-the-language-selection-screen-if-shown-on-first-visit-defaults-to-english-as-the-pre-selected-option",
+      "title": "Ensure the language selection screen (if shown on first visit) defaults to English as the pre-selected option",
       "reqIds": [
         "REQ-3"
       ],
@@ -36,12 +40,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Fix cancel task and delete buttons to provide user feedback/response when clicked",
+      "summary": "Change default language to English for all UI content and login interface",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Fix non-responsive Cancel and Delete buttons in Personal Center",
+  "projectName": "Grit Bounty",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

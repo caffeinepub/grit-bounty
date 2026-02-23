@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Coins, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { formatUSD, centsToUSD, usdToCents } from '../utils/formatters';
 
 interface AddBountyDialogProps {
   open: boolean;
@@ -35,12 +36,12 @@ export default function AddBountyDialog({
   const { data: balance, isLoading: balanceLoading } = useGetCallerBalance();
   const { mutateAsync: addBounty, isPending } = useAddBounty();
 
-  const balanceICP = balance ? Number(balance) / 100000000 : 0;
-  const currentPoolICP = Number(currentRewardPool) / 100000000;
+  const balanceUSD = balance ? centsToUSD(balance) : 0;
+  const currentPoolUSD = centsToUSD(currentRewardPool);
   const contributionAmount = parseFloat(amount) || 0;
-  const newPoolICP = currentPoolICP + contributionAmount;
+  const newPoolUSD = currentPoolUSD + contributionAmount;
 
-  const hasInsufficientBalance = contributionAmount > balanceICP;
+  const hasInsufficientBalance = contributionAmount > balanceUSD;
   const isInvalidAmount = contributionAmount <= 0 || isNaN(contributionAmount);
 
   useEffect(() => {
@@ -63,8 +64,8 @@ export default function AddBountyDialog({
     }
 
     try {
-      const amountE8 = BigInt(Math.floor(contributionAmount * 100000000));
-      await addBounty({ questId, amountE8 });
+      const amountCents = usdToCents(contributionAmount);
+      await addBounty({ questId, amountCents });
       toast.success(t('addBounty.success'));
       onOpenChange(false);
     } catch (error: any) {
@@ -93,23 +94,26 @@ export default function AddBountyDialog({
           <div className="space-y-2">
             <Label className="text-sm text-muted-foreground">{t('addBounty.yourBalance')}</Label>
             <p className="text-lg font-bold text-neon-cyan">
-              {balanceLoading ? t('wallet.loadingBalance') : `${balanceICP.toFixed(4)} ICP`}
+              {balanceLoading ? t('wallet.loadingBalance') : formatUSD(balance || 0n)}
             </p>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="bounty-amount">{t('addBounty.amount')}</Label>
-            <Input
-              id="bounty-amount"
-              type="number"
-              step="0.0001"
-              min="0"
-              placeholder="0.0000"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="text-lg"
-              disabled={isPending}
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+              <Input
+                id="bounty-amount"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="text-lg pl-7"
+                disabled={isPending}
+              />
+            </div>
             {hasInsufficientBalance && contributionAmount > 0 && (
               <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/30">
                 <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
@@ -121,16 +125,16 @@ export default function AddBountyDialog({
           <div className="space-y-2 p-3 rounded-lg bg-muted/50">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">{t('addBounty.currentPool')}</span>
-              <span className="font-medium">{currentPoolICP.toFixed(4)} ICP</span>
+              <span className="font-medium">${currentPoolUSD.toFixed(2)} USD</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">{t('addBounty.yourContribution')}</span>
-              <span className="font-medium text-neon-cyan">+{contributionAmount.toFixed(4)} ICP</span>
+              <span className="font-medium text-neon-cyan">+${contributionAmount.toFixed(2)} USD</span>
             </div>
             <div className="h-px bg-border my-2" />
             <div className="flex justify-between text-sm font-bold">
               <span>{t('addBounty.newPool')}</span>
-              <span className="text-neon-cyan">{newPoolICP.toFixed(4)} ICP</span>
+              <span className="text-neon-cyan">${newPoolUSD.toFixed(2)} USD</span>
             </div>
           </div>
 

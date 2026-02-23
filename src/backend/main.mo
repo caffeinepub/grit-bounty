@@ -3,19 +3,24 @@ import Map "mo:core/Map";
 import List "mo:core/List";
 import Nat "mo:core/Nat";
 import Time "mo:core/Time";
-import Nat64 "mo:core/Nat64";
 import Int "mo:core/Int";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 import MixinStorage "blob-storage/Mixin";
 import Runtime "mo:core/Runtime";
-import ICP "mo:core/Nat64";
 
+import Stripe "stripe/stripe";
+import OutCall "http-outcalls/outcall";
 
 
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
+
+  type USD = Nat;
+  type Cents = Nat;
+
+  public type USDString = Text;
 
   public type TransactionType = {
     #deposit;
@@ -23,6 +28,7 @@ actor {
     #taskPayment;
     #taskDeduction;
     #bountyContribution;
+    #serviceFee;
   };
 
   public type TransactionStatus = {
@@ -48,7 +54,7 @@ actor {
 
   public type BountyContribution = {
     contributorId : Principal;
-    amountE8 : Nat64;
+    amountCents : Nat;
     timestamp : Int;
   };
 
@@ -67,10 +73,10 @@ actor {
     publisherId : Principal;
     warriorId : ?Principal;
     status : QuestStatus;
-    reward : Nat64;
-    originalBountyAmountE8 : Nat64;
+    reward : Nat;
+    originalBountyAmountCents : Nat;
     bountyContributions : List.List<BountyContribution>;
-    depositAmount : Nat64;
+    depositAmount : Nat;
     depositRate : Nat;
     createdAt : Int;
     acceptedAt : ?Int;
@@ -86,14 +92,14 @@ actor {
     questId : Nat;
     title : Text;
     description : Text;
-    reward : Nat64;
+    reward : Nat;
     difficulty : Difficulty;
     publisherId : Principal;
     warriorId : ?Principal;
     status : QuestStatus;
-    originalBountyAmountE8 : Nat64;
+    originalBountyAmountCents : Nat;
     bountyContributions : [BountyContribution];
-    depositAmount : Nat64;
+    depositAmount : Nat;
     depositRate : Nat;
     createdAt : Int;
     acceptedAt : ?Int;
@@ -109,9 +115,18 @@ actor {
     id : Nat;
     timestamp : Int;
     transactionType : TransactionType;
-    amountE8 : Nat64;
+    amountCents : Nat;
     from : Principal;
     to : Principal;
+    status : TransactionStatus;
+  };
+
+  public type RechargeRequest = {
+    amountUSD : USD;
+    amountCents : Cents;
+    stripeSessionId : Text;
+    userId : Principal;
+    initiatedAt : Int;
     status : TransactionStatus;
   };
 
@@ -119,54 +134,46 @@ actor {
     name : Text;
     successfulQuests : Nat;
     depositRate : Nat;
-    totalEarned : Nat64;
-    totalDeposited : Nat64;
+    totalEarned : Nat;
+    totalDeposited : Nat;
   };
 
   let userProfiles = Map.empty<Principal, UserProfile>();
-  let userBalances = Map.empty<Principal, Nat64>();
+  let userBalances = Map.empty<Principal, Nat>();
   let quests = Map.empty<Nat, Quest>();
   var nextQuestId = 1;
-  var systemBountyBalance : Nat64 = 0;
+  var systemBountyBalance : Nat = 0;
   var nextTransactionId = 0;
   let transactions = Map.empty<Nat, Transaction>();
+  let rechargeRequests = Map.empty<Nat, RechargeRequest>();
+
+  var stripeConfiguration : ?Stripe.StripeConfiguration = null;
 
   include MixinStorage();
 
-  private func getUserBalance(user : Principal) : Nat64 {
-    switch (userBalances.get(user)) {
-      case (null) { 0 };
-      case (?balance) { balance };
+  public query func isStripeConfigured() : async Bool {
+    stripeConfiguration != null;
+  };
+
+  public shared ({ caller }) func setStripeConfiguration(config : Stripe.StripeConfiguration) : async () {
+    if (not (AccessControl.isAdmin(accessControlState, caller))) {
+      Runtime.trap("Unauthorized: Only admins can perform this action");
+    };
+    stripeConfiguration := ?config;
+  };
+
+  func getStripeConfiguration() : Stripe.StripeConfiguration {
+    switch (stripeConfiguration) {
+      case (null) { Runtime.trap("Stripe needs to be first configured") };
+      case (?value) { value };
     };
   };
 
-  private func setUserBalance(user : Principal, balance : Nat64) {
-    userBalances.add(user, balance);
-  };
-
-  private func recordTransaction(txType : TransactionType, amount : Nat64, from : Principal, to : Principal, status : TransactionStatus) : Nat {
-    let txId = nextTransactionId;
-    nextTransactionId += 1;
-
-    let tx : Transaction = {
-      id = txId;
-      timestamp = Time.now();
-      transactionType = txType;
-      amountE8 = amount;
-      from;
-      to;
-      status;
-    };
-
-    transactions.add(txId, tx);
-    txId;
-  };
-
-  public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
+  public query ({ caller }) func getUserWalletBalance() : async Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can save profiles");
+      Runtime.trap("Unauthorized: Only users can view wallet balance");
     };
-    userProfiles.add(caller, profile);
+    getUserBalance(caller);
   };
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
@@ -183,17 +190,22 @@ actor {
     userProfiles.get(user);
   };
 
+  public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can save profiles");
+    };
+    userProfiles.add(caller, profile);
+  };
+
   public query ({ caller }) func getTransactionsView() : async [(Nat, Transaction)] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view transactions");
     };
 
-    // Admins can see all transactions
     if (AccessControl.isAdmin(accessControlState, caller)) {
       return transactions.toArray();
     };
 
-    // Regular users can only see their own transactions
     let userTransactions = transactions.filter(
       func(_, tx) {
         tx.from == caller or tx.to == caller
@@ -203,8 +215,6 @@ actor {
   };
 
   public query ({ caller }) func getActiveQuests(difficulty : ?Difficulty) : async [QuestImmutable] {
-    // Allow any authenticated user (including guests) to view active quests
-    // This is a public marketplace feature
     let filtered = switch (difficulty) {
       case (null) {
         quests.filter(func(_, quest) { quest.status == #active });
@@ -229,7 +239,7 @@ actor {
           publisherId = q.publisherId;
           warriorId = q.warriorId;
           status = q.status;
-          originalBountyAmountE8 = q.originalBountyAmountE8;
+          originalBountyAmountCents = q.originalBountyAmountCents;
           bountyContributions = q.bountyContributions.toArray();
           depositAmount = q.depositAmount;
           depositRate = q.depositRate;
@@ -268,7 +278,7 @@ actor {
           publisherId = q.publisherId;
           warriorId = q.warriorId;
           status = q.status;
-          originalBountyAmountE8 = q.originalBountyAmountE8;
+          originalBountyAmountCents = q.originalBountyAmountCents;
           bountyContributions = q.bountyContributions.toArray();
           depositAmount = q.depositAmount;
           depositRate = q.depositRate;
@@ -310,7 +320,7 @@ actor {
           publisherId = q.publisherId;
           warriorId = q.warriorId;
           status = q.status;
-          originalBountyAmountE8 = q.originalBountyAmountE8;
+          originalBountyAmountCents = q.originalBountyAmountCents;
           bountyContributions = q.bountyContributions.toArray();
           depositAmount = q.depositAmount;
           depositRate = q.depositRate;
@@ -329,22 +339,19 @@ actor {
 
   public type BountyTransaction = {
     contributorId : Principal;
-    amountE8 : Nat64;
+    amountCents : Nat;
     timestamp : Int;
   };
 
-  public shared ({ caller }) func addToBounty(questId : Nat, amountE8 : Nat64) : async () {
-    // Authorization: Only authenticated users can contribute
+  public shared ({ caller }) func addToBounty(questId : Nat, amountCents : Nat) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can contribute to bounties");
     };
 
-    // Validate amount
-    if (amountE8 == 0) {
+    if (amountCents == 0) {
       Runtime.trap("Contribution amount must be greater than zero");
     };
 
-    // Get quest and validate
     let quest = switch (quests.get(questId)) {
       case (null) { Runtime.trap("Quest not found") };
       case (?quest) { quest };
@@ -354,13 +361,10 @@ actor {
       Runtime.trap("Quest is not active");
     };
 
-    // Authorization: Prevent conflicts of interest
-    // Publisher cannot contribute to their own quest
     if (quest.publisherId == caller) {
       Runtime.trap("Unauthorized: Quest publisher cannot contribute to their own quest");
     };
 
-    // Warrior cannot contribute to quest they accepted
     switch (quest.warriorId) {
       case (?warriorId) {
         if (warriorId == caller) {
@@ -370,78 +374,81 @@ actor {
       case (null) {};
     };
 
-    // Validate user has sufficient balance
     let userBalance = getUserBalance(caller);
-    if (userBalance < amountE8) {
+    if (userBalance < amountCents) {
       Runtime.trap("Insufficient balance: User does not have enough funds");
     };
 
-    // Deduct from user's wallet
-    let newUserBalance = userBalance - amountE8;
+    let newUserBalance = userBalance - amountCents;
     setUserBalance(caller, newUserBalance);
 
-    // Create contribution record
     let bountyContribution : BountyContribution = {
       contributorId = caller;
-      amountE8;
+      amountCents;
       timestamp = Time.now();
     };
 
-    // Update quest with contribution
     let currentContributions = quest.bountyContributions.clone();
     currentContributions.add(bountyContribution);
     let updatedQuest : Quest = {
       quest with
       bountyContributions = currentContributions;
-      reward = quest.reward + amountE8;
+      reward = quest.reward + amountCents;
       hypeCount = quest.hypeCount + 1;
     };
 
     quests.add(questId, updatedQuest);
 
-    // Add to system escrow
-    systemBountyBalance += amountE8;
+    systemBountyBalance += amountCents;
 
-    // Record transaction
     let systemPrincipal = Principal.fromText("aaaaa-aa");
-    ignore recordTransaction(#bountyContribution, amountE8, caller, systemPrincipal, #success);
+    ignore recordTransaction(#bountyContribution, amountCents, caller, systemPrincipal, #success);
   };
 
-  public shared ({ caller }) func createQuest(title : Text, description : Text, reward : Nat64, difficulty : Difficulty, participantCount : ?Nat) : async Nat {
+  public type CreateQuestRequest = {
+    title : Text;
+    description : Text;
+    rewardUSD : USD;
+    rewardCents : Cents;
+    difficulty : Difficulty;
+    participantCount : ?Nat;
+  };
+
+  public shared ({ caller }) func createQuest(request : CreateQuestRequest) : async Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can create quests");
+      Runtime.trap(
+        "Unauthorized: Only users can create quests"
+      : Text
+      );
     };
 
-    if (reward == 0) {
+    if (request.rewardCents == 0) {
       Runtime.trap("Reward pool must be greater than zero");
     };
 
-    // Validate user has sufficient balance for initial bounty
     let userBalance = getUserBalance(caller);
-    if (userBalance < reward) {
+    if (userBalance < request.rewardCents) {
       Runtime.trap("Insufficient balance: User does not have enough funds to create quest");
     };
 
-    // Deduct initial bounty from user's wallet
-    let newUserBalance = userBalance - reward;
+    let newUserBalance = userBalance - request.rewardCents;
     setUserBalance(caller, newUserBalance);
 
-    // Add to system escrow
-    systemBountyBalance += reward;
+    systemBountyBalance += request.rewardCents;
 
     let questId = nextQuestId;
     nextQuestId += 1;
 
     let newQuest : Quest = {
       questId;
-      title;
-      description;
-      reward;
-      difficulty;
+      title = request.title;
+      description = request.description;
+      reward = request.rewardCents;
+      difficulty = request.difficulty;
       publisherId = caller;
       warriorId = null;
       status = #active;
-      originalBountyAmountE8 = reward;
+      originalBountyAmountCents = request.rewardCents;
       bountyContributions = List.empty<BountyContribution>();
       depositAmount = 0;
       depositRate = 50;
@@ -452,7 +459,7 @@ actor {
       dailyCheckIns = List.empty<CheckInRecord>();
       completionTarget = 21;
       currentStreak = 0;
-      participantCount = switch (participantCount) {
+      participantCount = switch (request.participantCount) {
         case (null) { 1 };
         case (?count) { count };
       };
@@ -460,9 +467,8 @@ actor {
 
     quests.add(questId, newQuest);
 
-    // Record transaction
     let systemPrincipal = Principal.fromText("aaaaa-aa");
-    ignore recordTransaction(#deposit, reward, caller, systemPrincipal, #success);
+    ignore recordTransaction(#deposit, request.rewardCents, caller, systemPrincipal, #success);
 
     questId;
   };
@@ -472,7 +478,7 @@ actor {
     descriptionA : Text,
     titleB : Text,
     descriptionB : Text,
-    reward : Nat64,
+    rewardCents : Nat,
     difficulty : Difficulty,
     participantCount : ?Nat,
   ) : async (Nat, Nat) {
@@ -480,23 +486,20 @@ actor {
       Runtime.trap("Unauthorized: Only users can create A/B quests");
     };
 
-    if (reward == 0) {
+    if (rewardCents == 0) {
       Runtime.trap("Reward pool must be greater than zero");
     };
 
-    let totalCost = reward * 2;
+    let totalCost = rewardCents * 2;
 
-    // Validate user has sufficient balance for both quests
     let userBalance = getUserBalance(caller);
     if (userBalance < totalCost) {
       Runtime.trap("Insufficient balance: User does not have enough funds to create A/B quests");
     };
 
-    // Deduct total cost from user's wallet
     let newUserBalance = userBalance - totalCost;
     setUserBalance(caller, newUserBalance);
 
-    // Add to system escrow
     systemBountyBalance += totalCost;
 
     let questIdA = nextQuestId;
@@ -514,12 +517,12 @@ actor {
       questId = questIdA;
       title = titleA;
       description = descriptionA;
-      reward;
+      reward = rewardCents;
       difficulty;
       publisherId = caller;
       warriorId = null;
       status = #active;
-      originalBountyAmountE8 = reward;
+      originalBountyAmountCents = rewardCents;
       bountyContributions = List.empty<BountyContribution>();
       depositAmount = 0;
       depositRate = 50;
@@ -537,12 +540,12 @@ actor {
       questId = questIdB;
       title = titleB;
       description = descriptionB;
-      reward;
+      reward = rewardCents;
       difficulty;
       publisherId = caller;
       warriorId = null;
       status = #active;
-      originalBountyAmountE8 = reward;
+      originalBountyAmountCents = rewardCents;
       bountyContributions = List.empty<BountyContribution>();
       depositAmount = 0;
       depositRate = 50;
@@ -559,7 +562,6 @@ actor {
     quests.add(questIdA, questA);
     quests.add(questIdB, questB);
 
-    // Record transaction
     let systemPrincipal = Principal.fromText("aaaaa-aa");
     ignore recordTransaction(#deposit, totalCost, caller, systemPrincipal, #success);
 
@@ -583,20 +585,17 @@ actor {
           case (null) {};
         };
 
-        // Authorization: Cannot accept your own quest
         if (quest.publisherId == caller) {
           Runtime.trap("Unauthorized: Cannot accept your own quest");
         };
 
-        let depositAmount = (quest.reward * Nat64.fromNat(quest.depositRate)) / (100 : Nat64);
+        let depositAmount = (quest.reward * quest.depositRate) / 100;
 
-        // Validate warrior has sufficient balance for deposit
         let warriorBalance = getUserBalance(caller);
         if (warriorBalance < depositAmount) {
           Runtime.trap("Insufficient balance: Warrior does not have enough funds for deposit");
         };
 
-        // Deduct deposit from warrior's wallet
         let newWarriorBalance = warriorBalance - depositAmount;
         setUserBalance(caller, newWarriorBalance);
 
@@ -610,7 +609,6 @@ actor {
 
         quests.add(questId, updatedQuest);
 
-        // Record transaction
         let systemPrincipal = Principal.fromText("aaaaa-aa");
         ignore recordTransaction(#deposit, depositAmount, caller, systemPrincipal, #success);
       };
@@ -628,7 +626,6 @@ actor {
         switch (quest.warriorId) {
           case (null) { Runtime.trap("Quest not yet accepted by any warrior") };
           case (?warriorId) {
-            // Authorization: Only the assigned warrior can submit check-ins
             if (warriorId != caller) {
               Runtime.trap("Unauthorized: You are not the warrior for this quest");
             };
@@ -672,7 +669,6 @@ actor {
         switch (quest.warriorId) {
           case (null) { Runtime.trap("Quest not yet accepted by any warrior") };
           case (?warriorId) {
-            // Authorization: Only the assigned warrior can submit completion
             if (warriorId != caller) {
               Runtime.trap("Unauthorized: You are not the warrior for this quest");
             };
@@ -715,12 +711,10 @@ actor {
           Runtime.trap("Quest cannot be deleted (already accepted by a warrior)");
         };
 
-        // Authorization: Only the publisher can delete their quest
         if (quest.publisherId != caller) {
           Runtime.trap("Unauthorized: Only the publisher can delete this quest");
         };
 
-        // Refund the original bounty to publisher
         let publisherBalance = getUserBalance(caller);
         setUserBalance(caller, publisherBalance + quest.reward);
 
@@ -728,7 +722,6 @@ actor {
 
         quests.remove(questId);
 
-        // Record refund transaction
         let systemPrincipal = Principal.fromText("aaaaa-aa");
         ignore recordTransaction(#withdrawal, quest.reward, systemPrincipal, caller, #success);
 
@@ -745,7 +738,6 @@ actor {
     switch (quests.get(questId)) {
       case (null) { Runtime.trap("Quest not found") };
       case (?quest) {
-        // Authorization: Only the quest publisher can exit
         if (quest.publisherId != caller) {
           Runtime.trap("Unauthorized: Only the quest publisher can exit");
         };
@@ -785,7 +777,6 @@ actor {
         switch (quest.warriorId) {
           case (null) { Runtime.trap("Invalid abandon action: No warrior assigned to quest yet") };
           case (?warriorId) {
-            // Authorization: Only the assigned warrior can abandon
             if (caller != warriorId) {
               Runtime.trap("Unauthorized: You are not the warrior for this quest");
             };
@@ -813,5 +804,87 @@ actor {
         };
       };
     };
+  };
+
+  private func getUserBalance(user : Principal) : Nat {
+    switch (userBalances.get(user)) {
+      case (null) { 0 };
+      case (?balance) { balance };
+    };
+  };
+
+  private func setUserBalance(user : Principal, balance : Nat) {
+    userBalances.add(user, balance);
+  };
+
+  private func recordTransaction(txType : TransactionType, amount : Nat, from : Principal, to : Principal, status : TransactionStatus) : Nat {
+    let txId = nextTransactionId;
+    nextTransactionId += 1;
+
+    let tx : Transaction = {
+      id = txId;
+      timestamp = Time.now();
+      transactionType = txType;
+      amountCents = amount;
+      from;
+      to;
+      status;
+    };
+
+    transactions.add(txId, tx);
+    txId;
+  };
+
+  private func toUSDAmount(cents : Nat) : USD {
+    Int.abs(cents) / 100;
+  };
+
+  public query func transform(input : OutCall.TransformationInput) : async OutCall.TransformationOutput {
+    OutCall.transform(input);
+  };
+
+  public func getStripeSessionStatus(sessionId : Text) : async Stripe.StripeSessionStatus {
+    await Stripe.getSessionStatus(getStripeConfiguration(), sessionId, transform);
+  };
+
+  public shared ({ caller }) func createCheckoutSession(items : [Stripe.ShoppingItem], successUrl : Text, cancelUrl : Text) : async Text {
+    await Stripe.createCheckoutSession(getStripeConfiguration(), caller, items, successUrl, cancelUrl, transform);
+  };
+
+  public type RechargeDialogRequest = {
+    amountUSD : USD;
+    amountCents : Cents;
+  };
+
+  public shared ({ caller }) func createStripeCheckoutSession(request : RechargeDialogRequest, successUrl : Text, cancelUrl : Text) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can create checkout sessions");
+    };
+
+    let items = [{
+      currency = "USD";
+      productName = "Balance recharge";
+      productDescription = "Monetize app exploration";
+      priceInCents = request.amountCents;
+      quantity = 1;
+    }];
+
+    await Stripe.createCheckoutSession(getStripeConfiguration(), caller, items, successUrl, cancelUrl, transform);
+  };
+
+  public shared ({ caller }) func recordSuccessfulRecharge(amountUSD : Nat, amountCents : Cents, userPrincipal : Principal) : async () {
+    if (not (AccessControl.isAdmin(accessControlState, caller))) {
+      Runtime.trap(
+        "Unauthorized: Only admins can trigger successful recharge"
+      : Text
+      );
+    };
+
+    let balance = getUserBalance(userPrincipal);
+    let newBalance = balance + amountCents;
+    setUserBalance(userPrincipal, newBalance);
+
+    let systemPrincipal = Principal.fromText("aaaaa-aa");
+    ignore recordTransaction(#deposit, amountCents, systemPrincipal, userPrincipal, #success);
   };
 };
